@@ -1,0 +1,19 @@
+body {
+        margin: 0px;
+        padding: 0px;
+		background:#607d8b;
+      }
+	  li {
+
+	 border: solid 1px;
+	background-color:#9e9e9e;
+    padding: 5px;
+    list-style: none;
+    font-family: trebuchet ms;
+
+
+    text-align: justify;
+    word-wrap:break-word;}
+	ul {margin:0;padding:0;}
+	input {margin:10px;}
+	pre {border: solid 1px;}

@@ -1,30 +1,11 @@
 <!DOCTYPE HTML>
 <html>
   <head>
-    <style>
-      body {
-        margin: 0px;
-        padding: 0px;
-		background:#607d8b;
-      }
-	  li {
-
-	 border: solid 1px;
-	background-color:#9e9e9e;
-    padding: 5px;
-    list-style: none;
-    font-family: trebuchet ms;
-
-
-    text-align: justify;
-    word-wrap:break-word;}
-	ul {margin:0;padding:0;}
-	input {margin:10px;}
-	pre {border: solid 1px;}
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+	<script src="js/AmigaFontEditor.js"></script>
   </head>
   <body>
-	<a href="https://github.com/you"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
 
 	<div id="content" style="padding:50px">
 		<h2>Amiga font editor</h2>
@@ -33,6 +14,8 @@
 			<input type=button id=showbin value="Show Binary">
 			<input type=button id=showhex value="Show Hex">
 			<input type=button id=calculate value="Generate Raw File">
+			<input type="button" value="Import from raw file" onclick="document.getElementById('fileChooser').click();" />
+			<input type="file" id="fileChooser" style="display:none;">
 			<p>
 				<pre id=resultpre style="display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:500px;"></pre>
 			</p>
@@ -53,308 +36,12 @@
 	  // Create list of characters
 	  var charset = [];
 
-	  for (var i = 32; i <= 126; i++) {
+	  for (var i = 32; i <= 127; i++) {
    		charset.push(i);
 	  }
 
 	  var table=createFontTable(charset);
 	  table.createList(document.getElementById("fonttable"));
-
-	  //var fontsCharacters = [' ','"','A'];
-
-	  /*fontsCharacters.forEach(function(element) {
-    		console.log(element);
-		});*/
-
-	  // Create font object
-	  /*var fontArray = [];
-	  var fontObj = createFontObj(SQUARE_PIXELS,XRES,YRES,document.getElementById('spacefont'));
-	  fontObj.createCanvas();
-	  fontArray.push(fontObj);
-
-	  fontObj = createFontObj(SQUARE_PIXELS,XRES,YRES,document.getElementById('!font'));
-	  fontObj.createCanvas();
-	  fontArray.push(fontObj);
-
-	  fontObj = createFontObj(SQUARE_PIXELS,XRES,YRES,document.getElementById('"font'));
-	  fontObj.createCanvas();
-	  fontArray.push(fontObj);*/
-
-
-	function createFontTable(characters,parent)
-	{
-		return {
-			characters:characters,
-			fontArray:[],
-			createList: function (parent) {
-				var fontArray=[];
-				this.characters.forEach(function(element) {
-    				console.log(String.fromCharCode(element));
-				
-	  				var li = document.createElement("li");
-					var p = document.createElement("p");
-					var oTxt = document.createTextNode("Font: `"+String.fromCharCode(element)+"' Ascii code: "+element);
-
-					p.appendChild(oTxt);
-	  				li.appendChild(p);
-					
-	  				parent.appendChild(li);
-					var fontObj = createFontObj(SQUARE_PIXELS,XRES,YRES,li);
-	  				fontObj.createCanvas();
-	  				fontArray.push(fontObj);
-				});
-				this.fontArray=fontArray;
-				return;
-			}
-		};
-	}
-
-	function createFontObj(square_pixels,xres,yres,parentObject)
-	{
-		return { 
-			square_pixels:square_pixels,
-			xres:xres,
-			yres:yres,
-			canvas:undefined,
-			context:undefined,
-			squaresObjs:[],
-			createCanvas: function () {
-				canvas = document.createElement('canvas');
-	  			canvas.width  = square_pixels*xres;
-	  			canvas.height = square_pixels*yres;
-				this.canvas = canvas;
-	  			parentObject.appendChild(canvas);
-
-				// Create clear button
-				var p = document.createElement("p");
-				var clearBtn = document.createElement("BUTTON");
-				var clearTxt = document.createTextNode("Clear");
-				clearBtn.appendChild(clearTxt);
-				p.appendChild(clearBtn);
-				parentObject.appendChild(p);
-
-				context = canvas.getContext('2d');
-				canvas.data = this;
-				clearBtn.data = this;
-
-				for (ysquarecont=0;ysquarecont<YRES;ysquarecont++)
-					for (xsquarecont=0;xsquarecont<XRES;xsquarecont++)
-					{
-						var square = createSquareObj(context,xsquarecont,ysquarecont);
-						square.draw();
-						this.squaresObjs.push(square);
-	  				}
-				canvas.addEventListener("mousemove",function(e){
-				   	var pos = this.data.findPos(this);
-					var x = e.pageX - pos.x;
-					var y = e.pageY - pos.y;
-					var coord = "x=" + x + ", y=" + y;
-					var c = this.getContext('2d');
-					var p = c.getImageData(x, y, 1, 1).data; 
-					var hex = "#" + ("000000" + this.data.rgbToHex(p[0], p[1], p[2])).slice(-6);
-					//console.log(coord);
-					//console.log(hex);
-					square_selected=this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
-					other_squares=this.data.getOtherSquares(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
-					// On hover i fill the square					
-					square_selected.fill();
-					for (var i = 0; i < other_squares.length; i++) {
-						if (other_squares[i].pixel_clicked==false) other_squares[i].unfill();
-					}
-				});
-				// On mouse exit canvas unfill all non clicked squares
-				canvas.addEventListener("mouseout",function(e){
-					//this.data.clearAllSquares();
-					all_squares=this.data.getAllSquares();
-					for (var i = 0; i < all_squares.length; i++) {
-						if (all_squares[i].pixel_clicked==false) all_squares[i].unfill();
-					}
-				});
-				canvas.addEventListener("click",function(e){
-					var pos = this.data.findPos(this);
-					var x = e.pageX - pos.x;
-					var y = e.pageY - pos.y;
-					square_selected=this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
-					square_selected.storeClick();
-				});
-
-				// Handler for clearing image at button press
-				clearBtn.addEventListener("click",function(e){
-					this.data.clearAllSquares();
-				});
-			},
-			printSquareInfo: function (x,y)
-			{
-				console.log("square infooooooo"+x);
-			},
-			// Get a square object from a coordinate pair
-			getSquare: function (x,y)
-			{
-				for (var i = 0; i < this.squaresObjs.length; i++) {
-					if (this.squaresObjs[i].x==x && this.squaresObjs[i].y==y )
-						return this.squaresObjs[i];
-				}
-			},
-			// Get all squares not matching the coordinate given
-			getOtherSquares: function (x,y)
-			{
-				var res = [];
-				for (var i = 0; i < this.squaresObjs.length; i++) {
-					if (this.squaresObjs[i].x!=x || this.squaresObjs[i].y!=y )
-						res.push(this.squaresObjs[i]);
-				}
-				return res;
-			},
-			getAllSquares: function ()
-			{
-				return this.squaresObjs;
-			},
-			clearAllSquares: function ()
-			{
-				for (var i = 0; i < this.squaresObjs.length; i++) {
-					this.squaresObjs[i].unfill();
-				}
-			},
-			// Get a string representing binary data of the image
-			getBinaryDataString: function () {
-				var res="";
-				for (var i = 0; i < this.squaresObjs.length; i++) {
-					if (this.squaresObjs[i].pixel_clicked) res+="1";
-					else								   res+="0";
-				}
-				return res;
-			},
-			// Get a UInt8Array of the image
-			getBinaryData: function () {
-				var resIndex=0;
-				var byteIndex=7;
-				var res = new Uint8Array(this.xres*this.yres/8);
-				
-				for (var i = 0; i < this.squaresObjs.length; i++) {
-					var temp=0;
-					if (this.squaresObjs[i].pixel_clicked==true)
-						temp=Math.pow(2, byteIndex);
-					res[resIndex]+=temp;
-					if (byteIndex==0){ byteIndex=7; resIndex++; }
-					else byteIndex--;
-				}
-				return res;
-			},
-			// Find mouse position inside canvas
-			findPos: function (obj) {
-				var curleft = 0, curtop = 0;
-				if (obj.offsetParent) {
-					do {
-						curleft += obj.offsetLeft;
-						curtop += obj.offsetTop;
-					} while (obj = obj.offsetParent);
-					return { x: curleft, y: curtop };
-				}
-				return undefined;
-			},
-			rgbToHex : function (r,g,b) {
-				if (r > 255 || g > 255 || b > 255)
-					throw "Invalid color component";
-				return ((r << 16) | (g << 8) | b).toString(16);
-			},
-			getHexDataString: function () {
-				var s = this.getBinaryDataString();
-				var i, k, part, accum, ret = '';
-				for (i = s.length-1; i >= 3; i -= 4) {
-					// extract out in substrings of 4 and convert to hex
-					part = s.substr(i+1-4, 4);
-					accum = 0;
-					for (k = 0; k < 4; k += 1) {
-						if (part[k] !== '0' && part[k] !== '1') {
-						    // invalid character
-						    return { valid: false };
-						}
-						// compute the length 4 substring
-						accum = accum * 2 + parseInt(part[k], 10);
-					}
-					if (accum >= 10) {
-						// 'A' to 'F'
-						ret = String.fromCharCode(accum - 10 + 'A'.charCodeAt(0)) + ret;
-					} else {
-						// '0' to '9'
-						ret = String(accum) + ret;
-					}
-				}
-				// remaining characters, i = 0, 1, or 2
-				if (i >= 0) {
-					accum = 0;
-					// convert from front
-					for (k = 0; k <= i; k += 1) {
-						if (s[k] !== '0' && s[k] !== '1') {
-						    return { valid: false };
-						}
-						accum = accum * 2 + parseInt(s[k], 10);
-					}
-					// 3 bits, value cannot exceed 2^3 - 1 = 7, just convert
-					ret = String(accum) + ret;
-				}
-				//return { valid: true, result: ret };
-				return ret;
-			}
-
-
-		};
-	}
-
-	// Function to create a square (single pixel within a canvas
-	function createSquareObj(context,x,y)
-	{
-		return {
-			context: context,
-    		x: x,
-    		y: y,
-			pixel_clicked: false,  // If true the pixel has been clicked
-			pixel_filled: false,   // If true the pixel has been filled (this occurs whether the pixel has been click or the mouse pointer is hovering on it
-			checked: false,
-    		getInfo: function () {
-        		return ' apple';
-    		},
-			draw: function () {
-				context.beginPath();
-				context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
-				context.fillStyle = 'white';
-				context.fill();
-				context.lineWidth = 1;
-				context.strokeStyle = 'black';
-				context.stroke();
-			},
-			//Fill the square with black
-			fill: function () {
-				if (this.pixel_filled==true) return ;
-				context.beginPath();
-				context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
-				context.fillStyle = 'black';
-				context.fill();
-				context.lineWidth = 1;
-				context.strokeStyle = 'black';
-				context.stroke();
-				this.pixel_filled=true;
-			},
-			// Fill the square with white
-			unfill: function () {
-				if (this.pixel_filled==false) return ;
-				context.beginPath();
-				context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
-				context.fillStyle = 'white';
-				context.fill();
-				context.lineWidth = 1;
-				context.strokeStyle = 'black';
-				context.stroke();
-				this.pixel_filled=false;
-			},
-			// Change the state of the square
-			storeClick() {
-				this.pixel_clicked=!this.pixel_clicked;
-				if (this.pixel_clicked==true)	this.fill();
-				else							this.unfill();
-			}
-		};
-	}
 
 	var calculate = document.getElementById('calculate');
 	calculate.onclick = function() {
@@ -376,9 +63,9 @@
 			offset+=sampleBytes.length;
 			console.log(binaryData);
 		}
-		//console.log(binaryData);
-		
-		saveByteArray([binaryData], 'example.fnt');
+		var fileName = prompt("Please enter the name of your export file", "Myfonts.fnt");
+		if (fileName)
+			saveByteArray([binaryData], fileName);
 	};
 
 	var showbin=document.getElementById('showbin');
@@ -442,6 +129,45 @@
 
 		return ret
    };
+
+	document.querySelector("#fileChooser").addEventListener('change',filesChosen, false);
+	function filesChosen(evt){
+		var chosenFile = evt.target.files[0]; //get the first file in the FileList
+		var fileName = chosenFile.name; //the name of the file as a string
+		var fileSize = chosenFile.size; //the size of the file in bytes, as an integer
+		var fileModifiedDate = chosenFile.lastModifiedDate; //a Date object
+		console.log(chosenFile);
+		reader = new FileReader();
+		//reader.addEventListener("load", readFile, false);
+		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
+		reader.onloadend = function () {
+			console.log(reader.result);
+			var view   = new Uint8Array(reader.result);
+			//console.log(view);
+			var fontCounter=0;
+			var bitCounter=0;
+			var bitArray = [];
+			for (var i=0;i<view.length;i++)
+			{
+				//console.log(i+"-"+view[i]);
+				var arrayConverter = [];
+				for (bytevalue=view[i],j=0;j<8;j++)
+				{
+					//console.log(i+"-"+j+"-"+bytevalue+"--->"+bytevalue%2);
+					//bitArray[bitCounter]=bytevalue%2;
+					arrayConverter.push(bytevalue%2);
+					bitCounter++;
+					
+					bytevalue=Math.floor(bytevalue/2);
+				}
+				arrayConverter=arrayConverter.reverse();
+				bitArray=bitArray.concat(arrayConverter);
+				if (bitCounter>=XRES*YRES){ table.fontArray[fontCounter].setSquares(bitArray);bitCounter=0;bitArray = [];fontCounter++; }
+			}
+		  }
+
+	}
+
 	
     </script>
   </body>
