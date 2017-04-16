@@ -66,10 +66,11 @@
 					var coord = "x=" + x + ", y=" + y;
 					var c = this.getContext('2d');
 					var p = c.getImageData(x, y, 1, 1).data; 
-					var hex = "#" + ("000000" + this.data.rgbToHex(p[0], p[1], p[2])).slice(-6);
+					//var hex = "#" + ("000000" + this.data.rgbToHex(p[0], p[1], p[2])).slice(-6);
 					//console.log(coord);
 					//console.log(hex);
 					square_selected=this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
+					if (square_selected==undefined) return; 
 					other_squares=this.data.getOtherSquares(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
 					// On hover i fill the square					
 					square_selected.fill();
@@ -97,10 +98,6 @@
 				clearBtn.addEventListener("click",function(e){
 					this.data.clearAllSquares();
 				});
-			},
-			printSquareInfo: function (x,y)
-			{
-				console.log("square infooooooo"+x);
 			},
 			// Get a square object from a coordinate pair
 			getSquare: function (x,y)
@@ -214,13 +211,19 @@
 
 			// Function to set squares status according to a binaryData array, this array must be made by 0 or 1 only and his length must match the font resolution
 			setSquares : function (binaryData) {
-				console.log(binaryData);
+				//console.log(binaryData);
 				if (binaryData.length!=this.squaresObjs.length) return ;
 				for (var i = 0; i < this.squaresObjs.length; i++) {
 					if (binaryData[i]==0)
+					{
 						this.squaresObjs[i].unfill();
+						this.squaresObjs[i].pixel_clicked=false;
+					}
 					else
+					{
 						this.squaresObjs[i].fill();
+						this.squaresObjs[i].pixel_clicked=true;
+					}				
 				}
 			}
 
@@ -236,7 +239,6 @@
     		y: y,
 			pixel_clicked: false,  // If true the pixel has been clicked
 			pixel_filled: false,   // If true the pixel has been filled (this occurs whether the pixel has been click or the mouse pointer is hovering on it
-			checked: false,
     		getInfo: function () {
         		return ' apple';
     		},

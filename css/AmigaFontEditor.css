@@ -17,3 +17,4 @@ body {
 	ul {margin:0;padding:0;}
 	input {margin:10px;}
 	pre {border: solid 1px;}
+	canvas {cursor:pointer;};
