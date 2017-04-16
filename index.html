@@ -135,7 +135,7 @@
 		//reader.addEventListener("load", readFile, false);
 		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
 		reader.onloadend = function () {
-			console.log(reader.result);
+			//console.log(reader.result);
 			var view   = new Uint8Array(reader.result);
 			//console.log(view);
 			var fontCounter=0;
@@ -158,6 +158,7 @@
 				bitArray=bitArray.concat(arrayConverter);
 				if (bitCounter>=XRES*YRES){ table.fontArray[fontCounter].setSquares(bitArray);bitCounter=0;bitArray = [];fontCounter++; }
 			}
+			alert('File loaded succesfully');
 		  }
 
 	}
