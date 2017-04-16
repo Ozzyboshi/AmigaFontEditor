@@ -9,12 +9,12 @@
 
 	<div id="content" style="padding:50px">
 		<h2>Amiga font editor</h2>
-		<h4>Draw your fonts on the left grids and get the raw data to load into the Amiga copperlist</h4>
+		<h4>Draw your fonts on the left grids and get the binary raw data to load into the Amiga copperlist</h4>
 		<div id=result style="position:fixed;right:100px;width:600px;height:600px;background:white;border: solid 1px;top:100px;border: solid 10px;">
 			<input type=button id=showbin value="Show Binary">
 			<input type=button id=showhex value="Show Hex">
 			<input type=button id=calculate value="Generate Raw File">
-			<input type="button" value="Import from raw file" onclick="document.getElementById('fileChooser').click();" />
+			<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
 			<input type="file" id="fileChooser" style="display:none;">
 			<p>
 				<pre id=resultpre style="display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:500px;"></pre>
