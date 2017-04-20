@@ -10,19 +10,32 @@
 	<div id="content" style="padding:50px">
 		<h2>Amiga font editor</h2>
 		<h4>Draw your fonts on the left grids and get the binary raw data to load into the Amiga copperlist</h4>
-		<div id=result style="position:fixed;right:100px;width:600px;height:600px;background:white;border: solid 1px;top:100px;border: solid 10px;">
+		<div id=result style="">
+			<div id="buttondiv">
 			<input type=button id=showbin value="Show Binary">
 			<input type=button id=showhex value="Show Hex">
 			<input type=button id=calculate value="Generate Raw File">
 			<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
 			<input type="file" id="fileChooser" style="display:none;">
-			<p>
-				<pre id=resultpre style="display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:500px;"></pre>
-			</p>
+			</div>
+			
+			<ul id="colorslist">
+				<li><input type=color id="color0" value="#ffffff">Color 0</li>
+				<li><input type=color id="color1" value="#ff0000">Color 1</li>
+				<li><input type=color id="color2" value="#00ff00">Color 2</li>
+				<li><input type=color id="color3" value="#0000ff">Color 3</li>
+				<li><input type=color id="color4" value="#000000">Color 4</li>
+				<li><input type=color id="color5" value="#ff00ff">Color 5</li>
+			</ul>
+			
+			<pre id="resultpre"></pre>
+		
+			
 		</div>
-		<ul id=fonttable></ul>
+		<ul id="fonttable"></ul>
 	</div>
     <script>
+      var NUMBITPLANES=6;
       var SQUARE_PIXELS = 10;
 	  var XRES = 8;
 	  var YRES = 8;
@@ -36,6 +49,14 @@
 
 	  var table=createFontTable(charset);
 	  table.createList(document.getElementById("fonttable"));
+
+	  for (i=0;i<NUMBITPLANES;i++) document.querySelectorAll("#colorslist > li")[i].addEventListener('click',handleChangeColor, false);
+	  function handleChangeColor(event) { 
+	  for (i=0;i<NUMBITPLANES;i++)
+	  	document.querySelectorAll("#colorslist > li")[i].style.background='#9e9e9e';
+	  this.style.backgroundColor  = 'red';
+
+	}
 
 	var calculate = document.getElementById('calculate');
 	calculate.onclick = function() {
