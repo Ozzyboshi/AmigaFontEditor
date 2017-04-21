@@ -10,23 +10,54 @@
 	<div id="content" style="padding:50px">
 		<h2>Amiga font editor</h2>
 		<h4>Draw your fonts on the left grids and get the binary raw data to load into the Amiga copperlist</h4>
-		<div id=result style="">
+		<div id="colorpalette">
+			<input type="file" id="fileChooser" style="display:none;">
+			<input id="nbitplanes" type="range" min="1" max="5" step="1" value="5" /><a id="bitplaneslabel">Bitplanes :5</a>
+			<ul id="colorslist">
+				<li><input type=color id="color0" value="#ffffff">Color 00</li>
+				<li><input type=color id="color1" value="#ff0000">Color 01</li>
+				<li><input type=color id="color2" value="#00ff00">Color 02</li>
+				<li><input type=color id="color3" value="#0000ff">Color 03</li>
+				<li><input type=color id="color4" value="#000000">Color 04</li>
+				<li><input type=color id="color5" value="#ff00ff">Color 05</li>
+				<li><input type=color id="color6" value="#ff00ff">Color 06</li>
+				<li><input type=color id="color7" value="#ff00ff">Color 07</li>
+				<li><input type=color id="color8" value="#ff00ff">Color 08</li>
+				<li><input type=color id="color9" value="#ff00ff">Color 09</li>
+				<li><input type=color id="color10" value="#ff00ff">Color 10</li>
+				<li><input type=color id="color11" value="#ff00ff">Color 11</li>
+				<li><input type=color id="color12" value="#ff00ff">Color 12</li>
+				<li><input type=color id="color13" value="#ff00ff">Color 13</li>
+				<li><input type=color id="color14" value="#ff00ff">Color 14</li>
+				<li><input type=color id="color15" value="#ff00ff">Color 15</li>
+				<li><input type=color id="color16" value="#ff00ff">Color 16</li>
+				<li><input type=color id="color17" value="#ff00ff">Color 17</li>
+				<li><input type=color id="color18" value="#ff00ff">Color 18</li>
+				<li><input type=color id="color19" value="#ff00ff">Color 19</li>
+				<li><input type=color id="color20" value="#ff00ff">Color 20</li>
+				<li><input type=color id="color21" value="#ff00ff">Color 21</li>
+				<li><input type=color id="color22" value="#ff00ff">Color 22</li>
+				<li><input type=color id="color23" value="#ff00ff">Color 23</li>
+				<li><input type=color id="color24" value="#ff00ff">Color 24</li>
+				<li><input type=color id="color25" value="#ff00ff">Color 25</li>
+				<li><input type=color id="color26" value="#ff00ff">Color 26</li>
+				<li><input type=color id="color27" value="#ff00ff">Color 27</li>
+				<li><input type=color id="color28" value="#ff00ff">Color 28</li>
+				<li><input type=color id="color29" value="#ff00ff">Color 29</li>
+				<li><input type=color id="color30" value="#ff00ff">Color 30</li>
+				<li><input type=color id="color31" value="#ff00ff">Color 31</li>
+			</ul>
+		</div>
+		<div id=result>
 			<div id="buttondiv">
 			<input type=button id=showbin value="Show Binary">
 			<input type=button id=showhex value="Show Hex">
 			<input type=button id=calculate value="Generate Raw File">
 			<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
-			<input type="file" id="fileChooser" style="display:none;">
+			
 			</div>
 			
-			<ul id="colorslist">
-				<li><input type=color id="color0" value="#ffffff">Color 0</li>
-				<li><input type=color id="color1" value="#ff0000">Color 1</li>
-				<li><input type=color id="color2" value="#00ff00">Color 2</li>
-				<li><input type=color id="color3" value="#0000ff">Color 3</li>
-				<li><input type=color id="color4" value="#000000">Color 4</li>
-				<li><input type=color id="color5" value="#ff00ff">Color 5</li>
-			</ul>
+			
 			
 			<pre id="resultpre"></pre>
 		
@@ -35,8 +66,8 @@
 		<ul id="fonttable"></ul>
 	</div>
     <script>
-      var NUMBITPLANES=6;
-      var SQUARE_PIXELS = 10;
+      var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors (from DFF180 (color 00 to DFF1BE color 31)
+      var SQUARE_PIXELS = 10; // Pixel needed to draw a square
 	  var XRES = 8;
 	  var YRES = 8;
 
@@ -50,9 +81,40 @@
 	  var table=createFontTable(charset);
 	  table.createList(document.getElementById("fonttable"));
 
-	  for (i=0;i<NUMBITPLANES;i++) document.querySelectorAll("#colorslist > li")[i].addEventListener('click',handleChangeColor, false);
+	  // Manage slider for changing bitplane numbers
+	  document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
+	  function handleChangeBitplaneNumber(event)
+	  {
+	  	console.log(this.value);
+	  	// Hide out of range palettes
+	  	for (i=0;i<NUMPALETTECOLORS;i++)
+	  	{
+	  		var liColor=document.querySelectorAll("#colorslist > li")[i];
+	  		if (i<Math.pow(2,this.value*1))
+	  			liColor.style = "display: show";
+	  		else
+	  			liColor.style = "display: none";
+	  	}
+
+	  	//Bitplane label update
+	  	document.getElementById('bitplaneslabel').innerHTML='Bitplanes :'+this.value;
+	  }
+
+	  // Manage palette change color
+	  for (i=0;i<NUMPALETTECOLORS;i++)
+	  document.querySelectorAll("#colorslist > li > input[type=color]")[i].addEventListener('input',handleChangePaletteColor, false);
+	  function handleChangePaletteColor(event) {
+	  	var rgb=hexToRgb(this.value);
+	  	var amigaR=Math.round(rgb.r*15/255).toString(16);
+	  	var amigaG=Math.round(rgb.g*15/255).toString(16);
+	  	var amigaB=Math.round(rgb.b*15/255).toString(16);
+	  	console.log(amigaR+'-'+amigaG+'-'+amigaB);
+	  }
+
+	  // Manage color selection
+	  for (i=0;i<NUMPALETTECOLORS;i++) document.querySelectorAll("#colorslist > li")[i].addEventListener('click',handleChangeColor, false);
 	  function handleChangeColor(event) { 
-	  for (i=0;i<NUMBITPLANES;i++)
+	  for (i=0;i<NUMPALETTECOLORS;i++)
 	  	document.querySelectorAll("#colorslist > li")[i].style.background='#9e9e9e';
 	  this.style.backgroundColor  = 'red';
 
@@ -183,7 +245,14 @@
 		  }
 
 	}
-
+	function hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
 	
     </script>
   </body>

@@ -12,16 +12,22 @@ li {
     	text-align: justify;
     	word-wrap:break-word;
 }
-#colorslist > li {display:inline-block}
-#colorslist {position: absolute;width: 100%;left: 1px;padding-left: 25px;padding-right: 0px;};
+#colorslist > li {float: left;}
+#colorslist {    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333333;
+};
 
 
 ul {margin:0;padding:0;}
 input {margin:10px;}
 input[type=color] {width: 20px;margin: 1px;}
 pre {border: solid 1px;margin: 0px;}
-#resultpre{display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:540px;margin-top: 118px;}
+#resultpre{display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:645px;margin-top: 12px;}
 #result{position:fixed;right:100px;width:600px;height:700px;background:white;top:100px;border: solid 10px;}
+#colorpalette{position:fixed;left:750px;width:300px;height:700px;background:white;top:100px;border: solid 10px;}
 canvas {cursor:pointer;}
 #colorslist > li:nth-child(2) {background-color: red;}
 #colorslist > li {cursor:pointer;}
