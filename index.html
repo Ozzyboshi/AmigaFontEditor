@@ -7,88 +7,85 @@
   <body>
 	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
 
-	<div id="content" style="padding:50px">
+	<div id="content" style="padding:25px">
 		<h2>Amiga font editor</h2>
 		<h4>Draw your fonts on the left grids and get the binary raw data to load into the Amiga copperlist</h4>
 		<div id="colorpalette">
 			<input type="file" id="fileChooser" style="display:none;">
-			<input id="nbitplanes" type="range" min="1" max="5" step="1" value="5" /><a id="bitplaneslabel">Bitplanes :5</a>
+			<input id="nbitplanes" type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :5</a>
 			<ul id="colorslist">
-				<li><input type=color id="color0" value="#ffffff">Color 00</li>
-				<li><input type=color id="color1" value="#ff0000">Color 01</li>
-				<li><input type=color id="color2" value="#00ff00">Color 02</li>
-				<li><input type=color id="color3" value="#0000ff">Color 03</li>
-				<li><input type=color id="color4" value="#000000">Color 04</li>
-				<li><input type=color id="color5" value="#ff00ff">Color 05</li>
-				<li><input type=color id="color6" value="#ff00ff">Color 06</li>
-				<li><input type=color id="color7" value="#ff00ff">Color 07</li>
-				<li><input type=color id="color8" value="#ff00ff">Color 08</li>
-				<li><input type=color id="color9" value="#ff00ff">Color 09</li>
-				<li><input type=color id="color10" value="#ff00ff">Color 10</li>
-				<li><input type=color id="color11" value="#ff00ff">Color 11</li>
-				<li><input type=color id="color12" value="#ff00ff">Color 12</li>
-				<li><input type=color id="color13" value="#ff00ff">Color 13</li>
-				<li><input type=color id="color14" value="#ff00ff">Color 14</li>
-				<li><input type=color id="color15" value="#ff00ff">Color 15</li>
-				<li><input type=color id="color16" value="#ff00ff">Color 16</li>
-				<li><input type=color id="color17" value="#ff00ff">Color 17</li>
-				<li><input type=color id="color18" value="#ff00ff">Color 18</li>
-				<li><input type=color id="color19" value="#ff00ff">Color 19</li>
-				<li><input type=color id="color20" value="#ff00ff">Color 20</li>
-				<li><input type=color id="color21" value="#ff00ff">Color 21</li>
-				<li><input type=color id="color22" value="#ff00ff">Color 22</li>
-				<li><input type=color id="color23" value="#ff00ff">Color 23</li>
-				<li><input type=color id="color24" value="#ff00ff">Color 24</li>
-				<li><input type=color id="color25" value="#ff00ff">Color 25</li>
-				<li><input type=color id="color26" value="#ff00ff">Color 26</li>
-				<li><input type=color id="color27" value="#ff00ff">Color 27</li>
-				<li><input type=color id="color28" value="#ff00ff">Color 28</li>
-				<li><input type=color id="color29" value="#ff00ff">Color 29</li>
-				<li><input type=color id="color30" value="#ff00ff">Color 30</li>
-				<li><input type=color id="color31" value="#ff00ff">Color 31</li>
+				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 00</li>
+				<li idcolor="1"><input type=color id="color1" value="#ff0000">Color 01</li>
+				<li idcolor="2"><input type=color id="color2" value="#00ff00">Color 02</li>
+				<li idcolor="3"><input type=color id="color3" value="#0000ff">Color 03</li>
+				<li idcolor="4"><input type=color id="color4" value="#000000">Color 04</li>
+				<li idcolor="5"><input type=color id="color5" value="#ff00ff">Color 05</li>
+				<li idcolor="6"><input type=color id="color6" value="#ff00ff">Color 06</li>
+				<li idcolor="7"><input type=color id="color7" value="#ff00ff">Color 07</li>
+				<li idcolor="8"><input type=color id="color8" value="#ff00ff">Color 08</li>
+				<li idcolor="9"><input type=color id="color9" value="#ff00ff">Color 09</li>
+				<li idcolor="10"><input type=color id="color10" value="#ff00ff">Color 10</li>
+				<li idcolor="11"><input type=color id="color11" value="#ff00ff">Color 11</li>
+				<li idcolor="12"><input type=color id="color12" value="#ff00ff">Color 12</li>
+				<li idcolor="13"><input type=color id="color13" value="#ff00ff">Color 13</li>
+				<li idcolor="14"><input type=color id="color14" value="#ff00ff">Color 14</li>
+				<li idcolor="15"><input type=color id="color15" value="#ff00ff">Color 15</li>
+				<li idcolor="16"><input type=color id="color16" value="#ff00ff">Color 16</li>
+				<li idcolor="17"><input type=color id="color17" value="#ff00ff">Color 17</li>
+				<li idcolor="18"><input type=color id="color18" value="#ff00ff">Color 18</li>
+				<li idcolor="19"><input type=color id="color19" value="#ff00ff">Color 19</li>
+				<li idcolor="20"><input type=color id="color20" value="#ff00ff">Color 20</li>
+				<li idcolor="21"><input type=color id="color21" value="#ff00ff">Color 21</li>
+				<li idcolor="22"><input type=color id="color22" value="#ff00ff">Color 22</li>
+				<li idcolor="23"><input type=color id="color23" value="#ff00ff">Color 23</li>
+				<li idcolor="24"><input type=color id="color24" value="#ff00ff">Color 24</li>
+				<li idcolor="25"><input type=color id="color25" value="#ff00ff">Color 25</li>
+				<li idcolor="26"><input type=color id="color26" value="#ff00ff">Color 26</li>
+				<li idcolor="27"><input type=color id="color27" value="#ff00ff">Color 27</li>
+				<li idcolor="28"><input type=color id="color28" value="#ff00ff">Color 28</li>
+				<li idcolor="29"><input type=color id="color29" value="#ff00ff">Color 29</li>
+				<li idcolor="30"><input type=color id="color30" value="#ff00ff">Color 30</li>
+				<li idcolor="31	"><input type=color id="color31" value="#ff00ff">Color 31</li>
 			</ul>
 		</div>
 		<div id=result>
 			<div id="buttondiv">
-			<input type=button id=showbin value="Show Binary">
-			<input type=button id=showhex value="Show Hex">
-			<input type=button id=calculate value="Generate Raw File">
-			<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
-			
+				<input type=button id=showbin value="Show Binary">
+				<input type=button id=showhex value="Show Hex">
+				<input type=button id=calculate value="Generate Raw File">
+				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />		
 			</div>
-			
-			
-			
 			<pre id="resultpre"></pre>
-		
-			
 		</div>
 		<ul id="fonttable"></ul>
 	</div>
     <script>
+      var NBITPLANES=2; // The program starts with 5 bitplanes
       var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors (from DFF180 (color 00 to DFF1BE color 31)
       var SQUARE_PIXELS = 10; // Pixel needed to draw a square
 	  var XRES = 8;
 	  var YRES = 8;
 
-	  // Create list of characters
-	  var charset = [];
-
-	  for (var i = 32; i <= 127; i++) {
-   		charset.push(i);
+	  // Set default bitplanes in slider
+	  document.getElementById('nbitplanes').value=NBITPLANES;
+	  document.getElementById('bitplaneslabel').innerHTML='Bitplanes :'+NBITPLANES;
+	  for (i=0;i<NUMPALETTECOLORS;i++)
+	  {
+	  	var liColor=document.querySelectorAll("#colorslist > li")[i];
+	  	if (i<Math.pow(2,NBITPLANES))
+	  		liColor.style = "display: show";
+	  	else
+	  		liColor.style = "display: none";
 	  }
-
-	  var table=createFontTable(charset);
-	  table.createList(document.getElementById("fonttable"));
-
+	  
 	  // Manage slider for changing bitplane numbers
 	  document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
 	  function handleChangeBitplaneNumber(event)
 	  {
-	  	console.log(this.value);
 	  	// Hide out of range palettes
 	  	for (i=0;i<NUMPALETTECOLORS;i++)
 	  	{
+	  		palette.changeBitplanes(this.value*1);
 	  		var liColor=document.querySelectorAll("#colorslist > li")[i];
 	  		if (i<Math.pow(2,this.value*1))
 	  			liColor.style = "display: show";
@@ -101,8 +98,18 @@
 	  }
 
 	  // Manage palette change color
+	  var palette = new FontColorsTable(NBITPLANES);
+
 	  for (i=0;i<NUMPALETTECOLORS;i++)
-	  document.querySelectorAll("#colorslist > li > input[type=color]")[i].addEventListener('input',handleChangePaletteColor, false);
+	  {
+	  	var colorObj=document.querySelectorAll("#colorslist > li > input[type=color]")[i];
+	  	palette.addFont24BitHexColor(colorObj.value);
+
+	  	colorObj.addEventListener('input',handleChangePaletteColor, false);
+	  }
+	  palette.setFgColorIndex(1);
+	  palette.setBgColorIndex(0);
+
 	  function handleChangePaletteColor(event) {
 	  	var rgb=hexToRgb(this.value);
 	  	var amigaR=Math.round(rgb.r*15/255).toString(16);
@@ -111,75 +118,37 @@
 	  	console.log(amigaR+'-'+amigaG+'-'+amigaB);
 	  }
 
-	  // Manage color selection
-	  for (i=0;i<NUMPALETTECOLORS;i++) document.querySelectorAll("#colorslist > li")[i].addEventListener('click',handleChangeColor, false);
+	  // Manage color selection and palette creation
+	  for (i=0;i<NUMPALETTECOLORS;i++)
+	  {
+	  	var fontLiObj=document.querySelectorAll("#colorslist > li")[i];
+	  	fontLiObj.addEventListener('click',handleChangeColor, false);
+	  }
 	  function handleChangeColor(event) { 
 	  for (i=0;i<NUMPALETTECOLORS;i++)
+	  {
 	  	document.querySelectorAll("#colorslist > li")[i].style.background='#9e9e9e';
+	  }
+	  palette.setFgColorIndex(this.getAttribute('idcolor'));
 	  this.style.backgroundColor  = 'red';
 
 	}
 
+	//Create fonts table for characters from ascii 32 to 127
+	var charset = [];
+	for (var i = 32; i <= 127; i++) charset.push(i);
+	var table=createFontTable(charset,palette);
+	table.createList(document.getElementById("fonttable"));
+
+	// Handle file export click
 	var calculate = document.getElementById('calculate');
 	calculate.onclick = function() {
-		fontArray=table.fontArray;
-		var binaryData = new Uint8Array(XRES*YRES/8*fontArray.length);
-		var offset=0;
-		
-		for (var i = 0; i < fontArray.length; i++) {
-			//console.log(fontArray[i]);	
-			var canvas=fontArray[i].canvas;
-			//console.log(canvas.data.getBinaryDataString());
-			binaryCharacters=canvas.data.getBinaryDataString();
-			var hex = parseInt(binaryCharacters, 2).toString(16);
-			//console.log(hex);
-			sampleBytes=canvas.data.getBinaryData();
-			console.log("Sabplebytes"+sampleBytes);
-			//binaryData=concatenate(Uint8Array,sampleBytes,Uint8Array.of(sampleBytes));
-			binaryData.set(sampleBytes,offset);
-			offset+=sampleBytes.length;
-			console.log(binaryData);
-		}
+		var binaryData=table.getBinaryData(palette.nBitplanes);
+		console.log(binaryData);
 		var fileName = prompt("Please enter the name of your export file", "Myfonts.fnt");
 		if (fileName)
 			saveByteArray([binaryData], fileName);
 	};
-
-	var showbin=document.getElementById('showbin');
-	showbin.onclick = function() {
-		var binaryCharacters="";
-		for (var i = 0; i < table.fontArray.length; i++) {
-			var canvas=table.fontArray[i].canvas;
-			binaryCharacters+=canvas.data.getBinaryDataString();
-		}
-		var formattedBinary=chunk(binaryCharacters, 8).join(' ');
-		var formattedBinary=chunk(formattedBinary, 72).join('\n');
-
-		document.getElementById("resultpre").innerHTML = formattedBinary;
-	};
-
-	var showhex=document.getElementById('showhex');
-	showhex.onclick = function() {
-		var binaryCharacters="";
-		var hex="";
-		//var offset=0;
-		//var binaryData = new Uint8Array(XRES*YRES/8*table.fontArray.length);
-		for (var i = 0; i < table.fontArray.length; i++) {
-			var canvas=table.fontArray[i].canvas;
-			binaryCharacters+=canvas.data.getBinaryDataString();
-			/*sampleBytes=canvas.data.getBinaryData();
-			binaryData.set(sampleBytes,offset);
-			offset+=sampleBytes.length;*/
-			hex+=canvas.data.getHexDataString();
-		}
-		//var hex = parseInt(binaryCharacters, 2).toString(16);
-		var formattedHex=chunk(hex, 2).join(' ');
-		var formattedHex=chunk(formattedHex, 24).join('\n');
-
-		document.getElementById("resultpre").innerHTML = formattedHex;
-	};
-
-
 
 	var saveByteArray = (function () {
 		var a = document.createElement("a");
@@ -187,13 +156,30 @@
 		a.style = "display: none";
 		return function (data, name) {
 		    var blob = new Blob(data, {type: "octet/stream"}),
-		        url = window.URL.createObjectURL(blob);
+		    url = window.URL.createObjectURL(blob);
 		    a.href = url;
 		    a.download = name;
 		    a.click();
 		    window.URL.revokeObjectURL(url);
 		};
 	}());
+
+	// Handle click on SHOWBINARYSTRING button
+	var showbin=document.getElementById('showbin');
+	showbin.onclick = function() {
+		var formattedBinary=chunk(table.getBinaryDataString(palette.nBitplanes),8).join(' ');
+		formattedBinary=chunk(formattedBinary, 72).join('\n');
+		document.getElementById("resultpre").innerHTML = formattedBinary;
+	};
+
+	// Handle click on SHOWEXSTRING button
+	var showhex=document.getElementById('showhex');
+	showhex.onclick = function() {
+		var formattedHex=chunk(table.getHexDataString(palette.nBitplanes), 2).join(' ');
+		var formattedHex=chunk(formattedHex, 24).join('\n');
+		document.getElementById("resultpre").innerHTML = formattedHex;
+		return ;
+	};
 
 	function chunk(str, n) {
 		var ret = [];
@@ -209,15 +195,18 @@
 
 	document.querySelector("#fileChooser").addEventListener('change',filesChosen, false);
 	function filesChosen(evt){
+		console.log("apro filechooser");
 		var chosenFile = evt.target.files[0]; //get the first file in the FileList
 		var fileName = chosenFile.name; //the name of the file as a string
 		var fileSize = chosenFile.size; //the size of the file in bytes, as an integer
 		var fileModifiedDate = chosenFile.lastModifiedDate; //a Date object
-		console.log(chosenFile);
+		//console.log(chosenFile);
 		reader = new FileReader();
 		//reader.addEventListener("load", readFile, false);
 		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
 		reader.onloadend = function () {
+			table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes);
+			return ;
 			//console.log(reader.result);
 			var view   = new Uint8Array(reader.result);
 			//console.log(view);
