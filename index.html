@@ -112,7 +112,8 @@
 	  palette.setBgColorIndex(0);
 
 	  function handleChangePaletteColor(event) {
-	  	console.log("color changed");
+	  	palette.changeColor(parseInt(this.parentNode.getAttribute('idcolor')),this.value);
+	  	table.updateColor(parseInt(this.parentNode.getAttribute('idcolor')),this.value);
 	  }
 
 	  // Manage color selection and palette creation
@@ -203,31 +204,8 @@
 		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
 		reader.onloadend = function () {
 			table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes);
-			return ;
-			//console.log(reader.result);
-			var view   = new Uint8Array(reader.result);
-			//console.log(view);
-			var fontCounter=0;
-			var bitCounter=0;
-			var bitArray = [];
-			for (var i=0;i<view.length;i++)
-			{
-				//console.log(i+"-"+view[i]);
-				var arrayConverter = [];
-				for (bytevalue=view[i],j=0;j<8;j++)
-				{
-					//console.log(i+"-"+j+"-"+bytevalue+"--->"+bytevalue%2);
-					//bitArray[bitCounter]=bytevalue%2;
-					arrayConverter.push(bytevalue%2);
-					bitCounter++;
-					
-					bytevalue=Math.floor(bytevalue/2);
-				}
-				arrayConverter=arrayConverter.reverse();
-				bitArray=bitArray.concat(arrayConverter);
-				if (bitCounter>=XRES*YRES){ table.fontArray[fontCounter].setSquares(bitArray);bitCounter=0;bitArray = [];fontCounter++; }
-			}
 			alert('File loaded succesfully');
+			return ;
 		  }
 
 	}
@@ -239,7 +217,7 @@
 		for (var i=0,startReg=384;i<palette.getTableSize();startReg+=2,i++)
 		{
 			var font=palette.getFontColorById(i);	
-			document.getElementById("resultpre").innerHTML += 'dc.w    $dff'+startReg.toString(16)+',$'+font.amigaR+font.amigaG+font.amigaB+'    ; color'+i+'\n';
+			document.getElementById("resultpre").innerHTML += 'dc.w    $'+startReg.toString(16)+',$'+font.amigaR+font.amigaG+font.amigaB+'    ; color'+i+'\n';
 		}
 	}
 

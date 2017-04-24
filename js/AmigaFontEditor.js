@@ -36,6 +36,9 @@ function FontColorsTable(nBitplanes)
 		return this.FontColorsArray[this.fgIndexColor];
 	};
 	this.getTableSize = function () { return this.FontColorsArray.length };
+	this.changeColor = function (index,hex) {
+		this.FontColorsArray[index]=new FontColor(hex,index);
+	}
 }
 
 
@@ -136,27 +139,42 @@ function createFontTable(characters,parent,palette)
 			// Init resultarray
 			for (var z = 0; z < table.fontArray.length; z++)
 			{
-			var binaryArray = [nBitplanes];
-			for (var i=0;i<nBitplanes;i++)
-				binaryArray[i]=new Uint8Array(XRES*YRES/8);
-			//Cycle an entire font
-			for (var i=0;i<XRES*YRES/8;i++)
-			{
-				//console.log("Byte"+i);
-				// Cycle all the bitplanes
-				for (var j=0;j<nBitplanes;j++)
+				var binaryArray = [nBitplanes];
+				for (var i=0;i<nBitplanes;i++)
+					binaryArray[i]=new Uint8Array(XRES*YRES/8);
+				//Cycle an entire font
+				for (var i=0;i<XRES*YRES/8;i++)
 				{
-					//console.log("Bitplane"+j);
-					var byte=rawData[(z*XRES*YRES/8)+i+j*XRES*YRES/8*table.fontArray.length];
-					//console.log(byte);
-					binaryArray[j][i]=byte;
+					//console.log("Byte"+i);
+					// Cycle all the bitplanes
+					for (var j=0;j<nBitplanes;j++)
+					{
+						//console.log("Bitplane"+j);
+						var byte=rawData[(z*XRES*YRES/8)+i+j*XRES*YRES/8*table.fontArray.length];
+						//console.log(byte);
+						binaryArray[j][i]=byte;
+					}
+					//console.log(rawData[i]);
 				}
-				//console.log(rawData[i]);
+				// Binaryarray is an array of Uint8Array, each element of the array is a bitplane representation of a font, bitplane0 is at index 0, bitplane1 is at index 1 and so on
+				//console.log(binaryArray);
+				this.fontArray[z].drawFontFromData(binaryArray);
 			}
-			// Binaryarray is an array of Uint8Array, each element of the array is a bitplane representation of a font, bitplane0 is at index 0, bitplane1 is at index 1 and so on
-			//console.log(binaryArray);
-			this.fontArray[z].drawFontFromData(binaryArray);
-		}
+		},
+		updateColor: function (index,color) {
+			for (var i = 0; i < table.fontArray.length; i++)
+			{
+				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
+				{
+					if (table.fontArray[i].squaresObjs[j].code==index)
+					{
+						//console.log(table.fontArray[i].squaresObjs[j].code);
+						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
+						if (index>0)
+							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFgFontColor());
+					}
+				}
+			}
 		}
 	};
 }
@@ -415,7 +433,6 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			}
 		},
 		drawFontFromData: function(data){
-			console.log("seguo la cacca");
 			var squaresObjsCont=0;
 			// Get length of the first bitplane
 			var imgLength=data[0].length;
