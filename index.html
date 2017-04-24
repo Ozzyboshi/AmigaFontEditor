@@ -54,7 +54,7 @@
 				<input type=button id=showhex value="Show Hex">
 				<input type=button id=calculate value="Generate Raw File">
 				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
-				<input type="button" value="Show Amiga colors code" id="amigacolorscode">
+				<input type="button" value="Amiga colors code" id="amigacolorscode">
 			</div>
 			<pre id="resultpre"></pre>
 		</div>
@@ -193,7 +193,6 @@
 
 	document.querySelector("#fileChooser").addEventListener('change',filesChosen, false);
 	function filesChosen(evt){
-		console.log("apro filechooser");
 		var chosenFile = evt.target.files[0]; //get the first file in the FileList
 		var fileName = chosenFile.name; //the name of the file as a string
 		var fileSize = chosenFile.size; //the size of the file in bytes, as an integer
@@ -205,9 +204,9 @@
 		reader.onloadend = function () {
 			table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes);
 			alert('File loaded succesfully');
+			document.getElementById('fileChooser').value = null;
 			return ;
-		  }
-
+		}
 	}
 
 	// Handle show amiga colors button click
@@ -221,14 +220,7 @@
 		}
 	}
 
-	function hexToRgb(hex) {
-    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16)
-    } : null;
-}
+	
 	
     </script>
   </body>
