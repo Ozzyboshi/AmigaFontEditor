@@ -23,6 +23,7 @@ li {
 
 ul {margin:0;padding:0;}
 input {margin:10px;}
+input[type=button] {margin:1px;}
 input[type=color] {width: 20px;margin: 1px;}
 pre {border: solid 1px;margin: 0px;}
 #resultpre{display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:545px;margin-top: 12px;}

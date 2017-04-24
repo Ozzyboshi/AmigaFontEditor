@@ -3,6 +3,10 @@ function FontColor(hex,code)
 	this.hex=hex;
 	this.code=code;
 	this.binaryCode=(code >>> 0).toString(2);
+	var rgb=hexToRgb(this.hex);
+	this.amigaR=Math.round(rgb.r*15/255).toString(16);
+	this.amigaG=Math.round(rgb.g*15/255).toString(16);
+	this.amigaB=Math.round(rgb.b*15/255).toString(16);
 }
 
 function FontColorsTable(nBitplanes)
@@ -25,12 +29,13 @@ function FontColorsTable(nBitplanes)
 	this.getBgFontColor = function () {
 		return this.FontColorsArray[this.bgIndexColor];
 	};
-	this.getFgFontColorById = function (id) {
+	this.getFontColorById = function (id) {
 		return this.FontColorsArray[id];
 	};
 	this.getFgFontColor = function (index) {
 		return this.FontColorsArray[this.fgIndexColor];
 	};
+	this.getTableSize = function () { return this.FontColorsArray.length };
 }
 
 
@@ -439,7 +444,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 					this.squaresObjs[squaresObjsCont].reset(this.palette.getBgFontColor());
 					if (bitArray[i]>0)
 					{
-						this.squaresObjs[squaresObjsCont].storeClick(this.palette.getBgFontColor(),this.palette.getFgFontColorById(bitArray[i]));
+						this.squaresObjs[squaresObjsCont].storeClick(this.palette.getBgFontColor(),this.palette.getFontColorById(bitArray[i]));
 					}
 					squaresObjsCont++;
 				}

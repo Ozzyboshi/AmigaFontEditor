@@ -53,7 +53,8 @@
 				<input type=button id=showbin value="Show Binary">
 				<input type=button id=showhex value="Show Hex">
 				<input type=button id=calculate value="Generate Raw File">
-				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />		
+				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
+				<input type="button" value="Show Amiga colors code" id="amigacolorscode">
 			</div>
 			<pre id="resultpre"></pre>
 		</div>
@@ -111,11 +112,7 @@
 	  palette.setBgColorIndex(0);
 
 	  function handleChangePaletteColor(event) {
-	  	var rgb=hexToRgb(this.value);
-	  	var amigaR=Math.round(rgb.r*15/255).toString(16);
-	  	var amigaG=Math.round(rgb.g*15/255).toString(16);
-	  	var amigaB=Math.round(rgb.b*15/255).toString(16);
-	  	console.log(amigaR+'-'+amigaG+'-'+amigaB);
+	  	console.log("color changed");
 	  }
 
 	  // Manage color selection and palette creation
@@ -234,6 +231,18 @@
 		  }
 
 	}
+
+	// Handle show amiga colors button click
+	document.querySelector("#amigacolorscode").addEventListener('click',showAmigaColors, false);
+	function showAmigaColors(evt) {
+		document.getElementById("resultpre").innerHTML = '';
+		for (var i=0,startReg=384;i<palette.getTableSize();startReg+=2,i++)
+		{
+			var font=palette.getFontColorById(i);	
+			document.getElementById("resultpre").innerHTML += 'dc.w    $dff'+startReg.toString(16)+',$'+font.amigaR+font.amigaG+font.amigaB+'    ; color'+i+'\n';
+		}
+	}
+
 	function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
