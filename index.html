@@ -63,7 +63,7 @@
 	</div>
     <script>
       var NBITPLANES=2; // The program starts with 2 bitplanes
-      var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors (from DFF180 (color 00 to DFF1BE color 31)
+      var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors from DFF180 (color 00 to DFF1BE color 31)
       var SQUARE_PIXELS = 10; // Pixel needed to draw a square
 	  var XRES = 8;
 	  var YRES = 8;
@@ -227,8 +227,6 @@
 		var ta = document.getElementById('resultpre');
 		ta.focus();
         ta.select();
-
-        console.log(document.execCommand('copy'));
 	}
     </script>
   </body>

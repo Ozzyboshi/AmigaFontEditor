@@ -1,3 +1,5 @@
+var COPIED_SQUARE;
+
 function FontColor(hex,code)
 {
 	this.hex=hex;
@@ -204,9 +206,25 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			p.appendChild(clearBtn);
 			parentObject.appendChild(p);
 
+			// Copy button
+			var copyBtn = document.createElement("BUTTON");
+			var copyTxt = document.createTextNode("Copy");
+			copyBtn.appendChild(copyTxt);
+			p.appendChild(copyBtn);
+			parentObject.appendChild(p);
+
+			// Create paste button
+			var pasteBtn = document.createElement("BUTTON");
+			var pasteTxt = document.createTextNode("Paste");
+			pasteBtn.appendChild(pasteTxt);
+			p.appendChild(pasteBtn);
+			parentObject.appendChild(p);
+
 			context = canvas.getContext('2d');
 			canvas.data = this;
 			clearBtn.data = this;
+			copyBtn.data = this;
+			pasteBtn.data = this;
 
 			for (ysquarecont=0;ysquarecont<YRES;ysquarecont++)
 				for (xsquarecont=0;xsquarecont<XRES;xsquarecont++)
@@ -252,6 +270,23 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			// Handler for clearing image at button press
 			clearBtn.addEventListener("click",function(e){
 				this.data.clearAllSquares();
+			});
+
+			// Handle for storing font
+			copyBtn.addEventListener("click",function(e){
+				COPIED_SQUARE=[];
+				for (var i=0;i<this.data.palette.nBitplanes;i++)
+				{
+					COPIED_SQUARE[i]=new Uint8Array(XRES*YRES/8);
+					COPIED_SQUARE[i]=this.data.getBinaryDataForBitplane(i);
+				}
+				alert('Image copied');
+			});
+
+			// Handle for pasting font
+			pasteBtn.addEventListener("click",function(e){
+				this.data.drawFontFromData(COPIED_SQUARE);
+				alert('Image pasted');
 			});
 		},
 		// Get a square object from a coordinate pair
@@ -344,7 +379,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			return res;
 		},
 		// Get a UInt8Array of the image
-		getBinaryData: function () {
+		/*getBinaryData: function () {
 			var resIndex=0;
 			var byteIndex=7;
 			var res = new Uint8Array(this.xres*this.yres/8);
@@ -358,7 +393,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				else byteIndex--;
 			}
 			return res;
-		},
+		},*/
 		// Find mouse position inside canvas
 		findPos: function (obj) {
 			var curleft = 0, curtop = 0;
