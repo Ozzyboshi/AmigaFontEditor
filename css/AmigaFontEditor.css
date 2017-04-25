@@ -26,10 +26,10 @@ input {margin:10px;}
 input[type=button] {margin:1px;}
 input[type=color] {width: 20px;margin: 1px;}
 pre {border: solid 1px;margin: 0px;}
-#resultpre{display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:545px;margin-top: 12px;}
+#resultpre{ width:587px; height: 545px; }
+#resultpre2{display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:545px;margin-top: 12px;}
 #result{position:fixed;right:50px;width:593px;height:600px;background:white;top:150px;border: solid 10px;}
 #colorpalette{position:fixed;right:680px;width:290px;height:600px;background:white;top:150px;border: solid 10px;}
 canvas {cursor:pointer;}
 #colorslist > li:nth-child(2) {background-color: red;}
 #colorslist > li {cursor:pointer;}
-p {margin: 0px;}

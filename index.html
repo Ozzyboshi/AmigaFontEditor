@@ -50,18 +50,19 @@
 		</div>
 		<div id=result>
 			<div id="buttondiv">
-				<input type=button id=showbin value="Show Binary">
-				<input type=button id=showhex value="Show Hex">
-				<input type=button id=calculate value="Generate Raw File">
-				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
-				<input type="button" value="Amiga colors code" id="amigacolorscode">
+				<input type=button id=showbin value="Show Binary" />
+				<input type=button id=showhex value="Show Hex" />
+				<input type="button" value="Amiga colors code" id="amigacolorscode" />
 			</div>
-			<pre id="resultpre"></pre>
+			<textarea id="resultpre"></textarea>
+			<input type=button id=copyresult value="Copy to Clipboard" />
+			<input type=button id=calculate value="Generate Raw File" />
+			<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
 		</div>
 		<ul id="fonttable"></ul>
 	</div>
     <script>
-      var NBITPLANES=2; // The program starts with 5 bitplanes
+      var NBITPLANES=2; // The program starts with 2 bitplanes
       var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors (from DFF180 (color 00 to DFF1BE color 31)
       var SQUARE_PIXELS = 10; // Pixel needed to draw a square
 	  var XRES = 8;
@@ -220,8 +221,15 @@
 		}
 	}
 
-	
-	
+	document.querySelector("#copyresult").addEventListener('click',copyToClipboard,false);
+	function copyToClipboard()
+	{
+		var ta = document.getElementById('resultpre');
+		ta.focus();
+        ta.select();
+
+        console.log(document.execCommand('copy'));
+	}
     </script>
   </body>
 </html>  
