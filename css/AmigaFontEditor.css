@@ -3,18 +3,37 @@ body {
         padding: 0px;
 		background:#607d8b;
       }
-	  li {
+li {
+		border: solid 1px;
+		background-color:#9e9e9e;
+    	padding: 5px;
+    	list-style: none;
+    	font-family: trebuchet ms;
+    	text-align: justify;
+    	word-wrap:break-word;
+}
+#colorslist > li {float: left;}
+#colorslist {    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333333;
+};
 
-	 border: solid 1px;
-	background-color:#9e9e9e;
-    padding: 5px;
-    list-style: none;
-    font-family: trebuchet ms;
 
+ul {margin:0;padding:0;}
+input {margin:10px;}
+input[type=button] {margin:1px;}
+input[type=color] {width: 20px;margin: 1px;}
+pre {border: solid 1px;margin: 0px;}
+#resultpre{ width:587px; height: 545px; }
+#resultpre2{display:block;overflow: auto;background-color: #eeeeee;word-break: normal !important;word-wrap: normal !important;white-space: pre !important;max-height:545px;margin-top: 12px;}
+#result{position:fixed;right:50px;width:593px;height:600px;background:white;top:150px;border: solid 10px;}
+#colorpalette{position:fixed;right:680px;width:290px;height:600px;background:white;top:150px;border: solid 10px;}
+#fontnavigator{position:fixed;right:1000px;width:50px;height:600px;background:white;top:150px;border: solid 10px;overflow: auto;}
+#fontnavigator ul {margin: 0px;}
+#fontnavigator li {cursor:pointer;}
 
-    text-align: justify;
-    word-wrap:break-word;}
-	ul {margin:0;padding:0;}
-	input {margin:10px;}
-	pre {border: solid 1px;}
-	canvas {cursor:pointer;};
+canvas {cursor:pointer;}
+#colorslist > li:nth-child(2) {background-color: red;}
+#colorslist > li {cursor:pointer;}
