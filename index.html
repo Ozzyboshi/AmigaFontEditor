@@ -10,6 +10,10 @@
 	<div id="content" style="padding:25px">
 		<h2>Amiga font editor</h2>
 		<h4>Draw your fonts on the left grids and get the binary raw data to load into the Amiga copperlist</h4>
+		<div id="fontnavigator">
+			<ul>
+			</ul>
+		</div>
 		<div id="colorpalette">
 			<input type="file" id="fileChooser" style="display:none;">
 			<input id="nbitplanes" type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :5</a>
@@ -135,9 +139,10 @@
 
 	//Create fonts table for characters from ascii 32 to 127
 	var charset = [];
-	for (var i = 32; i <= 127; i++) charset.push(i);
+	for (var i = 32; i < 127; i++) charset.push(i);
 	var table=createFontTable(charset,palette);
 	table.createList(document.getElementById("fonttable"));
+	table.appendlListToUl(document.getElementById('fontnavigator'));
 
 	// Handle file export click
 	var calculate = document.getElementById('calculate');

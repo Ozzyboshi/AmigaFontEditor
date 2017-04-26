@@ -54,6 +54,7 @@ function createFontTable(characters,parent,palette)
 			var fontArray=[];
 			this.characters.forEach(function(element) {
 	  			var li = document.createElement("li");
+	  			li.setAttribute("id", "lifont"+element);
 				var p = document.createElement("p");
 				var oTxt = document.createTextNode("Font: `"+String.fromCharCode(element)+"' Ascii code: "+element);
 
@@ -67,6 +68,14 @@ function createFontTable(characters,parent,palette)
 			});
 			this.fontArray=fontArray;
 			return;
+		},
+		appendlListToUl: function (parent) {
+			this.characters.forEach(function(element) {
+				var li = document.createElement("li");
+				li.appendChild(document.createTextNode(String.fromCharCode(parseInt(element))));
+				parent.appendChild(li);
+				li.addEventListener('click',function () { window.location.href='#lifont'+ parseInt(element)});
+			});
 		},
 		getHexDataString: function (nBitplanes) {
 			var binaryCharacters="";
