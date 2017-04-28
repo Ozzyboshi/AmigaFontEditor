@@ -326,7 +326,8 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 							square.draw(this.palette.getBgFontColor());
 							this.squaresObjs.push(square);
 						}
-						else{
+						else
+						{
 							var square = this.getSquare(xsquarecont,ysquarecont);
 							if (square.code>0) square.draw(this.palette.getFontColorById(square.code));
 							else square.draw(this.palette.getBgFontColor());
@@ -334,19 +335,17 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 					}
 					else
 						this.removeSquare(xsquarecont,ysquarecont);
-					//this.squaresObjs.push(square);
 	  			}
 	  		this.xres=newXres;
 		},
-		// da fixare
 		changeCanvasYResolution : function (newYres)
 		{
 			this.canvas.height  = square_pixels*newYres;
-			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
-				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
+			for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
+				for (ysquarecont=0;ysquarecont<Math.max(this.yres,newYres);ysquarecont++)
 				{
 					//var square = createSquareObj(context,xsquarecont,ysquarecont);
-					if (ysquarecont<this.yres)
+					if (ysquarecont<newYres)
 					{
 						if (this.getSquare(xsquarecont,ysquarecont)==undefined)
 						{
@@ -354,12 +353,17 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 							square.draw(this.palette.getBgFontColor());
 							this.squaresObjs.push(square);
 						}
-						else this.getSquare(xsquarecont,ysquarecont).draw(this.palette.getBgFontColor());
+						else
+						{
+							var square = this.getSquare(xsquarecont,ysquarecont);
+							if (square.code>0) square.draw(this.palette.getFontColorById(square.code));
+							else square.draw(this.palette.getBgFontColor());
+						}
 					}
 					else
-						this.getSquare(xsquarecont,ysquarecont).remove();
-					//this.squaresObjs.push(square);
+						this.removeSquare(xsquarecont,ysquarecont);
 	  			}
+	  		this.yres=newYres;
 		},
 		// Get a square object from a coordinate pair
 		getSquare: function (x,y)
