@@ -44,12 +44,13 @@ function FontColorsTable(nBitplanes)
 }
 
 
-function createFontTable(characters,parent,palette)
+function createFontTable(characters,palette,resolution)
 {
 	return {
 		characters:characters,
 		fontArray:[],
 		palette:palette,
+		resolution:resolution,
 		createList: function (parent) {
 			var fontArray=[];
 			this.characters.forEach(function(element) {
@@ -62,7 +63,7 @@ function createFontTable(characters,parent,palette)
 	  			li.appendChild(p);
 					
 	  			parent.appendChild(li);
-				var fontObj = createFontObj(SQUARE_PIXELS,XRES,YRES,li,this.palette);
+				var fontObj = createFontObj(SQUARE_PIXELS,resolution.x,resolution.y,li,this.palette);
 	  			fontObj.createCanvas();
 	  			fontArray.push(fontObj);
 			});
@@ -133,7 +134,9 @@ function createFontTable(characters,parent,palette)
 			return binaryCharacters;
 		},
 		getBinaryData: function (nBitplanes) {
-			var binaryData = new Uint8Array(XRES*YRES/8*this.fontArray.length*nBitplanes);
+			var xres=this.resolution.x;
+			var yres=this.resolution.y;
+			var binaryData = new Uint8Array(xres*yres/8*this.fontArray.length*nBitplanes);
 			var offset=0;
 			for (var j=0;j<nBitplanes;j++)
 				for (var i = 0; i < table.fontArray.length; i++)
@@ -144,33 +147,6 @@ function createFontTable(characters,parent,palette)
 					offset+=sampleBytes.length;
 				}
 			return binaryData;
-		},
-		drawRawData: function (rawData,nBitplanes) {
-			//console.log(rawData);
-			// Init resultarray
-			for (var z = 0; z < table.fontArray.length; z++)
-			{
-				var binaryArray = [nBitplanes];
-				for (var i=0;i<nBitplanes;i++)
-					binaryArray[i]=new Uint8Array(XRES*YRES/8);
-				//Cycle an entire font
-				for (var i=0;i<XRES*YRES/8;i++)
-				{
-					//console.log("Byte"+i);
-					// Cycle all the bitplanes
-					for (var j=0;j<nBitplanes;j++)
-					{
-						//console.log("Bitplane"+j);
-						var byte=rawData[(z*XRES*YRES/8)+i+j*XRES*YRES/8*table.fontArray.length];
-						//console.log(byte);
-						binaryArray[j][i]=byte;
-					}
-					//console.log(rawData[i]);
-				}
-				// Binaryarray is an array of Uint8Array, each element of the array is a bitplane representation of a font, bitplane0 is at index 0, bitplane1 is at index 1 and so on
-				//console.log(binaryArray);
-				this.fontArray[z].drawFontFromData(binaryArray);
-			}
 		},
 		updateColor: function (index,color) {
 			for (var i = 0; i < table.fontArray.length; i++)
@@ -235,8 +211,8 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			copyBtn.data = this;
 			pasteBtn.data = this;
 
-			for (ysquarecont=0;ysquarecont<YRES;ysquarecont++)
-				for (xsquarecont=0;xsquarecont<XRES;xsquarecont++)
+			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
+				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
 				{
 					var square = createSquareObj(context,xsquarecont,ysquarecont);
 					square.draw(this.palette.getBgFontColor());
@@ -286,7 +262,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				COPIED_SQUARE=[];
 				for (var i=0;i<this.data.palette.nBitplanes;i++)
 				{
-					COPIED_SQUARE[i]=new Uint8Array(XRES*YRES/8);
+					COPIED_SQUARE[i]=new Uint8Array(this.xres*this.yres/8);
 					COPIED_SQUARE[i]=this.data.getBinaryDataForBitplane(i);
 				}
 				alert('Image copied');
@@ -387,22 +363,6 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				res+=resultArray[i];
 			return res;
 		},
-		// Get a UInt8Array of the image
-		/*getBinaryData: function () {
-			var resIndex=0;
-			var byteIndex=7;
-			var res = new Uint8Array(this.xres*this.yres/8);
-			
-			for (var i = 0; i < this.squaresObjs.length; i++) {
-				var temp=0;
-				if (this.squaresObjs[i].pixel_clicked==true)
-					temp=Math.pow(2, byteIndex);
-				res[resIndex]+=temp;
-				if (byteIndex==0){ byteIndex=7; resIndex++; }
-				else byteIndex--;
-			}
-			return res;
-		},*/
 		// Find mouse position inside canvas
 		findPos: function (obj) {
 			var curleft = 0, curtop = 0;
