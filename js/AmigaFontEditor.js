@@ -160,7 +160,7 @@ function createFontTable(characters,palette,resolution)
 			{
 				var binaryArray = [nBitplanes];
 				for (var i=0;i<nBitplanes;i++)
-					binaryArray[i]=new Uint8Array(XRES*YRES/8);
+					binaryArray[i]=new Uint8Array(xres*yres/8);
 				//Cycle an entire font
 				for (var i=0;i<xres*yres/8;i++)
 				{
@@ -169,7 +169,7 @@ function createFontTable(characters,palette,resolution)
 					for (var j=0;j<nBitplanes;j++)
 					{
 						//console.log("Bitplane"+j);
-						var byte=rawData[(z*XRES*YRES/8)+i+j*XRES*YRES/8*table.fontArray.length];
+						var byte=rawData[(z*xres*yres/8)+i+j*xres*yres/8*table.fontArray.length];
 						//console.log(byte);
 						binaryArray[j][i]=byte;
 					}
@@ -194,6 +194,12 @@ function createFontTable(characters,palette,resolution)
 					}
 				}
 			}
+		},
+		changeFontXRes: function (newXres) {
+			table.fontArray[0].changeCanvasXResolution(newXres);
+		},
+		changeFontYRes: function (newYres) {
+			table.fontArray[0].changeCanvasYResolution(newYres);
 		}
 	};
 }
@@ -306,12 +312,72 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				alert('Image pasted');
 			});
 		},
+		changeCanvasXResolution : function (newXres)
+		{
+			this.canvas.width  = square_pixels*newXres;
+			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
+				for (xsquarecont=0;xsquarecont<Math.max(this.xres,newXres);xsquarecont++)
+				{
+					if (xsquarecont<newXres)
+					{
+						if (this.getSquare(xsquarecont,ysquarecont)==undefined)
+						{
+							var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
+							square.draw(this.palette.getBgFontColor());
+							this.squaresObjs.push(square);
+						}
+						else{
+							var square = this.getSquare(xsquarecont,ysquarecont);
+							if (square.code>0) square.draw(this.palette.getFontColorById(square.code));
+							else square.draw(this.palette.getBgFontColor());
+						} 
+					}
+					else
+						this.removeSquare(xsquarecont,ysquarecont);
+					//this.squaresObjs.push(square);
+	  			}
+	  		this.xres=newXres;
+		},
+		// da fixare
+		changeCanvasYResolution : function (newYres)
+		{
+			this.canvas.height  = square_pixels*newYres;
+			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
+				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
+				{
+					//var square = createSquareObj(context,xsquarecont,ysquarecont);
+					if (ysquarecont<this.yres)
+					{
+						if (this.getSquare(xsquarecont,ysquarecont)==undefined)
+						{
+							var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
+							square.draw(this.palette.getBgFontColor());
+							this.squaresObjs.push(square);
+						}
+						else this.getSquare(xsquarecont,ysquarecont).draw(this.palette.getBgFontColor());
+					}
+					else
+						this.getSquare(xsquarecont,ysquarecont).remove();
+					//this.squaresObjs.push(square);
+	  			}
+		},
 		// Get a square object from a coordinate pair
 		getSquare: function (x,y)
 		{
 			for (var i = 0; i < this.squaresObjs.length; i++) {
 				if (this.squaresObjs[i].x==x && this.squaresObjs[i].y==y )
 					return this.squaresObjs[i];
+			}
+		},
+		// Removes a square object from a coordinate pair
+		removeSquare: function (x,y)
+		{
+			for (var i = 0; i < this.squaresObjs.length; i++) {
+				if (this.squaresObjs[i].x==x && this.squaresObjs[i].y==y )
+				{
+					this.squaresObjs.splice(i);
+					return;
+				}
 			}
 		},
 		// Get all squares not matching the coordinate given

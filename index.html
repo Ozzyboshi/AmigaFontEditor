@@ -86,6 +86,7 @@
 	  function handleChangeXres(event)
 	  {
 	  	document.getElementById('xreslabel').innerHTML='X Resolution :'+this.value;
+	  	table.changeFontXRes(parseInt(this.value));
 	  }
 
 	  // Handle yres change
@@ -93,6 +94,7 @@
 	  function handleChangeYres(event)
 	  {
 	  	document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
+	  	table.changeFontYRes(parseInt(this.value));
 	  }
 
 	  // Set default bitplanes in slider
