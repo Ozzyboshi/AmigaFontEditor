@@ -196,10 +196,14 @@ function createFontTable(characters,palette,resolution)
 			}
 		},
 		changeFontXRes: function (newXres) {
-			table.fontArray[0].changeCanvasXResolution(newXres);
+			for (var i = 0; i < table.fontArray.length; i++)
+				table.fontArray[i].changeCanvasXResolution(newXres);
+			this.resolution.x=newXres;
 		},
 		changeFontYRes: function (newYres) {
-			table.fontArray[0].changeCanvasYResolution(newYres);
+			for (var i = 0; i < table.fontArray.length; i++)
+				table.fontArray[i].changeCanvasYResolution(newYres);
+			this.resolution.y=newYres;
 		}
 	};
 }
@@ -314,56 +318,50 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 		},
 		changeCanvasXResolution : function (newXres)
 		{
+
 			this.canvas.width  = square_pixels*newXres;
+			var newSquaresObj=[];
 			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
-				for (xsquarecont=0;xsquarecont<Math.max(this.xres,newXres);xsquarecont++)
+				for (xsquarecont=0;xsquarecont<newXres;xsquarecont++)
 				{
-					if (xsquarecont<newXres)
-					{
-						if (this.getSquare(xsquarecont,ysquarecont)==undefined)
-						{
-							var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
-							square.draw(this.palette.getBgFontColor());
-							this.squaresObjs.push(square);
-						}
-						else
-						{
-							var square = this.getSquare(xsquarecont,ysquarecont);
-							if (square.code>0) square.draw(this.palette.getFontColorById(square.code));
-							else square.draw(this.palette.getBgFontColor());
-						} 
-					}
+					var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
+					var oldSquare = this.getSquare(xsquarecont,ysquarecont);
+					if (oldSquare==undefined)
+						square.draw(this.palette.getBgFontColor());
 					else
-						this.removeSquare(xsquarecont,ysquarecont);
+					{
+						if (oldSquare.code>0) square.storeClick(this.palette.getBgFontColor(),this.palette.getFontColorById(oldSquare.code));
+						else square.draw(this.palette.getBgFontColor());
+					}
+					newSquaresObj.push(square);
 	  			}
+	  		
+	  		this.squaresObjs=newSquaresObj;
 	  		this.xres=newXres;
+	  		return ;
 		},
 		changeCanvasYResolution : function (newYres)
 		{
 			this.canvas.height  = square_pixels*newYres;
-			for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
-				for (ysquarecont=0;ysquarecont<Math.max(this.yres,newYres);ysquarecont++)
+			var newSquaresObj=[];
+			for (ysquarecont=0;ysquarecont<newYres;ysquarecont++)
+				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
 				{
-					//var square = createSquareObj(context,xsquarecont,ysquarecont);
-					if (ysquarecont<newYres)
-					{
-						if (this.getSquare(xsquarecont,ysquarecont)==undefined)
-						{
-							var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
-							square.draw(this.palette.getBgFontColor());
-							this.squaresObjs.push(square);
-						}
-						else
-						{
-							var square = this.getSquare(xsquarecont,ysquarecont);
-							if (square.code>0) square.draw(this.palette.getFontColorById(square.code));
-							else square.draw(this.palette.getBgFontColor());
-						}
-					}
+					var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
+					var oldSquare = this.getSquare(xsquarecont,ysquarecont);
+					if (oldSquare==undefined)
+						square.draw(this.palette.getBgFontColor());
 					else
-						this.removeSquare(xsquarecont,ysquarecont);
+					{
+						if (oldSquare.code>0) square.storeClick(this.palette.getBgFontColor(),this.palette.getFontColorById(oldSquare.code));
+						else square.draw(this.palette.getBgFontColor());
+					}
+					newSquaresObj.push(square);
 	  			}
+	  		
+	  		this.squaresObjs=newSquaresObj;
 	  		this.yres=newYres;
+	  		return ;
 		},
 		// Get a square object from a coordinate pair
 		getSquare: function (x,y)
@@ -401,7 +399,8 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 		clearAllSquares: function ()
 		{
 			for (var i = 0; i < this.squaresObjs.length; i++) {
-				this.squaresObjs[i].unfill(this.palette.getBgFontColor());
+				//this.squaresObjs[i].unfill(this.palette.getBgFontColor());
+				this.squaresObjs[i].reset(this.palette.getBgFontColor());
 			}
 		},
 		getBinaryBitplanes: function () {
