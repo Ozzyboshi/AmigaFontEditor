@@ -17,10 +17,27 @@ function FontColorsTable(nBitplanes)
 	this.FontColorsArray = [],
 	this.fgIndexColor = 0,
 	this.bgIndexColor = 0,
-	this.changeBitplanes = function (nBitplanes) { this.nBitplanes=nBitplanes },
+	this.changeBitplanes = function (nBitplanes) { 
+		// Shrink the array
+		if (nBitplanes<this.nBitplanes)
+		{
+			this.FontColorsArray = this.FontColorsArray.slice(0,Math.pow(2,nBitplanes));
+		}
+		// Increase array size
+		else if (nBitplanes>this.nBitplanes)
+		{
+			for (var i=Math.pow(2,this.nBitplanes);i<Math.pow(2,nBitplanes);i++)
+				this.FontColorsArray.push(new FontColor('#000000',this.FontColorsArray.length));
+		}
+		this.nBitplanes=nBitplanes 
+	},
 	this.addFont24BitHexColor = function (hex) {
 		if (this.FontColorsArray.length<Math.pow(2,this.nBitplanes))
 			this.FontColorsArray.push(new FontColor(hex,this.FontColorsArray.length));
+	};
+	this.addFont24BitHexColorAtPos = function (hex,pos) {
+		if (pos<this.FontColorsArray.length)
+			this.FontColorsArray[pos]=new FontColor(hex,pos);
 	};
 	this.setFgColorIndex = function (index) {
 		this.fgIndexColor = index;
@@ -194,6 +211,12 @@ function createFontTable(characters,palette,resolution)
 					}
 				}
 			}
+		},
+		updatePalette: function (newPalette) {
+			this.palette=newPalette;
+			for (var i = 0; i < table.fontArray.length; i++)
+				table.fontArray[i].updatePalette(newPalette);
+
 		},
 		changeFontXRes: function (newXres) {
 			for (var i = 0; i < table.fontArray.length; i++)
@@ -573,6 +596,13 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				
 			}
 			return ;
+		},
+		updatePalette: function (newPalette){
+			this.palette=newPalette;
+			for (var i = 0; i < this.squaresObjs.length; i++) {
+				if (this.squaresObjs[i].code>=Math.pow(2,newPalette.nBitplanes))
+					this.squaresObjs[i].reset(this.palette.getBgFontColor());
+			}
 		}
 
 	};
@@ -630,6 +660,7 @@ function createSquareObj(context,x,y)
 		reset(color) {
 			this.pixel_clicked=false;
 			this.pixel_filled=false;
+			this.code=0;
 			context.beginPath();
 			context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
 			context.fillStyle = color.hex;

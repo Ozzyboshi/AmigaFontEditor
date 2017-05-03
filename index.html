@@ -113,19 +113,27 @@
 	  document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
 	  function handleChangeBitplaneNumber(event)
 	  {
+	  	palette.changeBitplanes(this.value*1);
+	  	
 	  	// Hide out of range palettes
 	  	for (i=0;i<NUMPALETTECOLORS;i++)
 	  	{
-	  		palette.changeBitplanes(this.value*1);
 	  		var liColor=document.querySelectorAll("#colorslist > li")[i];
 	  		if (i<Math.pow(2,this.value*1))
 	  			liColor.style = "display: show";
 	  		else
 	  			liColor.style = "display: none";
+	  		var colorObj=document.querySelectorAll("#colorslist > li > input[type=color]")[i];
+	  		palette.addFont24BitHexColorAtPos(colorObj.value,i);
+
 	  	}
 
 	  	//Bitplane label update
 	  	document.getElementById('bitplaneslabel').innerHTML='Bitplanes :'+this.value;
+
+	  	table.updatePalette(palette);
+	  	palette.setFgColorIndex(1);
+	  	palette.setBgColorIndex(0);
 	  }
 
 	  // Manage palette change color
