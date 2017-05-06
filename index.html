@@ -51,6 +51,8 @@
 				<li idcolor="30"><input type=color id="color30" value="#ff00ff">Color 30</li>
 				<li idcolor="31	"><input type=color id="color31" value="#ff00ff">Color 31</li>
 			</ul>
+			<input id="xres" type="range" min="8" max="32" step="8"/><a id="xreslabel">X resolution :8</a>
+			<input id="yres" type="range" min="8" max="32" step="8"/><a id="yreslabel">Y resolution :8</a>
 		</div>
 		<div id=result>
 			<div id="buttondiv">
@@ -69,8 +71,31 @@
       var NBITPLANES=2; // The program starts with 2 bitplanes
       var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors from DFF180 (color 00 to DFF1BE color 31)
       var SQUARE_PIXELS = 10; // Pixel needed to draw a square
-	  var XRES = 8;
-	  var YRES = 8;
+	  //var XRES = 8;
+	  //var YRES = 8;
+	  var PIXEL_RESOLUTION=[16,32];
+
+	  // set default xres-yres in sliders
+	  document.getElementById('xres').value=PIXEL_RESOLUTION[0];
+	  document.getElementById('yres').value=PIXEL_RESOLUTION[1];
+	  document.getElementById('xreslabel').innerHTML='X Resolution :'+PIXEL_RESOLUTION[0];
+	  document.getElementById('yreslabel').innerHTML='Y Resolution :'+PIXEL_RESOLUTION[1];
+	  
+	  // Handle xres change
+	  document.getElementById('xres').addEventListener('change',handleChangeXres,false);
+	  function handleChangeXres(event)
+	  {
+	  	document.getElementById('xreslabel').innerHTML='X Resolution :'+this.value;
+	  	table.changeFontXRes(parseInt(this.value));
+	  }
+
+	  // Handle yres change
+	  document.getElementById('yres').addEventListener('change',handleChangeYres,false);
+	  function handleChangeYres(event)
+	  {
+	  	document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
+	  	table.changeFontYRes(parseInt(this.value));
+	  }
 
 	  // Set default bitplanes in slider
 	  document.getElementById('nbitplanes').value=NBITPLANES;
@@ -88,19 +113,27 @@
 	  document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
 	  function handleChangeBitplaneNumber(event)
 	  {
+	  	palette.changeBitplanes(this.value*1);
+	  	
 	  	// Hide out of range palettes
 	  	for (i=0;i<NUMPALETTECOLORS;i++)
 	  	{
-	  		palette.changeBitplanes(this.value*1);
 	  		var liColor=document.querySelectorAll("#colorslist > li")[i];
 	  		if (i<Math.pow(2,this.value*1))
 	  			liColor.style = "display: show";
 	  		else
 	  			liColor.style = "display: none";
+	  		var colorObj=document.querySelectorAll("#colorslist > li > input[type=color]")[i];
+	  		palette.addFont24BitHexColorAtPos(colorObj.value,i);
+
 	  	}
 
 	  	//Bitplane label update
 	  	document.getElementById('bitplaneslabel').innerHTML='Bitplanes :'+this.value;
+
+	  	table.updatePalette(palette);
+	  	palette.setFgColorIndex(1);
+	  	palette.setBgColorIndex(0);
 	  }
 
 	  // Manage palette change color
@@ -140,7 +173,7 @@
 	//Create fonts table for characters from ascii 32 to 127
 	var charset = [];
 	for (var i = 32; i < 127; i++) charset.push(i);
-	var table=createFontTable(charset,palette);
+	var table=createFontTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
 	table.createList(document.getElementById("fonttable"));
 	table.appendlListToUl(document.getElementById('fontnavigator'));
 
@@ -148,7 +181,7 @@
 	var calculate = document.getElementById('calculate');
 	calculate.onclick = function() {
 		var binaryData=table.getBinaryData(palette.nBitplanes);
-		console.log(binaryData);
+		//console.log(binaryData);
 		var fileName = prompt("Please enter the name of your export file", "Myfonts.fnt");
 		if (fileName)
 			saveByteArray([binaryData], fileName);
