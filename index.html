@@ -3,6 +3,8 @@
   <head>
     <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
 	<script src="js/AmigaFontEditor.js"></script>
+	<script src="js/UPNG.js"></script>
+	<script src="js/pako.js"></script>
   </head>
   <body>
 	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
@@ -11,7 +13,7 @@
 		<h2>Amiga font editor</h2>
 		<h4>Draw your fonts on the left grids and get the binary raw data to load into the Amiga copperlist</h4>
 		<div id="fontnavigator">
-			<ul>
+			<ul id="fontulnavigator">
 			</ul>
 		</div>
 		<div id="colorpalette">
@@ -68,12 +70,10 @@
 		<ul id="fonttable"></ul>
 	</div>
     <script>
-      var NBITPLANES=2; // The program starts with 2 bitplanes
-      var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors from DFF180 (color 00 to DFF1BE color 31)
-      var SQUARE_PIXELS = 10; // Pixel needed to draw a square
-	  //var XRES = 8;
-	  //var YRES = 8;
-	  var PIXEL_RESOLUTION=[16,32];
+	var NBITPLANES=4; // The program starts with 2 bitplanes
+	var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors from DFF180 (color 00 to DFF1BE color 31)
+	var SQUARE_PIXELS = 10; // Pixel needed to draw a square
+	var PIXEL_RESOLUTION=[32,25];
 
 	  // set default xres-yres in sliders
 	  document.getElementById('xres').value=PIXEL_RESOLUTION[0];
@@ -175,7 +175,21 @@
 	for (var i = 32; i < 127; i++) charset.push(i);
 	var table=createFontTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
 	table.createList(document.getElementById("fonttable"));
-	table.appendlListToUl(document.getElementById('fontnavigator'));
+	table.appendListToUl(document.getElementById('fontnavigator'));
+
+	// Set change palette callback to update gui if palette changes
+	table.setChangePaletteCallback(
+		function (paletteArray) {
+			for (var i=0;i<paletteArray.length;i++)
+			{
+				document.querySelectorAll("#colorslist > li > input[type=color]")[i].value=paletteArray[i];
+				palette.setBgColorIndex(0);
+				palette.setFgColorIndex(i);
+				palette.changeColor(i,paletteArray[i]);
+				table.updateColor(i,paletteArray[i]);
+			}
+		}
+	);
 
 	// Handle file export click
 	var calculate = document.getElementById('calculate');
@@ -228,7 +242,7 @@
 		}
 
 		return ret
-   };
+   	};
 
 	document.querySelector("#fileChooser").addEventListener('change',filesChosen, false);
 	function filesChosen(evt){
@@ -264,7 +278,7 @@
 	{
 		var ta = document.getElementById('resultpre');
 		ta.focus();
-        ta.select();
+		ta.select();
 	}
     </script>
   </body>

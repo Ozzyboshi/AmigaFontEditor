@@ -1,4 +1,5 @@
 var COPIED_SQUARE;
+var PNG_MAPPING = [];
 
 function FontColor(hex,code)
 {
@@ -87,7 +88,7 @@ function createFontTable(characters,palette,resolution)
 			this.fontArray=fontArray;
 			return;
 		},
-		appendlListToUl: function (parent) {
+		appendListToUl: function (parent) {
 			this.characters.forEach(function(element) {
 				var li = document.createElement("li");
 				li.appendChild(document.createTextNode(String.fromCharCode(parseInt(element))));
@@ -227,6 +228,10 @@ function createFontTable(characters,palette,resolution)
 			for (var i = 0; i < table.fontArray.length; i++)
 				table.fontArray[i].changeCanvasYResolution(newYres);
 			this.resolution.y=newYres;
+		},
+		setChangePaletteCallback: function (callback) {
+			for (var i = 0; i < table.fontArray.length; i++)
+				table.fontArray[i].setChangePaletteCallback(callback);
 		}
 	};
 }
@@ -241,6 +246,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 		canvas:undefined,
 		context:undefined,
 		squaresObjs:[],
+		changePaletteCallback:undefined,
 		createCanvas: function () {
 			canvas = document.createElement('canvas');
 	  		canvas.width  = square_pixels*xres;
@@ -269,12 +275,26 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			pasteBtn.appendChild(pasteTxt);
 			p.appendChild(pasteBtn);
 			parentObject.appendChild(p);
+			parentObject.appendChild(p);
 
+			// Create load PNG button
+			var loadPngBtnReal = document.createElement("INPUT");
+			loadPngBtnReal.type="file";
+			loadPngBtnReal.style="display:none;";
+			p.appendChild(loadPngBtnReal);
+			var loadPngBtn = document.createElement("BUTTON");
+			var loadPngTxt = document.createTextNode("Load png");
+			loadPngBtn.appendChild(loadPngTxt);
+			p.appendChild(loadPngBtn);
+			parentObject.appendChild(p);
+
+			// Create and assign data
 			context = canvas.getContext('2d');
 			canvas.data = this;
 			clearBtn.data = this;
 			copyBtn.data = this;
 			pasteBtn.data = this;
+			loadPngBtnReal.data = this;
 
 			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
 				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
@@ -338,7 +358,109 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				this.data.drawFontFromData(COPIED_SQUARE);
 				alert('Image pasted');
 			});
+
+			// Handle load png button click (fake)
+			loadPngBtn.addEventListener("click",function(e){
+				this.previousSibling.click();
+			});
+
+			// Handle load png button click (true)
+			loadPngBtnReal.addEventListener("change",function(e){
+				var palette=this.data.palette;
+				var squaresObjs=this.data.squaresObjs;
+				var rgbToHex = this.data.rgbToHex;
+				var xres=this.data.xres;
+				var yres=this.data.yres;
+				var changePaletteCallback=this.data.changePaletteCallback;
+
+				var fileReader = new FileReader();
+				fileReader.onloadend = function (e) 
+				{
+    					var arrayBuffer = e.target.result;
+					//console.log(arrayBuffer);
+					var img = UPNG.decode(arrayBuffer);
+					if (img.width!=xres || img.height!=yres)
+					{
+						alert('Image resolution invalid, png resolution : '+img.width+'X'+img.height+' pixels, change the png resolution or adjust settings in this page');
+						return ;
+					}
+					if (img.depth>palette.nBitplanes)
+					{
+						alert('Image color depth '+img.depth+' is too high, please change the png color depth or increase the bitplanes (if possible)');
+						return ;
+					}
+					//console.log(img);
+					var img2=UPNG.toRGBA8(img);
+					//console.log(img2);
+
+					var usePreviousPNGPaletteSchema=0;
+					if (PNG_MAPPING.length>0)
+					{
+						if (window.confirm("Use previous png palette schema?"))
+							usePreviousPNGPaletteSchema=1;
+						else
+							PNG_MAPPING=[];
+					}
+					var arrayPixel=[];
+					for (var i=0;i<img2.length;i+=4)
+					{
+						var pixel = {r:img2[i],g:img2[i+1],b:img2[i+2]};
+						var found=0;
+						for (var j=0;found==0&&j<arrayPixel.length;j++)
+						{
+							if (arrayPixel[j].r==pixel.r && arrayPixel[j].g==pixel.g && arrayPixel[j].b==pixel.b)
+							{
+								found=1;
+								if (squaresObjs[i/4]!=undefined){
+									squaresObjs[i/4].code=j;
+								}
+								squaresObjs[i/4].reset(palette.getBgFontColor());
+								if (j>0)
+									squaresObjs[i/4].storeClick(palette.getBgFontColor(),palette.getFontColorById(j));
+							}
+						}
+						if (found==0) {
+							var mapping_found=0;
+							for (var cont_mapping=0;usePreviousPNGPaletteSchema==1&&cont_mapping<PNG_MAPPING.length&&mapping_found==0;cont_mapping++)
+							{
+								var pngMap=PNG_MAPPING[cont_mapping].pixel;
+								if (pngMap.r==pixel.r && pngMap.g==pixel.g && pngMap.b==pixel.b)
+								{
+									mapping_found=1;
+									var code=PNG_MAPPING[cont_mapping].code;
+									if (squaresObjs[i/4]!=undefined) squaresObjs[i/4].code=code;
+									squaresObjs[i/4].reset(palette.getBgFontColor());
+									if (code>0)
+										squaresObjs[i/4].storeClick(palette.getBgFontColor(),palette.getFontColorById(code));
+								}
+							}
+							if (mapping_found==0)
+							{
+								if (squaresObjs[i/4]!=undefined) squaresObjs[i/4].code=arrayPixel.length;
+								squaresObjs[i/4].reset(palette.getBgFontColor());
+								if (arrayPixel.length>0)
+									squaresObjs[i/4].storeClick(palette.getBgFontColor(),palette.getFontColorById(arrayPixel.length));
+								PNG_MAPPING.push({'code':arrayPixel.length,'pixel':pixel});
+								arrayPixel.push(pixel);
+							}
+						}
+					}
+					//console.log(arrayPixel);
+					if (!window.confirm('Use new colors extracted from the png file?')) return ;
+					var arrayPixelRgb = [];
+					for (var i=0;i<arrayPixel.length;i++)
+					{
+						var rgbRes=rgbToHex(arrayPixel[i].r,arrayPixel[i].g,arrayPixel[i].b);
+						while (rgbRes.length < 6)  rgbRes="0"+rgbRes;
+						arrayPixelRgb.push('#'+rgbRes);
+					}
+					changePaletteCallback(arrayPixelRgb);
+				};
+				fileReader.readAsArrayBuffer(this.files[0]);
+				this.value=null;
+			});
 		},
+		setChangePaletteCallback: function (callback) { this.changePaletteCallback = callback },
 		changeCanvasXResolution : function (newXres)
 		{
 
@@ -504,7 +626,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				throw "Invalid color component";
 			return ((r << 16) | (g << 8) | b).toString(16);
 		},
-		getHexDataString: function () {
+		/*getHexDataString: function () {
 			var s = this.getBinaryDataString();
 			var i, k, part, accum, ret = '';
 			for (i = s.length-1; i >= 3; i -= 4) {
@@ -542,7 +664,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			}
 			//return { valid: true, result: ret };
 			return ret;
-		},
+		},*/
 		// Function to set squares status according to a binaryData array, this array must be made by 0 or 1 only and his length must match the font resolution
 		setSquares : function (binaryData) {
 			//console.log(binaryData);
@@ -655,7 +777,7 @@ function createSquareObj(context,x,y)
 		storeClick(bgcolor,fgcolor) {
 			this.pixel_clicked=!this.pixel_clicked;
 			if (this.pixel_clicked==true)	{this.fill(fgcolor);this.code=fgcolor.code;}
-			else							{this.unfill(bgcolor);this.code=bgcolor.code;}
+			else				{this.unfill(bgcolor);this.code=bgcolor.code;}
 		},
 		reset(color) {
 			this.pixel_clicked=false;
