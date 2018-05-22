@@ -5,20 +5,18 @@
 	<script src="js/AmigaFontEditor.js"></script>
 	<script src="js/UPNG.js"></script>
 	<script src="js/pako.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2/math.min.js"></script>
   </head>
   <body>
 	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
 
 	<div id="content" style="padding:25px">
-		<h2>Amiga font editor</h2>
-		<h4>Draw your fonts on the left grids and get the binary raw data to load into the Amiga copperlist</h4>
-		<div id="fontnavigator">
-			<ul id="fontulnavigator">
-			</ul>
-		</div>
-		<div id="colorpalette">
+		<h2>Amiga sprite position editor</h2>
+		<h4>Draw your sprites position on the left grid and get the binary raw data to load into the Amiga copperlist</h4>
+		<input type="button" class="hideshowcontrols" value="Hide Controls">
+		
+		<div id="colorpalette" draggable="true" >
 			<input type="file" id="fileChooser" style="display:none;">
-			<input id="nbitplanes" type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :5</a>
 			<ul id="colorslist">
 				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 00</li>
 				<li idcolor="1"><input type=color id="color1" value="#ff0000">Color 01</li>
@@ -51,55 +49,37 @@
 				<li idcolor="28"><input type=color id="color28" value="#ff00ff">Color 28</li>
 				<li idcolor="29"><input type=color id="color29" value="#ff00ff">Color 29</li>
 				<li idcolor="30"><input type=color id="color30" value="#ff00ff">Color 30</li>
-				<li idcolor="31	"><input type=color id="color31" value="#ff00ff">Color 31</li>
+				<li idcolor="31"><input type=color id="color31" value="#ff00ff">Color 31</li>
 			</ul>
-			<input id="xres" type="range" min="8" max="32" step="8"/><a id="xreslabel">X resolution :8</a>
-			<input id="yres" type="range" min="8" max="32" step="1"/><a id="yreslabel">Y resolution :8</a>
+			<pre id=pospre>
+			X: 0
+			Y: 0
+			</pre>
 		</div>
 		<div id=result>
 			<div id="buttondiv">
-				<input type=button id=showbin value="Show Binary" />
-				<input type=button id=showhex value="Show Hex" />
-				<input type="button" value="Amiga colors code" id="amigacolorscode" />
+				<input type="button" id="mirrormode" value="Mirror mode Off" />
+				<input type="button" id="horizintalpixelforclick" value="Set horizontal pixels for click">
+				<input type="button" id="verticalpixelforclick" value="Set vertical pixels for click">
+				<input type="button" id="setfunctionclick" value="Set function">
 			</div>
 			<textarea id="resultpre"></textarea>
 			<input type=button id=copyresult value="Copy to Clipboard" />
 			<input type=button id=calculate value="Generate Raw File" />
 			<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
+			<input type="button" class="hideshowcontrols" value="Hide Controls">
+
 		</div>
 		<ul id="fonttable"></ul>
 	</div>
     <script>
-	var NBITPLANES=4; // The program starts with 2 bitplanes
+	var NBITPLANES=1; // The program starts with 2 bitplane
 	var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors from DFF180 (color 00 to DFF1BE color 31)
 	var SQUARE_PIXELS = 10; // Pixel needed to draw a square
-	var PIXEL_RESOLUTION=[32,25];
+	var PIXEL_RESOLUTION=[320,256];
+	var XCOORDINATES=[];
+	var YCOORDINATES=[];
 
-	  // set default xres-yres in sliders
-	  document.getElementById('xres').value=PIXEL_RESOLUTION[0];
-	  document.getElementById('yres').value=PIXEL_RESOLUTION[1];
-	  document.getElementById('xreslabel').innerHTML='X Resolution :'+PIXEL_RESOLUTION[0];
-	  document.getElementById('yreslabel').innerHTML='Y Resolution :'+PIXEL_RESOLUTION[1];
-	  
-	  // Handle xres change
-	  document.getElementById('xres').addEventListener('change',handleChangeXres,false);
-	  function handleChangeXres(event)
-	  {
-	  	document.getElementById('xreslabel').innerHTML='X Resolution :'+this.value;
-	  	table.changeFontXRes(parseInt(this.value));
-	  }
-
-	  // Handle yres change
-	  document.getElementById('yres').addEventListener('change',handleChangeYres,false);
-	  function handleChangeYres(event)
-	  {
-	  	document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
-	  	table.changeFontYRes(parseInt(this.value));
-	  }
-
-	  // Set default bitplanes in slider
-	  document.getElementById('nbitplanes').value=NBITPLANES;
-	  document.getElementById('bitplaneslabel').innerHTML='Bitplanes :'+NBITPLANES;
 	  for (i=0;i<NUMPALETTECOLORS;i++)
 	  {
 	  	var liColor=document.querySelectorAll("#colorslist > li")[i];
@@ -109,33 +89,6 @@
 	  		liColor.style = "display: none";
 	  }
 	  
-	  // Manage slider for changing bitplane numbers
-	  document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
-	  function handleChangeBitplaneNumber(event)
-	  {
-	  	palette.changeBitplanes(this.value*1);
-	  	
-	  	// Hide out of range palettes
-	  	for (i=0;i<NUMPALETTECOLORS;i++)
-	  	{
-	  		var liColor=document.querySelectorAll("#colorslist > li")[i];
-	  		if (i<Math.pow(2,this.value*1))
-	  			liColor.style = "display: show";
-	  		else
-	  			liColor.style = "display: none";
-	  		var colorObj=document.querySelectorAll("#colorslist > li > input[type=color]")[i];
-	  		palette.addFont24BitHexColorAtPos(colorObj.value,i);
-
-	  	}
-
-	  	//Bitplane label update
-	  	document.getElementById('bitplaneslabel').innerHTML='Bitplanes :'+this.value;
-
-	  	table.updatePalette(palette);
-	  	palette.setFgColorIndex(1);
-	  	palette.setBgColorIndex(0);
-	  }
-
 	  // Manage palette change color
 	  var palette = new FontColorsTable(NBITPLANES);
 
@@ -172,8 +125,28 @@
 
 	//Create fonts table for characters from ascii 32 to 127
 	var charset = [];
-	for (var i = 32; i < 127; i++) charset.push(i);
-	var table=createFontTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
+	for (var i = 48; i <= 48; i++) charset.push(i);
+	//var spriteTable=createSpriteTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
+	//spriteTable.createList();
+	var table=createMonitorTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]}, function (square) {
+		var xPos=parseInt(parseInt(square.x/2)+64);
+		var yPos=parseInt(parseInt(square.y)+44);
+		console.log(xPos+"-"+xPos.toString(16));
+		console.log(yPos+"-"+yPos.toString(16));
+
+		xPos=xPos<<1;
+		if (square.x%2==1)
+		{
+			xPos=xPos|1;
+		}
+
+		XCOORDINATES.push("$"+xPos.toString(16));
+		YCOORDINATES.push("$"+yPos.toString(16));
+
+		updateResults();
+	},function (square_selected) {
+		document.getElementById('pospre').innerHTML='X : '+square_selected.x+'\nY : '+square_selected.y;
+	});
 	table.createList(document.getElementById("fonttable"));
 	table.appendListToUl(document.getElementById('fontnavigator'));
 
@@ -185,6 +158,7 @@
 				document.querySelectorAll("#colorslist > li > input[type=color]")[i].value=paletteArray[i];
 				palette.setBgColorIndex(0);
 				palette.setFgColorIndex(i);
+
 				palette.changeColor(i,paletteArray[i]);
 				table.updateColor(i,paletteArray[i]);
 			}
@@ -215,35 +189,6 @@
 		};
 	}());
 
-	// Handle click on SHOWBINARYSTRING button
-	var showbin=document.getElementById('showbin');
-	showbin.onclick = function() {
-		var formattedBinary=chunk(table.getBinaryDataString(palette.nBitplanes),8).join(' ');
-		formattedBinary=chunk(formattedBinary, 72).join('\n');
-		document.getElementById("resultpre").innerHTML = formattedBinary;
-	};
-
-	// Handle click on SHOWEXSTRING button
-	var showhex=document.getElementById('showhex');
-	showhex.onclick = function() {
-		var formattedHex=chunk(table.getHexDataString(palette.nBitplanes), 2).join(' ');
-		var formattedHex=chunk(formattedHex, 24).join('\n');
-		document.getElementById("resultpre").innerHTML = formattedHex;
-		return ;
-	};
-
-	function chunk(str, n) {
-		var ret = [];
-		var i;
-		var len;
-
-		for(i = 0, len = str.length; i < len; i += n) {
-		   ret.push(str.substr(i, n))
-		}
-
-		return ret
-   	};
-
 	document.querySelector("#fileChooser").addEventListener('change',filesChosen, false);
 	function filesChosen(evt){
 		var chosenFile = evt.target.files[0]; //get the first file in the FileList
@@ -255,32 +200,135 @@
 		//reader.addEventListener("load", readFile, false);
 		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
 		reader.onloadend = function () {
-			var module=0;
-			if (palette.nBitplanes==1) module=parseInt(prompt("Please enter the module for interleaved images (0 not to use it)", "0"));
-			table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes,module);
+			table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes);
 			alert('File loaded succesfully');
 			document.getElementById('fileChooser').value = null;
 			return ;
 		}
 	}
 
-	// Handle show amiga colors button click
-	document.querySelector("#amigacolorscode").addEventListener('click',showAmigaColors, false);
-	function showAmigaColors(evt) {
-		document.getElementById("resultpre").innerHTML = '';
-		for (var i=0,startReg=384;i<palette.getTableSize();startReg+=2,i++)
-		{
-			var font=palette.getFontColorById(i);	
-			document.getElementById("resultpre").innerHTML += 'dc.w    $'+startReg.toString(16)+',$'+font.amigaR+font.amigaG+font.amigaB+'    ; color'+i+'\n';
-		}
-	}
-
+	
 	document.querySelector("#copyresult").addEventListener('click',copyToClipboard,false);
 	function copyToClipboard()
 	{
 		var ta = document.getElementById('resultpre');
 		ta.focus();
 		ta.select();
+	}
+
+	document.querySelector("#horizintalpixelforclick").addEventListener('click',horizontalpixelforclick,false);
+	function horizontalpixelforclick ()
+	{
+		newValue=window.prompt("Set horizontal pixels number for each click (from 1 to 320)","1");
+		if (parseInt(newValue)>=1 && parseInt(newValue)<=320)
+		{
+			table.changeHorizontalPixelToDraw(parseInt(newValue));
+			alert('Horizontal pixels set to '+parseInt(newValue));
+		}
+	}
+
+	document.querySelector("#verticalpixelforclick").addEventListener('click',verticalpixelforclick,false);
+	function verticalpixelforclick ()
+	{
+		newValue=window.prompt("Set vertical pixels number for each click (from 1 to 256)","1");
+		if (parseInt(newValue)>=1 && parseInt(newValue)<=320)
+		{
+			table.changeVerticalPixelToDraw(parseInt(newValue));
+			alert('Vertical pixels set to '+parseInt(newValue));
+		}
+	}
+	document.querySelector("#setfunctionclick").addEventListener('click',setfunctionforclick,false);
+	function setfunctionforclick ()
+	{
+		newValue=window.prompt("Enter function, ex f(x)=x^2+x+1, empty to do not use it, help yourself at https://www.desmos.com/calculator","f(x)=x^2+x+1");
+		
+		table.changeFunctionPixelToDraw(newValue);
+		if (newValue.length==0) alert('Function cleared');
+		else alert('Function set to '+newValue);
+	}
+
+	document.querySelector("#mirrormode").addEventListener('click',setmirrormode,false);
+	function setmirrormode()
+	{
+		if (this.value=="Mirror mode Off") this.value="Mirror mode On";
+		else this.value="Mirror mode Off";
+		updateResults();
+	}
+
+	//document.querySelector(".hideshowcontrols").addEventListener('click',hideshowcontrols,false);
+	var classname = document.getElementsByClassName("hideshowcontrols");
+	for (var i = 0; i < classname.length; i++) {
+    	classname[i].addEventListener('click', hideshowcontrols, false);
+	}
+	function hideshowcontrols()
+	{
+		if (this.value=="Hide Controls")
+		{
+			document.querySelector(".hideshowcontrols").value="Show Controls";
+			document.querySelector("#colorpalette").style.display = "none";
+			document.querySelector("#result").style.display = "none";
+			return;
+		}
+		document.querySelector(".hideshowcontrols").value="Hide Controls";
+		document.querySelector("#colorpalette").style.display = "block";
+		document.querySelector("#result").style.display = "block";
+	}
+
+	function updateResults()
+	{
+		var mirror=0;
+		if (document.querySelector("#mirrormode").value=="Mirror mode On") mirror=1;
+
+		document.getElementById("resultpre").innerHTML = 'TABX\n\tdc.w ';
+
+		for (var i=0;i<XCOORDINATES.length;i++)
+		{
+			var virgola="";
+			if (i>0) virgola=",";
+			if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
+			document.getElementById("resultpre").innerHTML += virgola+XCOORDINATES[i];
+		}
+		if (mirror)
+		{
+			document.getElementById("resultpre").innerHTML += '\nTABXMIRROR\n\tdc.w ';
+			for (var i=0;i<XCOORDINATES.length;i++)
+			{
+				var virgola="";
+				if (i>0) virgola=",";
+				if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
+				document.getElementById("resultpre").innerHTML += virgola+XCOORDINATES[XCOORDINATES.length-1-i];
+			}
+		}
+		document.getElementById("resultpre").innerHTML += '\nFINETABX';
+
+		document.getElementById("resultpre").innerHTML += '\n\nTABY\n\tdc.w ';
+		for (var i=0;i<YCOORDINATES.length;i++)
+		{
+			var virgola="";
+			if (i>0) virgola=",";
+			if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
+			document.getElementById("resultpre").innerHTML += virgola+YCOORDINATES[i];
+			
+		}
+		if (mirror)
+		{
+			document.getElementById("resultpre").innerHTML += '\n\nTABYMIRROR\n\tdc.w ';
+			for (var i=0;i<YCOORDINATES.length;i++)
+			{
+				var virgola="";
+				if (i>0) virgola=",";
+				if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
+				document.getElementById("resultpre").innerHTML += virgola+YCOORDINATES[YCOORDINATES.length-1-i];
+			}
+		}
+		document.getElementById("resultpre").innerHTML += '\nFINETABY';
+	}
+	document.getElementById("colorpalette").addEventListener('dragover',dragfunction,false);
+	function dragfunction (data)
+	{
+		console.log(data);
+		 document.getElementById("colorpalette").style.left = data.screenX + 'px';
+    	document.getElementById("colorpalette").style.top = data.screenY + 'px';
 	}
     </script>
   </body>

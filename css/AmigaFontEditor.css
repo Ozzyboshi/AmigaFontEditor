@@ -41,3 +41,14 @@ pre {border: solid 1px;margin: 0px;}
 canvas {cursor:pointer;}
 #colorslist > li:nth-child(2) {background-color: red;}
 #colorslist > li {cursor:pointer;}
+
+[draggable=true] {
+    cursor: move;
+}
+
+.resizable {
+    overflow: scroll;
+    resize: both;
+    max-width: 300px;
+    max-height: 460px;
+}

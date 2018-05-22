@@ -61,6 +61,192 @@ function FontColorsTable(nBitplanes)
 	}
 }
 
+function createSpriteTable(characters,palette,resolution)
+{
+	var newObj=createFontTable(characters,palette,resolution);
+	newObj.createList = function (parent) {
+		var fontArray=[];
+		this.characters.forEach(function(element) {
+	  		var li = document.createElement("li");
+	  		li.setAttribute("id", "lifont"+element);
+			var p = document.createElement("p");
+			var oTxt = document.createTextNode("Sprite: `"+String.fromCharCode(element)+"' Ascii code: "+element);
+
+			p.appendChild(oTxt);
+	  		li.appendChild(p);
+					
+	  		parent.appendChild(li);
+			var fontObj = createFontObj(SQUARE_PIXELS,resolution.x,resolution.y,li,this.palette);
+	  		fontObj.createCanvas();
+	  		fontArray.push(fontObj);
+		});
+		this.fontArray=fontArray;
+		return;
+	};
+	return newObj;
+}
+
+function createMonitorTable(characters,palette,resolution,clickCallback=null,mouseMoveCallback=null)
+{
+	var newObj=createFontTable(characters,palette,resolution);
+	newObj.createList = function (parent) {
+		var fontArray=[];
+		this.characters.forEach(function(element) {
+	  		var li = document.createElement("li");
+	  		li.setAttribute("id", "lifont"+element);
+			var p = document.createElement("p");
+			var oTxt = document.createTextNode("Draw positions");
+
+			p.appendChild(oTxt);
+	  		li.appendChild(p);
+					
+	  		parent.appendChild(li);
+			var fontObj = createTableObj(SQUARE_PIXELS,resolution.x,resolution.y,li,this.palette,clickCallback,mouseMoveCallback);
+	  		fontObj.createCanvas();
+	  		fontArray.push(fontObj);
+		});
+		this.fontArray=fontArray;
+		return;
+	};
+	newObj.appendListToUl = function () { return ; };
+	newObj.changeHorizontalPixelToDraw = function (horizontalPixelToDraw) {
+		for (var i = 0; i < table.fontArray.length; i++)
+		{
+			table.fontArray[i].setHorizontalPixelToDraw(horizontalPixelToDraw);
+		}
+	};
+
+	newObj.changeVerticalPixelToDraw = function (verticalPixelToDraw) {
+		for (var i = 0; i < table.fontArray.length; i++)
+		{
+			table.fontArray[i].setVerticalPixelToDraw(verticalPixelToDraw);
+		}
+	};
+	newObj.changeFunctionPixelToDraw = function (verticalPixelToDraw) {
+		for (var i = 0; i < table.fontArray.length; i++)
+		{
+			table.fontArray[i].setFunctionPixelToDraw(verticalPixelToDraw);
+		}
+	};
+
+	return newObj;
+}
+
+function createTableObj(square_pixels,xres,yres,parentObject,palette,clickCallback=null,mouseMoveCallback=null)
+{
+	var newObj=createFontObj(square_pixels,xres,yres,parentObject,palette);
+	newObj.horizontalPixelToDraw=1;
+	newObj.setHorizontalPixelToDraw = function (horizontalPixelToDraw) {
+		this.horizontalPixelToDraw=horizontalPixelToDraw;
+	};
+	newObj.setVerticalPixelToDraw = function (verticalPixelToDraw) {
+		this.verticalPixelToDraw=verticalPixelToDraw;
+	};
+	newObj.setFunctionPixelToDraw = function (functionPixelToDraw) {
+		this.functionPixelToDraw=functionPixelToDraw;
+	};
+	newObj.createCanvas = function () {
+		canvas = document.createElement('canvas');
+	  	canvas.width  = square_pixels*xres;
+	  	canvas.height = square_pixels*yres;
+		this.canvas = canvas;
+	  	parentObject.appendChild(canvas);
+
+	  	// Create and assign data
+		context = canvas.getContext('2d');
+		canvas.data = this;
+
+	  	for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
+				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
+				{
+					var square = createSquareObj(context,xsquarecont,ysquarecont);
+					square.draw(this.palette.getBgFontColor());
+					this.squaresObjs.push(square);
+	  			}
+			canvas.addEventListener("mousemove",function(e){
+			   	var pos = this.data.findPos(this);
+				var x = e.pageX - pos.x;
+				var y = e.pageY - pos.y;
+				var coord = "x=" + x + ", y=" + y;
+				var c = this.getContext('2d');
+				var p = c.getImageData(x, y, 1, 1).data; 
+				square_selected=this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
+				if (square_selected==undefined) return; 
+				if (mouseMoveCallback!=null) mouseMoveCallback(square_selected);
+				other_squares=this.data.getOtherSquares(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
+				// On hover i fill the square	
+				square_selected.fill(this.data.palette.getFgFontColor());
+				for (var i = 0; i < other_squares.length; i++) {
+					if (other_squares[i].pixel_clicked==false) other_squares[i].unfill(this.data.palette.getBgFontColor());
+				}
+			});
+			// On mouse exit canvas unfill all non clicked squares
+			canvas.addEventListener("mouseout",function(e){
+				all_squares=this.data.getAllSquares();
+				for (var i = 0; i < all_squares.length; i++) {
+					if (all_squares[i].pixel_clicked==false) all_squares[i].unfill(this.data.palette.getBgFontColor());
+				}
+			});
+			canvas.addEventListener("click",function(e){
+				var pos = this.data.findPos(this);
+				var x = e.pageX - pos.x;
+				var y = e.pageY - pos.y;
+
+				var squareX = Math.floor(x/this.data.square_pixels);
+				var squareY = Math.floor(y/this.data.square_pixels);
+
+				
+				if (this.data.functionPixelToDraw!=undefined && this.data.functionPixelToDraw.length>0)
+				{
+					//var paraboleDraw="f(x)=1/500x^2+1/100x+0";
+					var paraboleDraw=this.data.functionPixelToDraw;
+					alert(paraboleDraw);
+					var scope = {
+					  a: 3,
+					  b: 4
+					};
+					square_selected=this.data.getSquare(squareX,squareY);
+					var f = math.eval(paraboleDraw, scope);
+
+					var contParabola=0;
+					for (contParabola=0;contParabola<50;contParabola++)
+					{
+						console.log(Math.floor(f(square_selected.x+contParabola))); 
+						console.log(yres);
+						square_selected2=this.data.getSquare(square_selected.x+contParabola,yres-Math.floor(f(square_selected.x+contParabola)));
+						if (square_selected2!=undefined)
+						{
+							square_selected2.storeClick(this.data.palette.getFgFontColor(),this.data.palette.getFgFontColor());
+							if (clickCallback) clickCallback(square_selected2);	
+						}
+					}
+					//console.log(square_selected.x);
+					return;               
+				}
+
+				for (var contHorizontalPixelToDraw=0;contHorizontalPixelToDraw<this.data.horizontalPixelToDraw;contHorizontalPixelToDraw++)
+				{
+					square_selected=this.data.getSquare(squareX+contHorizontalPixelToDraw,squareY);
+					if (square_selected!=undefined)
+					{
+						square_selected.storeClick(this.data.palette.getFgFontColor(),this.data.palette.getFgFontColor());
+						if (clickCallback) clickCallback(square_selected);	
+					}
+				}
+
+				for (var contVerticalPixelToDraw=1;contVerticalPixelToDraw<this.data.verticalPixelToDraw;contVerticalPixelToDraw++)
+				{
+					square_selected=this.data.getSquare(squareX,squareY+contVerticalPixelToDraw);
+					if (square_selected!=undefined)
+					{
+						square_selected.storeClick(this.data.palette.getFgFontColor(),this.data.palette.getFgFontColor());
+						if (clickCallback) clickCallback(square_selected);	
+					}
+				}
+			});
+	};
+	return newObj;
+}
 
 function createFontTable(characters,palette,resolution)
 {
@@ -166,15 +352,20 @@ function createFontTable(characters,palette,resolution)
 				}
 			return binaryData;
 		},
-		drawRawData: function (rawData,nBitplanes) {
+		drawRawData: function (rawData,nBitplanes,module=0) {
 			//console.log(rawData);
 
 			// Set resolution variables
 			var xres=this.resolution.x;
 			var yres=this.resolution.y;
 
+			// init contmodule and xContBytes for interleaved processing
+			var contModule=0;
+			var xContBytes=xres/8;
+			console.log(module);
+
 			// Init resultarray
-			for (var z = 0; z < table.fontArray.length; z++)
+			for (var z = 0; z < table.fontArray.length; z++,contModule=0)
 			{
 				var binaryArray = [nBitplanes];
 				for (var i=0;i<nBitplanes;i++)
@@ -187,7 +378,17 @@ function createFontTable(characters,palette,resolution)
 					for (var j=0;j<nBitplanes;j++)
 					{
 						//console.log("Bitplane"+j);
-						var byte=rawData[(z*xres*yres/8)+i+j*xres*yres/8*table.fontArray.length];
+
+						// Enter here for interleaved fonts with 1 bitplane
+						if (nBitplanes==1 && module>0)
+						{
+							
+							var skipBytes=z*xContBytes;
+							var byte=rawData[skipBytes+contModule+(i%xContBytes)];
+							if ((i+1)%xContBytes==0)
+								contModule+=module;
+						}
+						else var byte=rawData[(z*xres*yres/8)+i+j*xres*yres/8*table.fontArray.length];
 						//console.log(byte);
 						binaryArray[j][i]=byte;
 					}
