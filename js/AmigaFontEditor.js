@@ -209,7 +209,7 @@ function createTableObj(square_pixels,xres,yres,parentObject,palette,clickCallba
 					var f = math.eval(paraboleDraw, scope);
 
 					var contParabola=0;
-					for (contParabola=0;contParabola<50;contParabola++)
+					for (contParabola=0;contParabola<this.data.xres-square_selected.x;contParabola++)
 					{
 						console.log(Math.floor(f(square_selected.x+contParabola))); 
 						console.log(yres);
