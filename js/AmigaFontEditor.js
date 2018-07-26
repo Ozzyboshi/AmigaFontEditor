@@ -129,6 +129,13 @@ function createMonitorTable(characters,palette,resolution,clickCallback=null,mou
 		}
 	};
 
+	newObj.changeSpriteWidth = function (horizontalPixels) {
+		for (var i = 0; i < table.fontArray.length; i++)
+		{
+			table.fontArray[i].setFunctionSpriteWidth(horizontalPixels);
+		}
+	};
+
 	return newObj;
 }
 
@@ -144,6 +151,9 @@ function createTableObj(square_pixels,xres,yres,parentObject,palette,clickCallba
 	};
 	newObj.setFunctionPixelToDraw = function (functionPixelToDraw) {
 		this.functionPixelToDraw=functionPixelToDraw;
+	};
+	newObj.setFunctionSpriteWidth = function (functionSpriteWidth) {
+		this.functionSpriteWidth=functionSpriteWidth;
 	};
 	newObj.createCanvas = function () {
 		canvas = document.createElement('canvas');
@@ -200,7 +210,7 @@ function createTableObj(square_pixels,xres,yres,parentObject,palette,clickCallba
 				{
 					//var paraboleDraw="f(x)=1/500x^2+1/100x+0";
 					var paraboleDraw=this.data.functionPixelToDraw;
-					alert(paraboleDraw);
+					//alert(paraboleDraw);
 					var scope = {
 					  a: 3,
 					  b: 4
@@ -209,7 +219,7 @@ function createTableObj(square_pixels,xres,yres,parentObject,palette,clickCallba
 					var f = math.eval(paraboleDraw, scope);
 
 					var contParabola=0;
-					for (contParabola=0;contParabola<this.data.xres-square_selected.x;contParabola++)
+					for (contParabola=0;contParabola<this.data.xres-square_selected.x-this.data.functionSpriteWidth+1;contParabola++)
 					{
 						console.log(Math.floor(f(square_selected.x+contParabola))); 
 						console.log(yres);

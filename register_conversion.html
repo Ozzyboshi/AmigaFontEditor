@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+	<script src="js/AmigaFontEditor.js"></script>
+	<script src="js/AmigaRegisters.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2/math.min.js"></script>
+  </head>
+  <body>
+	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+	<div class="topnav">
+	  <a href="index.html">Fonts</a>
+	  <a href="index_sprite.html">Sprite</a>
+	  <a href="index_sprite_position.html">Sprite position</a>
+	  <a class="active" href="#">Register conversion</a>
+	</div>
+	<h2>Amiga register reader</h2>
+	<div id="content" style="padding:25px">
+		<p><input type=text size=4 maxlength=4 id=hex value=0000> Hex value
+		<p><select size=1 id=register> Register
+		</select>
+
+		<p><input type=button value=Convert id=convert>
+	
+		<ul>
+			<li id=bit15>Bit 15</li>
+			<li id=bit14>Bit 14</li>
+			<li id=bit13>Bit 13</li>
+			<li id=bit12>Bit 12</li>
+			<li id=bit11>Bit 11</li>
+			<li id=bit10>Bit 10</li>
+			<li id=bit9>Bit 9</li>
+			<li id=bit8>Bit 8</li>
+			<li id=bit7>Bit 7</li>
+			<li id=bit6>Bit 6</li>
+			<li id=bit5>Bit 5</li>
+			<li id=bit4>Bit 4</li>
+			<li id=bit3>Bit 3</li>
+			<li id=bit2>Bit 2</li>
+			<li id=bit1>Bit 1</li>
+			<li id=bit0>Bit 0</li>
+
+		</ul>
+
+		<p><pre id=note>Note :</pre>
+	</div>
+	<script>
+		// Init selectbox
+		for (var registerIndex in AMIGAREGISTERS)
+		{
+			var register=AMIGAREGISTERS[registerIndex];
+			var option = document.createElement("option");
+		    option.value = register.address;
+		    option.text = register.address+" ("+register.name+") - "+register.description;
+			document.querySelector("#register").appendChild(option);
+		}
+		
+
+		document.querySelector("#convert").addEventListener('click',setfunctionforclick,false);
+		function setfunctionforclick()
+		{
+			var note="Note :";
+
+			//var register=registerDesc[document.querySelector("#register").value];
+			var register=[];
+			for (var registerIndex in AMIGAREGISTERS)
+			{
+				register=AMIGAREGISTERS[registerIndex].bits;
+				if (AMIGAREGISTERS[registerIndex].note!=undefined) note+=AMIGAREGISTERS[registerIndex].note;
+				if (document.querySelector("#register").value==AMIGAREGISTERS[registerIndex].address) break;
+			}
+
+			// Read ad crunch
+			var hexValue=parseInt(document.querySelector("#hex").value,16);
+			var binaryValue=hexValue.toString(2);
+			//console.log("bin:"+binaryValue);
+			//console.log("binlength:"+binaryValue.length);
+			binaryValueLength=binaryValue.length
+			for (var i=0;i<16-binaryValueLength;i++)
+			{
+				binaryValue="0"+binaryValue;
+			}
+
+
+			//console.log("bin:"+binaryValue);
+
+			//console.log("binlength:"+binaryValue.length);
+			for (var i=0;i<16;i++)
+			{
+				var bitNum=15-i;
+				var selector="bit"+bitNum;
+				if (binaryValue[i]=='1') document.querySelector("#"+selector+"").innerHTML='<div style="display:inline-flex;width:100px">Bit '+bitNum+"</div><div id=value"+bitNum+" style='display:inline-flex;width:100px;color:red;font-weight:bold'>"+binaryValue[i]+"</div>";
+				else document.querySelector("#"+selector+"").innerHTML='<div style="display:inline-flex;width:100px">Bit '+bitNum+"</div><div id=value"+bitNum+" style='display:inline-flex;width:100px'>"+binaryValue[i]+"</div>";
+
+				document.querySelector("#"+selector+"").innerHTML+="<div style='display:inline-flex;width:100px'><input type=button class=changestate value='Change' bit="+bitNum+"></div>";
+
+				if (register[bitNum]!=undefined)				
+						document.querySelector("#"+selector+"").innerHTML+= "<div style='display:inline-flex;width:300px'>"+register[bitNum].name+ "</div><pre style='margin:auto;width:50%;display:inline-flex;border:0px;'>"+register[bitNum].description+"</pre>";
+				
+			}
+			document.querySelector("#note").innerHTML=note;
+
+			var changeBtns=document.querySelectorAll(".changestate");
+			for (var i=0;i<changeBtns.length;i++)
+				document.querySelectorAll(".changestate")[i].addEventListener('click',setfunctionChangeState,false);
+			
+		}
+
+		function setfunctionChangeState()
+		{
+			//console.log(this);
+			var bitStr="";
+			for (var i=15;i>=0;i--)
+			{
+				var oldBit=document.querySelector("#value"+i).innerHTML;
+				var changeBit=false;
+
+				//console.log(i+" "+oldBit);
+				if (i==this.getAttribute("bit"))
+					changeBit=true;
+
+				if (changeBit)
+				{
+					if (oldBit==0) bitStr+="1";
+					else bitStr+="0";
+				}
+				else bitStr+=oldBit;
+			}
+			/*console.log(bitStr);
+			console.log(binaryToHex(bitStr));*/
+			document.querySelector("#hex").value=binaryToHex(bitStr).result;
+			document.querySelector("#convert").click();
+		}
+
+		function binaryToHex(s) {
+		    var i, k, part, accum, ret = '';
+		    for (i = s.length-1; i >= 3; i -= 4) {
+		        // extract out in substrings of 4 and convert to hex
+		        part = s.substr(i+1-4, 4);
+		        accum = 0;
+		        for (k = 0; k < 4; k += 1) {
+		            if (part[k] !== '0' && part[k] !== '1') {
+		                // invalid character
+		                return { valid: false };
+		            }
+		            // compute the length 4 substring
+		            accum = accum * 2 + parseInt(part[k], 10);
+		        }
+		        if (accum >= 10) {
+		            // 'A' to 'F'
+		            ret = String.fromCharCode(accum - 10 + 'A'.charCodeAt(0)) + ret;
+		        } else {
+		            // '0' to '9'
+		            ret = String(accum) + ret;
+		        }
+		    }
+		    // remaining characters, i = 0, 1, or 2
+		    if (i >= 0) {
+		        accum = 0;
+		        // convert from front
+		        for (k = 0; k <= i; k += 1) {
+		            if (s[k] !== '0' && s[k] !== '1') {
+		                return { valid: false };
+		            }
+		            accum = accum * 2 + parseInt(s[k], 10);
+		        }
+		        // 3 bits, value cannot exceed 2^3 - 1 = 7, just convert
+		        ret = String(accum) + ret;
+		    }
+		    return { valid: true, result: ret };
+		}
+	</script>
+  </body>
+</html>  
