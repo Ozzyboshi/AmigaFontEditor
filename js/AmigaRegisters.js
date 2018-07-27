@@ -186,7 +186,35 @@ I bit vengono shiftati di numero di posizioni che puo` variare da 0 a 15.\n\
 Shiftare di 0 posizioni equivale a non shiftare affatto: tutte le blittate che \n\
 abbiamo visto (e fatto) finora erano blittate con shift di 0 posizioni.\n\
 Il valore di shift per il canale A è assegnato con i bit dal 15 al 12 del\n\
-registro BLTCON0 ($dff040);",
+registro BLTCON0 ($dff040);\n\
+\n\
+Minterms\n\
+	A	B	C	 	posizione BLTCON0\n\
+	-	-	-	        -----------------\n\
+						\n\
+	0	0	0			0\n\
+						\n\
+	0	0	1			1\n\
+						\n\
+	0	1	0			2\n\
+						\n\
+	0	1	1		 	3\n\
+						\n\
+	1	0	0			4\n\
+						\n\
+	1	0	1			5\n\
+						\n\
+	1	1	0			6\n\
+\n\
+	1	1	1			7\n\
+\n\
+		Fig. 27	MINTERMS\n\
+\n\
+Per esempio, se vogliamo che una blittata produca un'uscita pari a 1 quando\n\
+l'ingresso A vale 0, il B vale 1 e il C vale 0, e che invece produca un uscita\n\
+pari a 0 in tutti gli altri casi, dobbiamo settare a 1 il minterm 2, e azzerare\n\
+tutti gli altri minterms. Quindi scriveremo il valore $04 nel byte LF.\n\
+",
 	bits:[
 		{
 			name:"LF0",
