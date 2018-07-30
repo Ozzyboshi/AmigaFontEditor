@@ -272,7 +272,7 @@ AMIGAREGISTERS.push(
 {
 	address: "DFF042",
 	name:	 "BLTCON1",
-	description:	"(lower 8 bits) This is to speed up software - the upper bits are often the same.",
+	description:	"Blitter control register 0 - (lower 8 bits) This is to speed up software - the upper bits are often the same.",
 	note: "",
 	bits:[
 		{
@@ -394,6 +394,71 @@ Essa sarà di 64 word X 1024 linee (=64*2*1024=128 Kb).",
 			name:"H9",
 			description:"Height bit 9 - Vertical lines (10 bits = 1024 lines max)"
 		},
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF096",
+	name:	 "DMACON",
+	description:	"DMA Control write (clear or set)",
+	note : "",
+	bits:[
+		{
+			name:"AUD0EN",
+			description:"Audio channel 0 DMA enable"
+		},{
+			name:"AUD1EN",
+			description:"Audio channel 1 DMA enable"
+		},{
+			name:"AUD2EN",
+			description:"Audio channel 2 DMA enable"
+		},{
+			name:"AUD3EN",
+			description:"Audio channel 3 DMA enable"
+		},{
+			name:"DSKEN",
+			description:"Disk DMA enable"
+		},{
+			name:"SPREN",
+			description:"Sprite DMA enable"
+		},{
+			name:"BLTEN",
+			description:"Blitter DMA enable"
+		},{
+			name:"COPEN",
+			description:"Coprocessor DMA enable"
+		},{
+			name:"BPLEN",
+			description:"Bit plane DMA enable"
+		},{
+			name:"DMAEN",
+			description:"Enable all DMA below (also UHRES DMA)"
+		},{
+			name:"BLTPRI",
+			description:"Blitter DMA priority (over CPU micro)\n\
+(also called blitter nasty)\n\
+(disables /BLS pin, preventing micro\n\
+from stealing any bus cycles while\n\
+blitter DMA is running)"
+		},{
+			name:"X",
+			description:""
+		},{
+			name:"X",
+			description:""
+		},{
+			name:"BZERO",
+			description:"Blitter logic zero status bit (read only)"
+		},{
+			name:"BBUSY",
+			description:"Blitter busy status bit (read only)"
+		},{
+			name:"SET/CLR	",
+			description:"Set/Clear control bit. Determines if bits\n\
+written with a 1 get set or cleared\n\
+Bits written with a zero are unchanged"
+		}
 	]
 });
 
