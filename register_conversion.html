@@ -66,8 +66,13 @@
 			for (var registerIndex in AMIGAREGISTERS)
 			{
 				register=AMIGAREGISTERS[registerIndex].bits;
-				if (AMIGAREGISTERS[registerIndex].note!=undefined) note+=AMIGAREGISTERS[registerIndex].note;
-				if (document.querySelector("#register").value==AMIGAREGISTERS[registerIndex].address) break;
+				//if (AMIGAREGISTERS[registerIndex].note!=undefined) note+=AMIGAREGISTERS[registerIndex].note;
+				if (document.querySelector("#register").value==AMIGAREGISTERS[registerIndex].address) 
+				{ 
+					if (AMIGAREGISTERS[registerIndex].note!=undefined)
+						note+=AMIGAREGISTERS[registerIndex].note; 
+					break 
+				};
 			}
 
 			// Read ad crunch

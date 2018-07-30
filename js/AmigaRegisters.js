@@ -270,6 +270,67 @@ tutti gli altri minterms. Quindi scriveremo il valore $04 nel byte LF.\n\
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF042",
+	name:	 "BLTCON1",
+	description:	"(lower 8 bits) This is to speed up software - the upper bits are often the same.",
+	note: "",
+	bits:[
+		{
+			name:"LINE(=0)",
+			description:"Line mode control bit"
+		},{
+			name:"DESC",
+			description:"Descending (dec address)control bit"
+		},{
+			name:"FCI",
+			description:"Fill carry input"
+		},{
+			name:"IFE",
+			description:"Inclusive fill enable"
+		},{
+			name:"EFE",
+			description:"Exclusive fill enable"
+		},{
+			name:"0",
+			description:""
+		},{
+			name:"0",
+			description:""
+		},{
+			name:"DOFF",
+			description:"Disables the D output- for external ALUs\n\
+The cycle occurs normally, but the data\n\
+bus is tristate (hires chips only)"
+		},{
+			name:"0",
+			description:""
+		},{
+			name:"0",
+			description:""
+		},{
+			name:"0",
+			description:""
+		},{
+			name:"0",
+			description:""
+		},{
+			name:"BSH1",
+			description:"Shift value of B source and line texture"
+		},{
+			name:"BSH2",
+			description:"Shift value of B source and line texture"
+		},{
+			name:"BSH3",
+			description:"Shift value of B source and line texture"
+		},{
+			name:"BSH4",
+			description:"Shift value of B source and line texture"
+		},
+	]
+});
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF058",
 	name:	 "BLTSIZE",
 	description:	"Blitter start and size (width, height)",
