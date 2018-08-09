@@ -553,6 +553,80 @@ called EXTRA-HALFBRITE Mode."
 	]
 });
 
+AMIGAREGISTERS.push(
+{
+	address: "DFF104",
+	name:	 "BPLCON2",
+	description:	"Bit Plane Control Register (new control bits)",
+	bits:[
+		{
+			name:"PF1P0",
+			description:"Playfield 1 priority code (with resp. to sprites)."
+		},
+		{
+			name:"PF1P1",
+			description:"Playfield 1 priority code (with resp. to sprites)."
+		},
+		{
+			name:"PF1P2",
+			description:"Playfield 1 priority code (with resp. to sprites)."
+		},
+		{
+			name:"PF2P0",
+			description:"Playfield 2 priority code (with resp. to sprites)."
+		},
+		{
+			name:"PF2P1",
+			description:"Playfield 2 priority code (with resp. to sprites)."
+		},
+		{
+			name:"PF2P2",
+			description:"Playfield 2 priority code (with resp. to sprites)."
+		},
+		{
+			name:"PF2PRI",
+			description:"Gives playfield 2 priority over playfield 1."
+		},
+		{
+			name:"SOGEN=0",
+			description:"When set causes SOG output pin to go high"
+		},
+		{
+			name:"RDRAM=0",
+			description:"Causes color table address to read the color table instead of writing to it."
+		},
+		{
+			name:"KILLEHB",
+			description:"Disables extra halfbrite mode."
+		},
+		{
+			name:"ZDCTEN",
+			description:"Causes ZD pin to mirror bit #15 of the active entry in high color table. When ZDCTEN is reset ZD reverts to mirroring color (0)."
+		},
+		{
+			name:"ZDBPEN",
+			description:"Causes ZD pin to mirror bitplane selected by ZDBPSELx bits. This does not disable the ZD mode defined by ZDCTEN, but rather is 'ored' with it."
+		},
+		{
+			name:"ZDBPSEL0",
+			description:"3 bit field which selects which bitplane is to be used for ZD when ZDBBPEN is set- 000 selects BB1 and 111 selects BP8."
+		},
+		{
+			name:"ZDBPSEL1",
+			description:"3 bit field which selects which bitplane is to be used for ZD when ZDBBPEN is set- 000 selects BB1 and 111 selects BP8."
+		},
+		{
+			name:"ZDBPSEL2",
+			description:"3 bit field which selects which bitplane is to be used for ZD when ZDBBPEN is set- 000 selects BB1 and 111 selects BP8."
+		},
+		{
+			name:"x",
+			description:"don`t care- but drive to 0 for upward compatibility"
+		}
+
+	]
+});
+
 
 AMIGAREGISTERS.push(
 {

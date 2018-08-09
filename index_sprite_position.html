@@ -22,6 +22,7 @@
 		<h4>Draw your sprites position on the left grid and get the binary raw data to load into the Amiga copperlist</h4>
 		<input type="button" class="hideshowcontrols" value="Hide Controls">
 		<input type="button" value="Function calculator" onclick="window.open('https://www.desmos.com/calculator')" />
+		<input type="button" value="Convert for bobs" id="convertforbobs" />
 		
 		<div id="colorpalette" draggable="true" >
 			<input type="file" id="fileChooser" style="display:none;">
@@ -284,6 +285,29 @@
 		document.querySelector(".hideshowcontrols").value="Hide Controls";
 		document.querySelector("#colorpalette").style.display = "block";
 		document.querySelector("#result").style.display = "block";
+	}
+
+	document.querySelector("#convertforbobs").addEventListener('click',convertforbobs,false);
+	function convertforbobs()
+	{
+		
+		for (var i=0;i<XCOORDINATES.length;i++)
+		{
+			if (XCOORDINATES[i][0]=='$')
+			{
+				var decimalX=parseInt(XCOORDINATES[i].substring(1),16);
+				var absoluteDecimalX=decimalX-128;
+				XCOORDINATES[i]=absoluteDecimalX;
+			}
+			if (YCOORDINATES[i][0]=='$')
+			{
+				console.log(YCOORDINATES[i].substring(1));
+				var decimalY=parseInt(YCOORDINATES[i].substring(1),16);
+				var absoluteDecimalY=decimalY-44;
+				YCOORDINATES[i]=absoluteDecimalY;
+			}
+		}
+		updateResults();
 	}
 
 	function updateResults()
