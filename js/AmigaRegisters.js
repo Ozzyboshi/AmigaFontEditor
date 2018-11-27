@@ -61,6 +61,71 @@ AMIGAREGISTERS.push(
 
 AMIGAREGISTERS.push(
 {
+	address: "BFED01",
+	name:	 "icr",
+	description:	"CIAA ICR",
+	note: "Questo registro controlla gli interrupt generabili dal CIAA.\n\
+Ogni interrupt risulta abilitato se il corrispondente bit della maschera X settato ad 1, infatti ogni interrupt CIAA, come farebbe con un INTREQ ($dff09c), setta il suo bit di richiesta in questo registro.\n\
+A questo punto, se tale interrupt e' abilitato, si setta il bit 7 (IR), che  una specie di set/clr bit, come in dmacon, ossia \n\
+quando tale bit e' azzerato gli altri 6 bit settati sono azzerati, quando il bit 7 e' settato, invece, gli altri bit settati sono settati,\n\ mentre quelli a zero non vengono modificati.\n\
+La cosa che puo' confondere e' che quando si legge il registro il suo contenuto viene azzerato, sia che si faccia un 'tst.b $bfed01' che qualsiasi azione di lettura.\n\
+Azzerando il registro si elimina anche la richiesta di interrupt, in modo analogo all' azzeramento dei bit di INTREQ ($dff09c).\n\
+",
+	bits:[
+		{
+			name:"IT",
+			description:"If 1 there's an active interrupt"
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"FLG",
+			description:""
+		},{
+			name:"SP",
+			description:"If 1 there's an active interrupt from the keyboard"
+		},{
+			name:"ALRM",
+			description:""
+		},{
+			name:"TB",
+			description:""
+		},{
+			name:"TA",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},
+	]
+});
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF004",
 	name:	 "VPOSR",
 	description:	"Read vert most sig. bits (and frame flop)",
@@ -331,6 +396,128 @@ bus is tristate (hires chips only)"
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF044",
+	name:	 "BLTAFWM",
+	description:	"Blitter first word mask for source A",
+	note: "La prima word di ogni riga (cioe` la word piu` a sinistra) e' andizzata con BLTAFWM \n\
+E` importante notare che le maschere vengono applicate ai dati PRIMA di eseguire lo SHIFT. I canali B e C non hanno invece la possibilita` di mascherare le words lette.\n\
+Questo registro va impostato a $ffff per il fill mode o per disegnare una linea continua",
+	bits:[
+		{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF046",
+	name:	 "BLTALWM",
+	description:	"Blitter last word mask for source A",
+	note: "La ultima word di ogni riga (cioe` la word piu` a sinistra) e' andizzata con BLTALWM \n\
+E` importante notare che le maschere vengono applicate ai dati PRIMA di eseguire lo SHIFT. I canali B e C non hanno invece la possibilita` di mascherare le words lette.\n\
+Questo registro va impostato a $ffff per il fill mode o per disegnare una linea continua",
+	bits:[
+		{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},
+	]
+});
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF058",
 	name:	 "BLTSIZE",
 	description:	"Blitter start and size (width, height)",
@@ -453,6 +640,67 @@ blitter DMA is running)"
 		},{
 			name:"BBUSY",
 			description:"Blitter busy status bit (read only)"
+		},{
+			name:"SET/CLR	",
+			description:"Set/Clear control bit. Determines if bits\n\
+written with a 1 get set or cleared\n\
+Bits written with a zero are unchanged"
+		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF09A",
+	name:	 "INTENA",
+	description:	"This register contains interrupt enable bits. The bit assignment for both the request, and enable registers is given below.",
+	note : "",
+	bits:[
+		{
+			name:"TBE",
+			description:"Serial port transmit buffer empty (level 1)"
+		},{
+			name:"DSKBLK",
+			description:"Disk block finished (level 1)"
+		},{
+			name:"SOFT",
+			description:"Reserved for software initiated interrupt (level 1)"
+		},{
+			name:"PORTS",
+			description:"I/O Ports and timers (level 2)"
+		},{
+			name:"COPER",
+			description:"Coprocessor (level 3)"
+		},{
+			name:"VERTB",
+			description:"Start of vertical blank (level 3)"
+		},{
+			name:"BLIT",
+			description:"Blitter has finished (level 3)"
+		},{
+			name:"AUD0",
+			description:"Audio channel 0 block finished (level 4)"
+		},{
+			name:"AUD1",
+			description:"Audio channel 1 block finished (level 4)"
+		},{
+			name:"AUD2",
+			description:"Audio channel 2 block finished (level 4)"
+		},{
+			name:"AUD3",
+			description:"Audio channel 3 block finished (level 4)"
+		},{
+			name:"RBF",
+			description:"Serial port receive buffer full (level 5)"
+		},{
+			name:"DSKSYN",
+			description:"Disk sync register (DSKSYNC) matches disk (level 5)"
+		},{
+			name:"EXTER",
+			description:"External interrupt (Level 6)"
+		},{
+			name:"INTEN",
+			description:"Master interrupt (enable only, no request)"
 		},{
 			name:"SET/CLR	",
 			description:"Set/Clear control bit. Determines if bits\n\
