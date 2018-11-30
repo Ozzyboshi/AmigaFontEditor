@@ -586,6 +586,270 @@ Essa sarà di 64 word X 1024 linee (=64*2*1024=128 Kb).",
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF060",
+	name:	 "BLTCMOD",
+	description:	"Blitter modulo for source C",
+	note : "I valori del modulo sono \n\
+in byte, non words. Siccome il blitter pur operare solo su words, il bit meno\n\
+significativo h ignorato, questo significa che il valore del modulo deve essere\n\
+pari.\n\
+Il valore, positivo o negativo, viene aggiunto automaticamente ai registri che\n\
+puntano agli indirizzi (BLTxPT) ogni volta che il blitter ha finito di copiare\n\
+una riga, in modo da calcolare l'indirizzo della prima word della riga\n\
+successiva.",
+	bits:[
+		{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF062",
+	name:	 "BLTBMOD",
+	description:	"Blitter modulo for source B",
+	note : "I valori del modulo sono \n\
+in byte, non words. Siccome il blitter pur operare solo su words, il bit meno\n\
+significativo h ignorato, questo significa che il valore del modulo deve essere\n\
+pari.\n\
+Il valore, positivo o negativo, viene aggiunto automaticamente ai registri che\n\
+puntano agli indirizzi (BLTxPT) ogni volta che il blitter ha finito di copiare\n\
+una riga, in modo da calcolare l'indirizzo della prima word della riga\n\
+successiva.",
+	bits:[
+		{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF064",
+	name:	 "BLTAMOD",
+	description:	"Blitter modulo for source A",
+	note : "I valori del modulo sono \n\
+in byte, non words. Siccome il blitter pur operare solo su words, il bit meno\n\
+significativo h ignorato, questo significa che il valore del modulo deve essere\n\
+pari.\n\
+Il valore, positivo o negativo, viene aggiunto automaticamente ai registri che\n\
+puntano agli indirizzi (BLTxPT) ogni volta che il blitter ha finito di copiare\n\
+una riga, in modo da calcolare l'indirizzo della prima word della riga\n\
+successiva.",
+	bits:[
+		{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF066",
+	name:	 "BLTDMOD",
+	description:	"Blitter modulo for source D",
+	note : "I valori del modulo sono \n\
+in byte, non words. Siccome il blitter pur operare solo su words, il bit meno\n\
+significativo h ignorato, questo significa che il valore del modulo deve essere\n\
+pari.\n\
+Il valore, positivo o negativo, viene aggiunto automaticamente ai registri che\n\
+puntano agli indirizzi (BLTxPT) ogni volta che il blitter ha finito di copiare\n\
+una riga, in modo da calcolare l'indirizzo della prima word della riga\n\
+successiva.",
+	bits:[
+		{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF096",
 	name:	 "DMACON",
 	description:	"DMA Control write (clear or set)",
