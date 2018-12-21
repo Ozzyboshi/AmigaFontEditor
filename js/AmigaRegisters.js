@@ -242,6 +242,132 @@ AMIGAREGISTERS.push(
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF018",
+	name:	 "SERDATR",
+	description:	"Serial port data and status read.",
+	note: "This address reads data from a recive data buffer. Data in this\n\
+buffer is loaded from a receiving shift register whenever it is full.\n\
+Several interrupt request bits are also read at this address, along\n\
+with the data as shown below.",
+	bits:[
+		{
+			name:"DB0",
+			description:"Data bit."
+		},{
+			name:"DB1",
+			description:"Data bit."
+		},{
+			name:"DB2",
+			description:"Data bit."
+		},{
+			name:"DB3",
+			description:"Data bit."
+		},{
+			name:"DB4",
+			description:"Data bit."
+		},{
+			name:"DB5",
+			description:"Data bit."
+		},{
+			name:"DB6",
+			description:"Data bit."
+		},{
+			name:"DB7",
+			description:"Data bit."
+		},{
+			name:"STP-DB8",
+			description:"Stop bit if LONG, data bit if not."
+		},{
+			name:"STP",
+			description:"Stop bit"
+		},{
+			name:"X",
+			description:"Not used."
+		},{
+			name:"RXD",
+			description:"RXD pin receives UART serial data for direct bit test by the micro."
+		},{
+			name:"TSRE",
+			description:"Serial port transmit shift reg. empty"
+		},{
+			name:"TBE",
+			description:"Serial port transmit buffer empty (mirror)"
+		},{
+			name:"RBF",
+			description:"Serial port receive buffer full (mirror)"
+		},{
+			name:"OVRUN",
+			description:"Serial port receiver overun"
+		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF030",
+	name:	 "SERDAT",
+	note:	"This address writes data to a transmit data buffer. Data from this\n\
+buffer is moved into a serial shift register for output transmission\n\
+whenever it is empty. This sets the interrupt request TBE\n\
+(transmit buffer empty).\n\
+A stop bit must be provided as part of the data word.\n\
+The length of the data word is set by the position of the stop bit.\n",
+	description:	"Serial port data and stop bits write",
+	bits:[
+		{
+			name:"D0",
+			description:"Data bit."
+		},{
+			name:"D1",
+			description:"Data bit."
+		},{
+			name:"D2",
+			description:"Data bit."
+		},{
+			name:"D3",
+			description:"Data bit."
+		},{
+			name:"D4",
+			description:"Data bit."
+		},{
+			name:"D5",
+			description:"Data bit."
+		},{
+			name:"D6",
+			description:"Data bit."
+		},{
+			name:"D7",
+			description:"Data bit."
+		},{
+			name:"D8",
+			description:"Data bit."
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		},{
+			name:"",
+			description:""
+		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF040",
 	name:	 "BLTCON0",
 	description:	"Blitter control register 0",
