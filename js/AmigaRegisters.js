@@ -678,7 +678,7 @@ Essa sarà di 64 word X 1024 linee (=64*2*1024=128 Kb).",
 			description:"Width bit 5 - Horiz pixels (6 bits = 64 words = 1024 pixels max)"
 		},{
 			name:"H0",
-			description:"Height bit 6 - Vertical lines (10 bits = 1024 lines max)"
+			description:"Height bit 0 - Vertical lines (10 bits = 1024 lines max)"
 		},{
 			name:"H1",
 			description:"Height bit 1 - Vertical lines (10 bits = 1024 lines max)"
