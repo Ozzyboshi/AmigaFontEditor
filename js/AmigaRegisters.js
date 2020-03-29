@@ -242,6 +242,65 @@ AMIGAREGISTERS.push(
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF00E",
+	name:	 "CLXDAT",
+	description:	"Collision detection register",
+	note:"NOTE:  Disabled bitplanes cannot prevent collisions.  Therefore if all bitplanes are disabled, collisions will be continuous, regardless of the match values.",
+	bits:[
+		{
+			name:"Playfield 1 to playfield 2",
+			description:""
+		},{
+			name:"Playfield 1 to sprite 0 (or 1)",
+			description:""
+		},{
+			name:"Playfield 1 to sprite 2 (or 3)",
+			description:""
+		},{
+			name:"Playfield 1 to sprite 4 (or 5)",
+			description:""
+		},{
+			name:"Playfield 1 to sprite 6 (or 7)",
+			description:""
+		},{
+			name:"Playfield 2 to sprite 0 (or 1)",
+			description:""
+		},{
+			name:"Playfield 2 to sprite 2 (or 3)",
+			description:""
+		},{
+			name:"Playfield 2 to sprite 4 (or 5)",
+			description:""
+		},{
+			name:"Playfield 2 to sprite 6 (or 7)",
+			description:""
+		},{
+			name:"Sprite 0 (or 1) to sprite 2 (or 3) - first couple with second couple of sprites",
+			description:""
+		},{
+			name:"Sprite 0 (or 1) to sprite 4 (or 5) - first couple with third couple of sprites",
+			description:""
+		},{
+			name:"Sprite 0 (or 1) to sprite 6 (or 7) - first couple with fourth couple of sprites",
+			description:""
+		},{
+			name:"Sprite 2 (or 3) to sprite 4 (or 5) - second couple with third couple of sprites",
+			description:""
+		},{
+			name:"Sprite 2 (or 3) to sprite 6 (or 7) - second couple with fourth couple of sprites",
+			description:""
+		},{
+			name:"Sprite 4 (or 5) to sprite 6 (or 7) - third couple with fourth couple of sprites",
+			description:""
+		},{
+			name:"not used",
+			description:""
+		},
+	]
+});
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF018",
 	name:	 "SERDATR",
 	description:	"Serial port data and status read.",
@@ -1036,6 +1095,64 @@ blitter DMA is running)"
 written with a 1 get set or cleared\n\
 Bits written with a zero are unchanged"
 		}
+	]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF098",
+	name:	 "CLXCON",
+	description:	"Collision control",
+	bits:[
+		{
+			name:"Match value for bit plane 1 collision",
+			description:""
+		},{
+			name:"Match value for bitplane 2 collision",
+			description:""
+		},{
+			name:"Match value for bitplane 3 collision",
+			description:""
+		},{
+			name:"Match value for bitplane 4 collision",
+			description:""
+		},{
+			name:"Match value for bitplane 5 collision",
+			description:""
+		},{
+			name:"Match value for bitplane 6 collision",
+			description:""
+		},{
+			name:"Enable bitplane 1 (match required for collision)",
+			description:""
+		},{
+			name:"Enable bitplane 2 (match required for collision)",
+			description:""
+		},{
+			name:"Enable bitplane 3 (match required for collision)",
+			description:""
+		},{
+			name:"Enable bitplane 4 (match required for collision)",
+			description:""
+		},{
+			name:"Enable bitplane 5 (match required for collision)",
+			description:""
+		},{
+			name:"Enable bitplane 6 (match required for collision)",
+			description:""
+		},{
+			name:"Enable sprite 1 (ORed with sprite 0)",
+			description:""
+		},{
+			name:"Enable sprite 3 (ORed with sprite 2)",
+			description:""
+		},{
+			name:"Enable sprite 5 (ORed with sprite 4)",
+			description:""
+		},{
+			name:"Enable sprite 7 (ORed with sprite 6)",
+			description:""
+		},
 	]
 });
 
