@@ -1,0 +1,212 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+	<script src="js/AmigaFontEditor.js"></script>
+	<script src="js/AmigaRegisters.js"></script>
+  </head>
+  <body>
+	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+	<div class="topnav">
+	  <a href="index.html">Fonts</a>
+	  <a href="index_sprite.html">Sprite</a>
+	  <a href="index_sprite_position.html">Sprite position</a>
+      <a  href="register_conversion.html">Register conversion</a>
+      <a class="active" href="#">Copperlist translator</a>
+	</div>
+	<h2>Copperlist translator</h2>
+    <div id="content" style="padding:25px">
+        
+        <label for="rawcop">Paste your coplist below:</label>
+        <br>
+
+        <textarea id="rawcop" rows="40" cols="100">
+000BEF50 0001 FFFF 0120 0000 0122 0770 0124 000B  ..... ...".p.$..
+000BEF60 0126 EC50 0128 000B 012A EC98 012C 000B  .&.P.(...*...,..
+000BEF70 012E ECE0 0130 000B 0132 ED28 0134 000B  .....0...2.(.4..
+000BEF80 0136 EDB0 0138 0000 013A 0770 013C 0000  .6...8...:.p.<..
+000BEF90 013E 0770 2BC7 FFFE 0094 00D0 0092 0030  .>.p+..........0
+000BEFA0 0108 0116 010A 0116 0102 0044 00E0 0006  ...........D....
+000BEFB0 00E2 4536 00E4 0006 00E6 1D36 00E8 0005  ..E6.......6....
+000BEFC0 00EA F536 00EC 0005 00EE CD36 00F0 0005  ...6.......6....
+000BEFD0 00F2 A536 4BC7 FFFE 0094 00D0 0092 0030  ...6K..........0
+000BEFE0 0108 0116 010A 0116 0102 0088 00E0 000A  ................
+000BEFF0 00E2 CD34 00E4 0009 00E6 B534 00E8 0008  ...4.......4....
+000BF000 00EA 9D34 00EC 0007 00EE 8534 00F0 0006  ...4.......4....
+000BF010 00F2 6D34 4C01 FFFE 0182 0FD8 0184 0FB7  ..m4L...........
+000BF020 0186 0F96 0188 0F74 018A 0F07 018C 0B43  .......t.......C
+000BF030 018E 0056 0190 0234 0192 0500 0194 0005  ...V...4........
+000BF040 0196 0001 0198 0FE9 019A 0111 019C 0644  ...............D
+000BF050 019E 0C11 FFDF FFFE 2C01 FFFE 0182 0888  ........,.......
+000BF060 0184 0800 0186 0008 FFFF FFFE
+        </textarea>
+		<p><input type=button value=Convert id=convert>
+    </div>
+    
+    <div id="coppernavigator">
+		<ul id="fontulnavigator">
+		</ul>
+	</div>
+
+	<script>
+
+        var commentArray = [];
+
+        document.getElementById('convert').addEventListener('click',parseCop, false);
+        document.getElementById('convert').addEventListener('click',updateResults, false);
+        function parseCop()
+        {
+            commentArray=[];
+            var copTxt = document.getElementById("rawcop").value;
+
+            console.log(copTxt);
+
+            let words = copTxt.match(/ [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]/gm);
+
+            console.log(words.length);
+
+            words.forEach( function (word,index) {
+                if (index % 2 ) return ; // Count only pair (one copper instruction at time)
+
+                var comment = {};
+                
+                /*var firstWord = parseInt(word.substring(1,3),16);
+                var secondWord = parseInt(word.substring(4,7),16);*/
+
+                // Strip first character (a space)
+                word = word.substring(1);
+                secondword = words[index+1].substring(1);
+
+                comment.firstWord = word;
+                comment.secondWord = secondword;
+
+                var instructionBinary = new Uint8Array(2);
+                instructionBinary.set([parseInt(word.substring(0,2),16),parseInt(word.substring(2,4),16)],0);
+                var secondInstructionBinary = new Uint8Array(2);
+                secondInstructionBinary.set([parseInt(secondword.substring(0,2),16),parseInt(secondword.substring(2,4),16)],0);
+                
+                //var secondWordBinary = new Uint8Array(4);
+                //instructionBinary.set([parseInt(word.substring(1,2),16),parseInt(word.substring(2,3),16),parseInt(word.substring(3,4),16),parseInt(word.substring(4,5),16)],0);
+                //secondWordBinary.set([parseInt(words[index+1].substring(1,2),16),parseInt(words[index+1].substring(2,3),16),parseInt(words[index+1].substring(3,4),16),parseInt(words[index+1].substring(4,5),16)],0);
+                //secondWordBinary.set([parseInt(word.substring(3,4),16),parseInt(word.substring(4,5),16)],0);
+                //console.log("first word: "+instructionBinary);
+
+                // Check if wait OR skip
+                if (instructionBinary[1]&0b00000001)
+                {
+                    if (secondInstructionBinary[1]&0b00000001)
+                        comment.instructionType = "SKIP";
+                    else
+                        comment.instructionType = "WAIT";
+                    //console.log("Bit 0 set to 1");
+                    console.log("First word: "+word);
+                    //console.log("Second word: "+words[index+1]);
+                    console.log("first word binary: "+instructionBinary);
+                    //console.log("second word binary: "+secondWordBinary);
+                    
+
+                    comment.HP =    
+                                instructionBinary[1]&0b00000010 | // bit 1
+                                instructionBinary[1]&0b00000100 | // bit 2
+                                instructionBinary[1]&0b00001000 | // bit 1
+                                instructionBinary[1]&0b00010000 | // bit 4
+                                instructionBinary[1]&0b00100000 | // bit 5
+                                instructionBinary[1]&0b01000000 | // bit 6
+                                instructionBinary[1]&0b10000000 ; // bit 7
+                    
+                    comment.HP=comment.HP>>1;
+
+                    comment.VP = instructionBinary[0];   
+
+                    console.log("HP: "+comment.HP);
+                    console.log("VP: "+comment.VP);
+
+                    console.log("second word:"+secondword);
+                    comment.HE =
+                                secondInstructionBinary[1]&0b00000010 | // bit 1
+                                secondInstructionBinary[1]&0b00000100 | // bit 2
+                                secondInstructionBinary[1]&0b00001000 | // bit 1
+                                secondInstructionBinary[1]&0b00010000 | // bit 4
+                                secondInstructionBinary[1]&0b00100000 | // bit 5
+                                secondInstructionBinary[1]&0b01000000 | // bit 6
+                                secondInstructionBinary[1]&0b10000000 ; // bit 7
+                    
+                    comment.HP=comment.HP>>1;
+                    comment.VE = secondInstructionBinary[0]&0b01111111;
+
+                    comment.VPMasked = comment.VP&comment.VE;
+                    comment.HPMasked = comment.HP&(comment.HE<<1);
+
+                    console.log("HE: "+comment.HE);
+                    console.log("VE: "+comment.VE);
+
+                    if (comment.HP==63&&comment.VP==255&&comment.HE==254&&comment.VE==127)
+                        comment.description="End of copperlist (waits for impossible location)";
+                    else
+                    {
+                        if (comment.instructionType == "SKIP")
+                            comment.description="Skips next instruction if the ray position is equal OR MORE THAN VPos "+comment.VPMasked+" and HPos "+comment.HPMasked;
+                        else
+                            comment.description="Wait for the ray position to be equal OR MORE THAN VPos "+comment.VPMasked+" and HPos "+comment.HPMasked;
+                    }
+
+                    commentArray.push(comment);
+                }
+                // Move instruction
+                else
+                {
+                    comment.instructionType = "MOVE"
+                    for (var i = 0, len = AMIGAREGISTERS.length,registerDescription=""; i < len; i++) {
+                        if (AMIGAREGISTERS[i].address==="DFF"+word.substr(1))
+                        {
+                            registerDescription = AMIGAREGISTERS[i].description;
+                        }
+                    }
+                    comment.description="Move (copies) bytes "+secondword+ " to $DFF"+word.substr(1);
+                    if (registerDescription.length>0) comment.description+=" - "+registerDescription;
+                    commentArray.push(comment);
+                }                    
+            });
+
+        }
+
+        function updateResults()
+        {
+            //console.log("Lancio updateresults");
+            document.getElementById("fontulnavigator").innerHTML = "";
+
+            commentArray.forEach( function (comment,index) {
+            /*     if (index % 2 ) return ; // Count only pair (one copper instruction at time)*/
+            console.log(comment);
+                var li = document.createElement("li");
+                li.setAttribute("id", "comment"+index);
+
+                li.setAttribute("class", comment.instructionType);
+
+                var p = document.createElement("p");
+                var oTxt = document.createTextNode(comment.firstWord+" "+comment.secondWord+" - Instruction: "+comment.instructionType);
+                p.appendChild(oTxt);
+                li.appendChild(p);
+
+                var p = document.createElement("p");
+                var oTxt = document.createTextNode(comment.description);
+                p.appendChild(oTxt);
+                li.appendChild(p);
+
+                if (comment.instructionType=='SKIP' || comment.instructionType=='WAIT')
+                {
+                    p = document.createElement("p");
+                    oTxt = document.createTextNode("HP: "+comment.HP+" VP: "+comment.VP+" HE: "+comment.HE+" VE: "+comment.VE);
+                    p.appendChild(oTxt);
+                    li.appendChild(p);         
+                    
+                }
+                document.getElementById('fontulnavigator').appendChild(li);
+            });
+
+            var text = document.getElementById("rawcop").value;
+            //document.getElementById("rawcop").value = text.replace("FFFF","<mark>FFFF</mark>");
+        }
+    </script>
+  </body>
+</html>  

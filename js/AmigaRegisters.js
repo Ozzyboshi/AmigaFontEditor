@@ -1035,6 +1035,21 @@ successiva.",
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF092",
+	name:	 "DDFSTRT",
+	description:	"Display data fetch start (horizontal position)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});	
+AMIGAREGISTERS.push(
+{
+	address: "DFF094",
+	name:	 "DDFSTOP",
+	description:	"Display data fetch stop (horizontal position)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});	
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF096",
 	name:	 "DMACON",
 	description:	"DMA Control write (clear or set)",
@@ -1219,6 +1234,102 @@ Bits written with a zero are unchanged"
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF0E0",
+	name:	 "BPL1PTH",
+	description:"Bit plane 1 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF0E2",
+	name:	 "BPL1PTL",
+	description:"Bit plane 1 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF0E4",
+	name:	 "BPL2PTH",
+	description:"Bit plane 2 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+	
+AMIGAREGISTERS.push(
+{
+	address: "DFF0E6",
+	name:	 "BPL2PTL",
+	description:"Bit plane 2 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF0E8",
+	name:	 "BPL3PTH",
+	description:"Bit plane 3 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+	
+AMIGAREGISTERS.push(
+{
+	address: "DFF0EA",
+	name:	 "BPL3PTL",
+	description:"Bit plane 3 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF0EC",
+	name:	 "BPL4PTH",
+	description:"Bit plane 4 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+	
+AMIGAREGISTERS.push(
+{
+	address: "DFF0EE",
+	name:	 "BPL4PTL",
+	description:"Bit plane 4 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF0F0",
+	name:	 "BPL5PTH",
+	description:"Bit plane 5 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+	
+AMIGAREGISTERS.push(
+{
+	address: "DFF0F2",
+	name:	 "BPL5PTL",
+	description:"Bit plane 5 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF0F4",
+	name:	 "BPL&PTH",
+	description:"Bit plane 6 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+	
+AMIGAREGISTERS.push(
+{
+	address: "DFF0F6",
+	name:	 "BPL6PTL",
+	description:"Bit plane 6 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF100",
 	name:	 "BPLCON0",
 	description:	"Bit Plane Control Register 0 (misc, control bits)",
@@ -1307,6 +1418,83 @@ called EXTRA-HALFBRITE Mode."
 
 	]
 });
+
+AMIGAREGISTERS.push(
+	{
+		address: "DFF102",
+		name:	 "BPLCON1",
+		description:	"Bit Plane Control Register (horizontal, scroll counter)",
+		bits:[
+			{
+				name:		"PF1H2",
+				description:""
+			},
+			{
+				name:		"PF1H3",
+				description:""
+			},
+			{
+				name:		"PF1H4",
+				description:""
+			},
+			{
+				name:		"PF1H5",
+				description:""
+			},
+			{
+				name:		"PF2H2",
+				description:""
+			},
+			{
+				name:		"PF2H3",
+				description:""
+			},
+			{
+				name:		"PF2H4",
+				description:""
+			},
+			{
+				name:		"PF2H5",
+				description:"OCS/ECS"
+			},
+			{
+				name:		"PF1H0",
+				description:""
+			},
+			{
+				name:		"PF1H1",
+				description:""
+			},
+			{
+				name:		"PF1H6",
+				description:""
+			},
+			{
+				name:		"PF1H7",
+				description:"(PF1Hx =) Playfield 1 horizontal scroll code, x=0-7\n\
+where PFyH0 = LSB = 35ns SHRES pixel (bits have been\n\
+renamed, old PFyH0 now PFyH2, etc). Now that the scroll\n\
+range has been quadrupled to allow for wider\n\
+(32 or 64 bits) bitplanes."
+			},
+			{
+				name:		"PF2H0",
+				description:""
+			},
+			{
+				name:		"PF2H1",
+				description:""
+			},
+			{
+				name:		"PF2H6",
+				description:""
+			},
+			{
+				name:		"PF2H7	",
+				description:"(PF2Hx =) Playfield 2 horizontal scroll code, x=0-7"
+			}
+		]
+	});
 
 AMIGAREGISTERS.push(
 {
@@ -1503,6 +1691,21 @@ has priority in dual playfield mode :\n\
 
 AMIGAREGISTERS.push(
 {
+	address: "DFF108",
+	name:	 "BPL1MOD",
+	description:	"Bit plane modulo (odd planes)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});	
+AMIGAREGISTERS.push(
+{
+	address: "DFF10A",
+	name:	 "BPL2MOD",
+	description:	"Bit plane modulo (even planes)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});	
+
+AMIGAREGISTERS.push(
+{
 	address: "DFF10C",
 	name:	 "BPLCON4",
 	description:	"Bit Plane Control Register (display masks)",
@@ -1590,6 +1793,133 @@ color table. Default value is 00000000 binary. (x=0-7)"
 		},
 	]
 });
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF120",
+	name:	 "SPR0PTH",
+	description:	"Sprite 0 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF122",
+	name:	 "SPR0PTL",
+	description:	"Sprite 0 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF124",
+	name:	 "SPR1PTH",
+	description:	"Sprite 1 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+	
+AMIGAREGISTERS.push(
+{
+	address: "DFF126",
+	name:	 "SPR1PTL",
+	description:	"Sprite 1 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF128",
+	name:	 "SPR2PTH",
+	description:	"Sprite 2 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+		
+AMIGAREGISTERS.push(
+{
+	address: "DFF12A",
+	name:	 "SPR2PTL",
+	description:	"Sprite 2 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF12C",
+	name:	 "SPR3PTH",
+	description:	"Sprite 3 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+			
+AMIGAREGISTERS.push(
+{
+	address: "DFF12E",
+	name:	 "SPR3PTL",
+	description:	"Sprite 3 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF130",
+	name:	 "SPR4PTH",
+	description:	"Sprite 4 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+				
+AMIGAREGISTERS.push(
+{
+	address: "DFF132",
+	name:	 "SPR4PTL",
+	description:	"Sprite 4 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF134",
+	name:	 "SPR5PTH",
+	description:	"Sprite 5 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+					
+AMIGAREGISTERS.push(
+{
+	address: "DFF136",
+	name:	 "SPR5PTL",
+	description:	"Sprite 5 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF138",
+	name:	 "SPR6PTL",
+	description:	"Sprite 6 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+
+AMIGAREGISTERS.push(
+{
+	address: "DFF13A",
+	name:	 "SPR6PTL",
+	description:	"Sprite 6 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+AMIGAREGISTERS.push(
+{
+	address: "DFF13C",
+	name:	 "SPR7PTL",
+	description:	"Sprite 7 pointer (high 5 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});
+	
+AMIGAREGISTERS.push(
+{
+	address: "DFF13E",
+	name:	 "SPR7PTL",
+	description:	"Sprite 7 pointer (low 15 bits)",
+	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
+});	
 
 /*
 AMIGAREGISTERS.push(

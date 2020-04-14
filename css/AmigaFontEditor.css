@@ -37,14 +37,14 @@ pre {border: solid 1px;margin: 0px;}
 #fontnavigator{position:fixed;right:1000px;width:50px;height:600px;background:white;top:150px;border: solid 10px;overflow: auto;}
 #fontnavigator ul {margin: 0px;}
 #fontnavigator li {cursor:pointer;}
+#coppernavigator{position:fixed;right:0px;height:600px;background:white;top:150px;border: solid 10px;overflow: auto;width:50%;float:right;}
+
 
 canvas {cursor:pointer;}
 #colorslist > li:nth-child(2) {background-color: red;}
 #colorslist > li {cursor:pointer;}
 
-[draggable=true] {
-    cursor: move;
-}
+.MOVE {background-color: #e2e29c;}
 
 .resizable {
     overflow: scroll;
