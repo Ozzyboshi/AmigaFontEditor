@@ -3,7 +3,15 @@
   <head>
     <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
 	<script src="js/AmigaFontEditor.js"></script>
-	<script src="js/AmigaRegisters.js"></script>
+    <script src="js/AmigaRegisters.js"></script>
+    <style>
+        mark {
+            background-color: #AAAAAA;
+            color: black;
+        }
+        li {cursor:pointer;}
+
+    </style>
   </head>
   <body>
 	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
@@ -20,7 +28,16 @@
         <label for="rawcop">Paste your coplist below:</label>
         <br>
 
-        <textarea id="rawcop" rows="40" cols="100">
+        <div id="rawcop" contenteditable="true" style="
+        float: left;
+        width: 40%;
+        border: solid 3px;
+        background: white;
+        border-color: black;
+        white-space: pre-wrap;
+        text-align: left;
+        padding: 10px;
+    "><code id="codetxt">
 000BEF50 0001 FFFF 0120 0000 0122 0770 0124 000B  ..... ...".p.$..
 000BEF60 0126 EC50 0128 000B 012A EC98 012C 000B  .&.P.(...*...,..
 000BEF70 012E ECE0 0130 000B 0132 ED28 0134 000B  .....0...2.(.4..
@@ -38,8 +55,8 @@
 000BF030 018E 0056 0190 0234 0192 0500 0194 0005  ...V...4........
 000BF040 0196 0001 0198 0FE9 019A 0111 019C 0644  ...............D
 000BF050 019E 0C11 FFDF FFFE 2C01 FFFE 0182 0888  ........,.......
-000BF060 0184 0800 0186 0008 FFFF FFFE
-        </textarea>
+000BF060 0184 0800 0186 0008 FFFF FFFE</code>
+    </div>
 		<p><input type=button value=Convert id=convert>
     </div>
     
@@ -51,17 +68,32 @@
 	<script>
 
         var commentArray = [];
+        var copTxt;
 
         document.getElementById('convert').addEventListener('click',parseCop, false);
         document.getElementById('convert').addEventListener('click',updateResults, false);
         function parseCop()
         {
             commentArray=[];
-            var copTxt = document.getElementById("rawcop").value;
+            // var copTxt = document.getElementById("rawcop").value;
+            copTxt = document.getElementById("codetxt").innerHTML;
 
-            console.log(copTxt);
+            //console.log(copTxt);
 
-            let words = copTxt.match(/ [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]/gm);
+            //let words = copTxt.match(/ [0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]/gm);
+
+            var regexp = /[ >][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]/gm;
+
+            words = [];
+            wordsIndexes = [];
+
+            while (match = regexp.exec(copTxt))
+            {
+                words.push(match[0]);
+                wordsIndexes.push(match.index);
+               /* console.log("aaaa"+match);
+                console.log("aaaa"+match.index);*/
+            }
 
             console.log(words.length);
 
@@ -79,6 +111,7 @@
 
                 comment.firstWord = word;
                 comment.secondWord = secondword;
+                comment.index = wordsIndexes[index];
 
                 var instructionBinary = new Uint8Array(2);
                 instructionBinary.set([parseInt(word.substring(0,2),16),parseInt(word.substring(2,4),16)],0);
@@ -118,8 +151,8 @@
 
                     comment.VP = instructionBinary[0];   
 
-                    console.log("HP: "+comment.HP);
-                    console.log("VP: "+comment.VP);
+                    /*console.log("HP: "+comment.HP);
+                    console.log("VP: "+comment.VP);*/
 
                     console.log("second word:"+secondword);
                     comment.HE =
@@ -137,8 +170,8 @@
                     comment.VPMasked = comment.VP&comment.VE;
                     comment.HPMasked = comment.HP&(comment.HE<<1);
 
-                    console.log("HE: "+comment.HE);
-                    console.log("VE: "+comment.VE);
+                    /*console.log("HE: "+comment.HE);
+                    console.log("VE: "+comment.VE);*/
 
                     if (comment.HP==63&&comment.VP==255&&comment.HE==254&&comment.VE==127)
                         comment.description="End of copperlist (waits for impossible location)";
@@ -160,10 +193,11 @@
                         if (AMIGAREGISTERS[i].address==="DFF"+word.substr(1))
                         {
                             registerDescription = AMIGAREGISTERS[i].description;
+                            registerName = AMIGAREGISTERS[i].name;
                         }
                     }
                     comment.description="Move (copies) bytes "+secondword+ " to $DFF"+word.substr(1);
-                    if (registerDescription.length>0) comment.description+=" - "+registerDescription;
+                    if (registerDescription.length>0) comment.description+=" - ("+registerName+") -"+registerDescription;
                     commentArray.push(comment);
                 }                    
             });
@@ -175,11 +209,14 @@
             //console.log("Lancio updateresults");
             document.getElementById("fontulnavigator").innerHTML = "";
 
-            commentArray.forEach( function (comment,index) {
-            /*     if (index % 2 ) return ; // Count only pair (one copper instruction at time)*/
-            console.log(comment);
+            commentArray.forEach( function (comment,index) 
+            {
+                /*     if (index % 2 ) return ; // Count only pair (one copper instruction at time)*/
+                console.log(comment);
                 var li = document.createElement("li");
+                li.addEventListener("click",clickOnCopperInstruction);
                 li.setAttribute("id", "comment"+index);
+                li.setAttribute("index", comment.index);
 
                 li.setAttribute("class", comment.instructionType);
 
@@ -206,6 +243,17 @@
 
             var text = document.getElementById("rawcop").value;
             //document.getElementById("rawcop").value = text.replace("FFFF","<mark>FFFF</mark>");
+        }
+        function clickOnCopperInstruction()
+        {
+            //console.log(this.getAttribute("index"));
+            var index = 1+this.getAttribute("index")*1;
+            var stringToReplace = copTxt.substring(index,index+9);
+            stringReplacement="<MARK>"+stringToReplace+"</MARK>";
+
+            var newTxt = copTxt.replace(stringToReplace,stringReplacement);
+            //console.log(newTxt);
+            document.getElementById("codetxt").innerHTML=newTxt;
         }
     </script>
   </body>
