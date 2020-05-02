@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+	<script src="js/AmigaFontEditor.js"></script>
+	<script src="js/AmigaRegisters.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2/math.min.js"></script>
+</head>
+
+<body>
+	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;"
+			src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
+			alt="Fork me on GitHub"
+			data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+	<div class="topnav">
+		<a href="index.html">Fonts</a>
+		<a href="index_sprite.html">Sprite</a>
+		<a href="index_sprite_position.html">Sprite position</a>
+		<a href="#">Register conversion</a>
+		<a href="copperlist_translator.html">Copperlist translator</a>
+		<a class="active" href="#">Diwstart/stop</a>
+	</div>
+	<h2>Amiga diwstart/stop simulation</h2>
+	<div id="content" style="padding:25px">
+		<canvas id=screen style="border:1px solid;"></canvas>
+		
+	
+	<div  style="float:right;width: 50%;height: 500px;">
+		<p>DiwXstart: <input type="number" id="diwXStartInput" value="129" min=0 max=255 step=1></p>
+		<input type="range" min="0" max="255" value="129" class="slider" id="diwXStart">
+
+		<p>DiwXstop: <input type="number" id="diwXStopInput" value="193" min=0 max=255 step=1></p>
+		<input type="range" min="0" max="255" value="193" class="slider" id="diwXStop">
+
+		<p>DiwYstart: <input type="number" id="diwYStartInput" value="44" min=0 max=255 step=1></p>
+		<input type="range" min="0" max="255" value="44" class="slider" id="diwYStart">
+
+		<p>DiwYstop: <input type="number" id="diwYStopInput" value="44" min=0 max=255 step=1>		</p> 
+		<input type="range" min="0" max="255" value="44" class="slider" id="diwYStop">
+	</div>
+
+	<p>DFF08E (DIWSTRT): 
+		<a id=diwstrt>0000</a>
+	</p>
+
+	<p>DFF08E (DIWSTOP): 
+		<a id=diwstop>0000</a>
+	</p>
+
+	<p>New image (must be a 320X256 png url): 
+		<input type="url" id=imgurl value="circles.png">
+	</p>
+	
+</div>
+
+	
+	<script>
+
+		var diwXStart = document.getElementById("diwXStart");
+		var diwXSstop = document.getElementById("diwXStop");
+		var diwYStart = document.getElementById("diwYStart");
+		var diwYStop = document.getElementById("diwYStop");
+
+		var diwXStartInput = document.getElementById("diwXStartInput");
+		var diwXStopInput = document.getElementById("diwXStopInput");
+		var diwYStartInput = document.getElementById("diwYStartInput");
+		var diwYStopInput = document.getElementById("diwYStopInput");
+
+		var LineCoords = {
+			x1: 0,
+			y1: 0,
+			x2: 0,
+			y2: 0
+		};
+
+		var diwXStartLine = Object.create(LineCoords);
+		var diwXStopLine = Object.create(LineCoords);
+		var diwYStartLine = Object.create(LineCoords);
+		var diwYStopLine = Object.create(LineCoords);
+
+		const startXDefault = diwXStart.value;
+		const endXDefault = 129+320;
+		const startYDefault=44;
+		const endYDefault=44+255;
+
+		var displayScreen = Object.create(LineCoords);
+		displayScreen.x1=diwXStart.value*1;
+		displayScreen.x2=diwXSstop.value*1;
+		displayScreen.y1=diwYStart.value*1;
+		displayScreen.y2=diwYStop.value*1;
+
+		var canvas = document.getElementById('screen');
+		var startWindowY = 44;
+		var displayYRes = 256;
+
+		var startWindowX = 129;
+		var displayXRes = 320;
+
+		var imageData;
+
+		canvas.height =   displayYRes+127;
+		//canvas.width=startWindowX*2+displayXRes;
+		canvas.width = 255 * 2;
+
+		if (canvas.getContext) {
+			var context = canvas.getContext('2d');
+
+			context.beginPath();
+			context.fillStyle = '#000000';    // color of fill
+			context.globalAlpha = 0.2;
+			context.fillRect(0, 0, canvas.width, canvas.height); // create rectangle  
+			context.globalAlpha = 1;
+
+			context.beginPath();
+			//context.moveTo(startWindowX,StartWindowHeight);
+			//context.lineTo(startWindowX,canvas.height);
+
+			context.moveTo(startWindowX, startWindowY);
+			context.lineTo(startWindowX, startWindowY + displayYRes);
+			context.lineTo(startWindowX + displayXRes, startWindowY + displayYRes);
+			context.lineTo(startWindowX + displayXRes, startWindowY);
+			context.lineTo(startWindowX, startWindowY);
+			context.stroke();
+
+			
+
+
+
+			// save the state of  the canvas here
+			imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+			redrawScreen2();
+		}
+
+		function redrawScreen2()
+		{
+			if (imageData)
+				context.putImageData(imageData, 0, 0);
+			drawing = new Image();
+			//drawing.src = "circles.png"; // can also be a remote URL e.g. http://
+			drawing.src = document.getElementById("imgurl").value;
+			drawing.onload = function () {
+				context.drawImage(drawing, startWindowX, startWindowY);
+				context.beginPath();
+				//context.fillStyle = '#FF0000';    // color of fill	
+				context.strokeStyle = "red";
+				console.log("Xvalues : "+displayScreen.x1+" "+displayScreen.x2);
+				console.log("Yvalues : "+displayScreen.y1+" "+displayScreen.y2);
+
+				if (displayScreen.y2>127)
+					context.rect(displayScreen.x1,displayScreen.y1,displayScreen.x2+256-displayScreen.x1,displayScreen.y2+1-displayScreen.y1);
+				else
+					context.rect(displayScreen.x1,displayScreen.y1,displayScreen.x2+256-displayScreen.x1,displayScreen.y2+256-displayScreen.y1);
+				context.stroke();
+
+				context.globalAlpha = 0.2;
+				context.beginPath();
+				context.moveTo(displayScreen.x1-1,displayScreen.y1-1);
+				context.lineTo(displayScreen.x1-1, 0);
+				context.lineTo(0, 0);
+				context.lineTo(0, canvas.height);
+				context.lineTo(displayScreen.x1-1, canvas.height);
+				context.closePath();
+				context.fill();
+				context.globalAlpha = 1;
+
+				context.globalAlpha = 0.2;
+				context.beginPath();
+				context.moveTo(displayScreen.x2+1+256,displayScreen.y1-1);
+				context.lineTo(displayScreen.x2+1+256, 0);
+				context.lineTo(canvas.width, 0);
+				context.lineTo(canvas.width, canvas.height);
+				context.lineTo(displayScreen.x2+1+256, canvas.height);
+				context.closePath();
+				context.fill();
+				context.globalAlpha = 1;
+
+				context.globalAlpha = 0.2;
+				context.beginPath();
+				context.moveTo(displayScreen.x1,displayScreen.y1-1);
+				context.lineTo(displayScreen.x1,0);
+				context.lineTo(displayScreen.x2+256,0);
+				context.lineTo(displayScreen.x2+256,displayScreen.y1-1);
+				context.closePath();
+				context.fill();
+				context.globalAlpha = 1;
+
+				context.globalAlpha = 0.2;
+				context.beginPath();
+				if (displayScreen.y2>127) context.moveTo(displayScreen.x1,displayScreen.y2+1);
+				else context.moveTo(displayScreen.x1,displayScreen.y2+256+1);
+				context.lineTo(displayScreen.x1,canvas.height);
+				context.lineTo(displayScreen.x2+256,canvas.height);
+				if (displayScreen.y2>127) context.lineTo(displayScreen.x2+256,displayScreen.y2+1);
+				else context.lineTo(displayScreen.x2+256,displayScreen.y2+256+1);
+				context.closePath();
+				context.fill();
+				context.globalAlpha = 1;
+
+				updateDiwstrt();
+				updateDiwstop();
+			};
+		}
+
+		diwXStart.oninput = function () {
+			displayScreen.x1=this.value*1;
+			document.getElementById('diwXStartInput').value=this.value*1;
+			redrawScreen2();
+		}
+
+		diwXSstop.oninput = function () {
+			displayScreen.x2=this.value*1;
+			document.getElementById('diwXStopInput').value=this.value*1;
+			redrawScreen2();
+
+		}
+
+		diwYStart.oninput = function () {
+			displayScreen.y1=this.value*1;
+			document.getElementById('diwYStartInput').value=this.value*1;
+			redrawScreen2();
+		}
+
+		diwYStop.oninput = function () {
+			displayScreen.y2=this.value*1;
+			document.getElementById('diwYStopInput').value=this.value*1;
+			redrawScreen2();
+		}
+
+		diwXStartInput.oninput = function ()
+		{
+			displayScreen.x1=this.value*1;
+			diwXStart.value=this.value*1;
+			redrawScreen2();
+		}
+
+		diwXStopInput.oninput = function ()
+		{
+			displayScreen.x2=this.value*1;
+			diwXSstop.value=this.value*1;
+			redrawScreen2();
+		}
+
+		diwYStartInput.oninput = function ()
+		{
+			displayScreen.y1=this.value*1;
+			diwYStart.value=this.value*1;
+			redrawScreen2();
+		}
+
+		diwYStopInput.oninput = function ()
+		{
+			displayScreen.y2=this.value*1;
+			diwYStop.value=this.value*1;
+			redrawScreen2();
+		}
+
+		document.getElementById("imgurl").oninput = function ()
+		{
+			redrawScreen2();
+		}
+
+		function updateDiwstrt()
+		{
+			document.getElementById('diwstrt').innerHTML=(document.getElementById('diwYStart').value*1).toString(16).padStart(2,'0')+(document.getElementById('diwXStart').value*1).toString(16).padStart(2,'0');
+		}
+
+		function updateDiwstop()
+		{
+			document.getElementById('diwstop').innerHTML=(document.getElementById('diwYStop').value*1).toString(16).padStart(2,'0')+(document.getElementById('diwXStop').value*1).toString(16).padStart(2,'0');
+		}
+		
+	</script>
+</body>
+
+</html>
