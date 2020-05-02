@@ -6,7 +6,7 @@ The goal of AmigaFontEditor is to let you draw for each grid a character ranging
 You can also inspect the binary content using the show binary and show hex buttons and restore a previously saved binary file with the `Import From Raw File' button.
 
 AmigaFontEditor has not dependencies, entirely written in pure javascript and can run offline.
-You can try it live now at [http://amigafonteditor.ozzyboshi.com]
+You can try it live now at (http://amigafonteditor.ozzyboshi.com)[http://amigafonteditor.ozzyboshi.com]
 
 Pull requests are welcome!!!
 
