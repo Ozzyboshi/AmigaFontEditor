@@ -1,0 +1,133 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+  <script src="js/AmigaFontEditor.js"></script>
+</head>
+
+<body>
+  <a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;"
+      src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
+      alt="Fork me on GitHub"
+      data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+  <div class="topnav">
+    <a href="index.html">Fonts</a>
+    <a href="index_sprite.html">Sprite</a>
+    <a href="index_sprite_position.html">Sprite position</a>
+    <a href="register_conversion.html">Register conversion</a>
+    <a href="copperlist_translator.html">Copperlist translator</a>
+    <a href="diwstartstop.html">Diwstart/stop</a>
+    <a class="active" href="projection.html">Point Projection</a>
+  </div>
+  <div id="content" style="padding:25px">
+    <h2>Amiga projection tester</h2>
+    <h4>Test 3d points projection on the screen</h4>
+    <p>
+      <br><input class="inputs" id=Xe type=number value=50>Xe
+      <br><input class="inputs" id=Ye type=number value=50>Ye
+      <br><input class="inputs" id=Ze type=number value=50>Ze
+      <br><input class="inputs" id=Zu type=number value=256>Zu
+    </p>
+
+    <p>
+    <p id=Xs value="0">Xs: 0</p>
+    <p id=Ys value="0">Ys: 0</p>
+    </p>
+    <p>
+      <canvas id=canvas width="320" height="256">3d Point tester</canvas>
+    </p>
+    <p>
+      <input id="store" type="button" value="Fix point">
+    </p>
+    <p>
+      <input id="clearpoints" type="button" value="Clear point">
+    </p>
+    <script>
+      lastXs = 0;
+      lastYs = 0;
+      storedPoints = [];
+
+      Xe = parseInt(document.getElementById('Xe').value);
+      Ye = parseInt(document.getElementById('Ye').value);
+      Ze = parseInt(document.getElementById('Ze').value);
+
+      Zu = parseInt(document.getElementById('Zu').value);
+
+      var Xs = 160 + (Xe * Zu * -1) / (Ze - Zu);
+      var Ys = 128 + (Ye * Zu * -1) / (Ze - Zu);
+      clearCanvas();
+      printPoint(Xs, Ys, 'green');
+
+      
+
+      obj = document.getElementById('clearpoints');
+      obj.onclick = function () {
+        storedPoints = [];
+        clearCanvas
+      }
+
+      obj = document.getElementById('store');
+      obj.onclick = function () {
+        point = {
+          'x': lastXs,
+          'y': lastXy
+        };
+        storedPoints.push(point);
+        console.log("store");
+      }
+      for (i = 0; i < document.getElementsByClassName('inputs').length; i++) {
+        obj = document.getElementsByClassName('inputs')[i];
+        obj.oninput = function () {
+          Xe = parseInt(document.getElementById('Xe').value);
+          Ye = parseInt(document.getElementById('Ye').value);
+          Ze = parseInt(document.getElementById('Ze').value);
+
+          Zu = parseInt(document.getElementById('Zu').value);
+
+          var Xs = 160 + (Xe * Zu * -1) / (Ze - Zu);
+          var Ys = 128 + (Ye * Zu * -1) / (Ze - Zu);
+          console.log("Xs: " + Xs);
+          document.getElementById('Xs').innerHTML = 'Xs: ' + Xs;
+          document.getElementById('Ys').innerHTML = 'Ys: ' + Ys;
+          lastXs = Xs;
+          lastXy = Ys;
+          console.log("Ys: " + Ys);
+          clearCanvas();
+          printPoint(Xs, Ys, 'green');
+          printStoredPoints();
+        }
+      }
+
+      function printStoredPoints() {
+        storedPoints.forEach(element => {
+          printPoint(element.x, element.y, 'red');
+        });
+      }
+
+
+
+      function clearCanvas() {
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        context.fillStyle = "white";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+
+      function printPoint(x, y, color) {
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var radius = 7;
+        context.beginPath();
+        context.arc(x, y, radius, 0, 2 * Math.PI, false);
+        context.fillStyle = color;
+        context.fill();
+        context.lineWidth = 5;
+        context.strokeStyle = '#003300';
+        context.stroke();
+      }
+    </script>
+</body>
+
+</html>
