@@ -1,6 +1,15 @@
 <!DOCTYPE HTML>
 <html>
 
+<style>
+  pre code {
+  background-color: #eee;
+  border: 1px solid #999;
+  display: block;
+  padding: 20px;
+}
+</style>
+
 <head>
   <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
   <script src="js/AmigaFontEditor.js"></script>
@@ -22,12 +31,38 @@
   </div>
   <div id="content" style="padding:25px">
     <h2>Amiga projection tester</h2>
-    <h4>Test 3d points projection on the screen</h4>
-    <p>
+    <h4>Test 3d points projection on the screen with the folliwing formula</h4>
+  
+    <pre style="border: 0px;width: 30%;">
+      <code>
+      var Xs = 160 + (Xe * Zu * -1) / (Ze - Zu);
+      var Ys = 128 + (Ye * Zu * -1) / (Ze - Zu);
+
+      Xe Ye Ze = coords of the point in a 3d space
+      Zu = distance of the viewer
+
+      Xs and Ys = projected points on the display monitor
+      </code>
+    </pre>
+    <p style="display: inline;padding: 110px;">
       <br><input class="inputs" id=Xe type=number value=50>Xe
       <br><input class="inputs" id=Ye type=number value=50>Ye
       <br><input class="inputs" id=Ze type=number value=50>Ze
       <br><input class="inputs" id=Zu type=number value=256>Zu
+    </p>
+
+    <p style="display: inline;padding: 110px;">
+      Point generator
+
+      <input type="number" id="numpoints" name="numpoints" min="1" value="1">
+      <label for="numpoints">Number of points</label>
+      <div style="display:inline;">
+        <input type="button" id="generatepoints" value="Generate random points">
+        <input type="button" id="resetpoints" value="Reset random points">
+        <textarea id=asmcode style="float:right;width:20%;height:500px;"></textarea>
+      </div>
+
+      
     </p>
 
     <p>
@@ -47,6 +82,7 @@
       lastXs = 0;
       lastYs = 0;
       storedPoints = [];
+      randomPoints = [];
 
       Xe = parseInt(document.getElementById('Xe').value);
       Ye = parseInt(document.getElementById('Ye').value);
@@ -59,19 +95,68 @@
       clearCanvas();
       printPoint(Xs, Ys, 'green');
 
-      
+      obj = document.getElementById('resetpoints');
+      obj.onclick = function () {
+        randomPoints = [];
+        document.getElementById("asmcode").innerHTML="";
+      }
+
+      obj = document.getElementById('generatepoints');
+      obj.onclick = function () {
+        var xBorderLeft = 10;
+        var xBorderRight = 10;
+        var yBorderUp = 10;
+        var yBorderDown = 10;
+
+        for (i=0;i<parseInt(document.getElementById("numpoints").value);i++)
+        {
+          var xRandom = getRandomInt(-319/2+xBorderLeft,319/2-xBorderRight);
+          var yRandom = getRandomInt(-255/2+yBorderUp,255/2-yBorderDown);
+          var zRandom = getRandomInt(0,255);
+
+          point = {
+            'x': xRandom,
+            'y': yRandom,
+            'z': zRandom
+          };
+
+          randomPoints.push(point);
+
+          console.log("Generated "+xRandom+":"+yRandom);
+          
+        }
+
+        var asmString ="";
+        var index = 0;
+        separator="";
+        randomPoints.forEach(randomPoint => {
+          if (!index) asmString+="POINTS:\n";
+          asmString+="\tdc.l ";
+          asmString+=randomPoint.x;
+          asmString+=",";
+          asmString+=randomPoint.y;
+          asmString+=",";
+          asmString+=randomPoint.z;
+          asmString+="\n";
+          index++;
+          printPoint(randomPoint.x+319/2, randomPoint.y+255/2, 'green');
+        });
+        document.getElementById("asmcode").innerHTML=asmString;
+
+        
+      }      
 
       obj = document.getElementById('clearpoints');
       obj.onclick = function () {
         storedPoints = [];
-        clearCanvas
+        clearCanvas(); 
       }
 
       obj = document.getElementById('store');
       obj.onclick = function () {
         point = {
           'x': lastXs,
-          'y': lastXy
+          'y': lastYs
         };
         storedPoints.push(point);
         console.log("store");
@@ -126,6 +211,19 @@
         context.lineWidth = 5;
         context.strokeStyle = '#003300';
         context.stroke();
+      }
+
+      /**
+       * Returns a random integer between min (inclusive) and max (inclusive).
+       * The value is no lower than min (or the next integer greater than min
+       * if min isn't an integer) and no greater than max (or the next integer
+       * lower than max if max isn't an integer).
+       * Using Math.round() will give you a non-uniform distribution!
+       */
+      function getRandomInt(min, max) {
+          min = Math.ceil(min);
+          max = Math.floor(max);
+          return Math.floor(Math.random() * (max - min + 1)) + min;
       }
     </script>
 </body>
