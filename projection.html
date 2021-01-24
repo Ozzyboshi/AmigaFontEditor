@@ -32,42 +32,41 @@
   <div id="content" style="padding:25px">
     <h2>Amiga projection tester</h2>
     <h4>Test 3d points projection on the screen with the folliwing formula</h4>
-  
-    <pre style="border: 0px;width: 30%;">
-      <code>
-      var Xs = 160 + (Xe * Zu * -1) / (Ze - Zu);
-      var Ys = 128 + (Ye * Zu * -1) / (Ze - Zu);
 
-      Xe Ye Ze = coords of the point in a 3d space
-      Zu = distance of the viewer
-
-      Xs and Ys = projected points on the display monitor
-      </code>
-    </pre>
-    <p style="display: inline;padding: 110px;">
-      <br><input class="inputs" id=Xe type=number value=50>Xe
-      <br><input class="inputs" id=Ye type=number value=50>Ye
-      <br><input class="inputs" id=Ze type=number value=50>Ze
-      <br><input class="inputs" id=Zu type=number value=256>Zu
-    </p>
-
-    <p style="display: inline;padding: 110px;">
+    <div style="display: inline;padding: 110px;float: right;background-color: beige;">
       Point generator
 
       <input type="number" id="numpoints" name="numpoints" min="1" value="1">
       <label for="numpoints">Number of points</label>
-      <div style="display:inline;">
-        <input type="button" id="generatepoints" value="Generate random points">
-        <input type="button" id="resetpoints" value="Reset random points">
-        <textarea id=asmcode style="float:right;width:20%;height:500px;"></textarea>
-      </div>
+      <ul>
+        <li><input type="button" id="generatepoints" value="Generate random points"></li>
+        <li><input type="button" id="resetpoints" value="Reset random points"></li>
+        <li><textarea id=asmcode style="width:20%;height:300px;"></textarea></li>
+      </ul>
+    </div>
+  
+    <pre style="border: 0px;width: fit-content;">
+      <code>
+var Xs = 160 + (Xe * Zu * -1) / (Ze - Zu);
+var Ys = 128 + (Ye * Zu * -1) / (Ze - Zu);
 
-      
-    </p>
+Xe Ye Ze = coords of the point in a 3d space
+Zu = distance of the viewer
+
+Xs and Ys = projected points on the display monitor
+      </code>
+    </pre>
+    <ul>
+      <li style="width: fit-content;"><input class="inputs" id=Xe type=number value=50>Xe</li>
+      <li style="width: fit-content;"><input class="inputs" id=Ye type=number value=50>Ye</li>
+      <li style="width: fit-content;"><input class="inputs" id=Ze type=number value=50>Ze</li>
+      <li style="width: fit-content;"><input class="inputs" id=Zu type=number value=256>Zu</li>
+    </ul>
+    
 
     <p>
-    <p id=Xs value="0">Xs: 0</p>
-    <p id=Ys value="0">Ys: 0</p>
+      <p id=Xs value="0">Xs: 0</p>
+      <p id=Ys value="0">Ys: 0</p>
     </p>
     <p>
       <canvas id=canvas width="320" height="256">3d Point tester</canvas>
