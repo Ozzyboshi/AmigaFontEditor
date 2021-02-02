@@ -1990,6 +1990,48 @@ AMIGAREGISTERS.push(
 			description:	"Ammx instruction word 2",
 			note: "Non è un registro ma la seconda word di una istruzione AMMX",
 			bits:[
+				
+				
+				{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				},
+				{
+					name:"0",
+					description:"Always 0"
+				},
+				{
+					name:"0",
+					description:"Always 0"
+				},{
+					name:"0",
+					description:"Always 0"
+				},
+				{
+					name:"REG-D",
+					description:"REG-D"
+				},{
+					name:"REG-D",
+					description:"REG-D"
+				},{
+					name:"REG-D",
+					description:"REG-D"
+				},{
+					name:"REG-D",
+					description:"REG-D"
+				},
 				{
 					name:"REG-B",
 					description:"REG-B"
@@ -2004,46 +2046,7 @@ AMIGAREGISTERS.push(
 					description:"REG-B"
 				},
 				
-				{
-					name:"REG-D",
-					description:"REG-D"
-				},{
-					name:"REG-D",
-					description:"REG-D"
-				},{
-					name:"REG-D",
-					description:"REG-D"
-				},{
-					name:"REG-D",
-					description:"REG-D"
-				},
 				
-				{
-					name:"0",
-					description:"Always 0"
-				},
-				{
-					name:"0",
-					description:"Always 0"
-				},{
-					name:"0",
-					description:"Always 0"
-				},{
-					name:"Op",
-					description:"Op code"
-				},{
-					name:"Op",
-					description:"Op code"
-				},{
-					name:"Op",
-					description:"Op code"
-				},{
-					name:"Op",
-					description:"Op code"
-				},{
-					name:"Op",
-					description:"Op code"
-				}
 			]
 		});
 	
