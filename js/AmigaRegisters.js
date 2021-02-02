@@ -1936,7 +1936,7 @@ AMIGAREGISTERS.push(
 				description:"VEA"
 			},{
 				name:"VEA",
-				description:""
+				description:"VEA"
 			},{
 				name:"VEA",
 				description:"VEA"
