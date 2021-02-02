@@ -1919,7 +1919,134 @@ AMIGAREGISTERS.push(
 	name:	 "SPR7PTL",
 	description:	"Sprite 7 pointer (low 15 bits)",
 	bits:[{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""},{name:"",description:""}]
-});	
+});
+
+AMIGAREGISTERS.push(
+	{
+		address: "AMMX1",
+		name:	 "ammx word 1",
+		description:	"Ammx instruction word 1",
+		note: "Non è un registro ma la prima word di una istruzione AMMX",
+		bits:[
+			{
+				name:"VEA",
+				description:"VEA"
+			},{
+				name:"VEA",
+				description:"VEA"
+			},{
+				name:"VEA",
+				description:""
+			},{
+				name:"VEA",
+				description:"VEA"
+			},{
+				name:"VEA",
+				description:"VEA"
+			},{
+				name:"VEA",
+				description:"VEA"
+			},
+			{
+				name:"D",
+				description:"D BANK selector"
+			},{
+				name:"B",
+				description:"B BANK selector"
+			},{
+				name:"A",
+				description:"A BANK selector"
+			},
+			{
+				name:"1",
+				description:"Must be 1"
+			},{
+				name:"1",
+				description:"Must be 1"
+			},{
+				name:"1",
+				description:"Must be 1"
+			},{
+				name:"1",
+				description:"Must be 1"
+			},{
+				name:"1",
+				description:"Must be 1"
+			},{
+				name:"1",
+				description:"Must be 1"
+			},{
+				name:"1",
+				description:"Must be 1"
+			}
+		]
+	});
+
+
+	AMIGAREGISTERS.push(
+		{
+			address: "AMMX2",
+			name:	 "ammx word 2",
+			description:	"Ammx instruction word 2",
+			note: "Non è un registro ma la seconda word di una istruzione AMMX",
+			bits:[
+				{
+					name:"REG-B",
+					description:"REG-B"
+				},{
+					name:"REG-B",
+					description:"REG-B"
+				},{
+					name:"REG-B",
+					description:"REG-B"
+				},{
+					name:"REG-B",
+					description:"REG-B"
+				},
+				
+				{
+					name:"REG-D",
+					description:"REG-D"
+				},{
+					name:"REG-D",
+					description:"REG-D"
+				},{
+					name:"REG-D",
+					description:"REG-D"
+				},{
+					name:"REG-D",
+					description:"REG-D"
+				},
+				
+				{
+					name:"0",
+					description:"Always 0"
+				},
+				{
+					name:"0",
+					description:"Always 0"
+				},{
+					name:"0",
+					description:"Always 0"
+				},{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				},{
+					name:"Op",
+					description:"Op code"
+				}
+			]
+		});
+	
 
 /*
 AMIGAREGISTERS.push(
