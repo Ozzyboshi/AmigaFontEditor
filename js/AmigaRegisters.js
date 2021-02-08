@@ -1988,7 +1988,82 @@ AMIGAREGISTERS.push(
 			address: "AMMX2",
 			name:	 "ammx word 2",
 			description:	"Ammx instruction word 2",
-			note: "Non è un registro ma la seconda word di una istruzione AMMX",
+			note: "Non e' un registro ma la seconda word di una istruzione AMMX\n\n\
+			List of opcodes:\n\
+			LOAD:        000 001\n\
+			LOADi:       000 001\n\
+			Trans-Hi:    000 010\n\
+			TRANS-LO:    000 011\n\
+			TRANSi-LO:   000 011\n\
+			STORE:       000 100\n\
+			STOREi:      000 100\n\
+			STOREM:      000 101\n\
+			PACKUSWB:    000 110\n\
+			PACKPIX:     000 111\n\
+			\n\
+			PAND:        001 000\n\
+			POR:         001 001\n\
+			PEOR:        001 010\n\
+			PANDN:       001 011\n\
+			PAVG:        001 100\n\
+			Slot libero: 001 101\n\
+			PABS.B:      001 110\n\
+			PABS.W:      001 111\n\
+			\n\
+			PADD.B:      010 000\n\
+			PADD.W:      010 001\n\
+			PSUB.B:      010 010\n\
+			PSUB.W:      010 011\n\
+			PADDus.B:    010 100\n\
+			PADDss.W:    010 101\n\
+			PSUBus.B:    010 110\n\
+			PSUBss.w:    010 111\n\
+			\n\
+			PMUL88:      011 000\n\
+			MULA:        011 001\n\
+			MULHW:       011 010\n\
+			MULLW:       011 011\n\
+			BFLY.B:      011 100\n\
+			BFLY.W:      011 101\n\
+			UNPACKPIX:   011 110\n\
+			Slot libero: 011 111\n\
+			\n\
+			PCMPeq.b:    100 000\n\
+			PCMPeq.w:    100 001\n\
+			PCMPhi.b:    100 010\n\
+			PCMPhi.w:    100 011\n\
+			STOREC:      100 100\n\
+			STOREM2:     100 101\n\
+			STOREM3:     100 110\n\
+			Slot libero: 100 111\n\
+			\n\
+			C2P:         101 000\n\
+			BSEL:        101 001\n\
+			MINTERM:     101 010\n\
+			PIXMRG:      101 011\n\
+			PCMPge.b:    101 100\n\
+			PCMPge.w:    101 101\n\
+			PCMPgt.b:    101 110\n\
+			PCMPgt.w:    101 111\n\
+			\n\
+			PMINs.b:     110 000\n\
+			PMINs.w:     110 001\n\
+			PMINu.b:     110 010\n\
+			PMINu.w:     110 011\n\
+			PMAXs.b:     110 100\n\
+			PMAXs.w:     110 101\n\
+			PMAXu.b:     110 110\n\
+			PMAXu.w:     110 111\n\
+			\n\
+			LSR.Q:       111 000\n\
+			LSL.Q:       111 001\n\
+			Slot libero: 111 010\n\
+			DTX:         111 011\n\
+			Slot libero: 111 100\n\
+			Slot libero: 111 101\n\
+			LEA3D:       111 110\n\
+			Slot libero: 111 111\n\
+			",
 			bits:[
 				
 				
@@ -2009,15 +2084,15 @@ AMIGAREGISTERS.push(
 					description:"Op code"
 				},
 				{
-					name:"0",
-					description:"Always 0"
+					name:"Op Code",
+					description:"0"
 				},
 				{
 					name:"0",
-					description:"Always 0"
+					description:"Always 0 - reserved for future uses"
 				},{
 					name:"0",
-					description:"Always 0"
+					description:"Always 0 - reserved for future uses"
 				},
 				{
 					name:"REG-D",
