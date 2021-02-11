@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html>
+
+<style>
+  pre code {
+    background-color: #eee;
+    border: 1px solid #999;
+    display: block;
+    padding: 20px;
+  }
+</style>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+  <script src="js/AmigaFontEditor.js"></script>
+</head>
+
+<body>
+  <a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;"
+      src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
+      alt="Fork me on GitHub"
+      data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+  <div class="topnav">
+    <a href="index.html">Fonts</a>
+    <a href="index_sprite.html">Sprite</a>
+    <a href="index_sprite_position.html">Sprite position</a>
+    <a href="register_conversion.html">Register conversion</a>
+    <a href="copperlist_translator.html">Copperlist translator</a>
+    <a href="diwstartstop.html">Diwstart/stop</a>
+    <a href="projection.html">Point Projection</a>
+    <a class="active" href="trigonometry.html">Trigonometric tables</a>
+  </div>
+  <div id="content" style="padding:25px">
+    <h2>Amiga Trigonometric tables generator</h2>
+    <h4>Build your ASM trigonometric functions</h4>
+
+    <div style="background-color: beige;">
+      Multiplier
+
+      <input type="number" id="multiplier" name="multiplier" min="1" value="256">
+      <select id=trigcol>
+        <option value=0>Sin()</option>
+        <option value=1>-Sin()</option>
+        <option value=2>Cos()</option>
+        <option value=3>-Cos()</option>
+      </select>
+      <input type="button" id="generatetables" value="Add">
+      <input type="button" id="removelast" value="Remove last">
+
+      <ul>
+        <li><input type="button" id="resettables" value="Reset tables"></li>
+        <li><textarea id=asmcode style="width:100%;height:300px;"></textarea></li>
+      </ul>
+    </div>
+
+
+    <script>
+
+      var tables = [];
+      var columns = [];
+
+      obj = document.getElementById('resettables');
+      obj.onclick = function () {
+        document.getElementById("asmcode").innerHTML = "";
+        tables = [];
+        columns = [];
+      }
+
+      obj = document.getElementById('removelast');
+      obj.onclick = function () {
+        columns.pop();
+        updateAsm();
+      }
+
+      obj = document.getElementById('generatetables');
+      obj.onclick = function () {
+        columns.push(document.getElementById("trigcol").value);
+        updateAsm();
+      }
+
+      function updateAsm() {
+        document.getElementById("asmcode").innerHTML = "";
+        tables = [];
+        
+
+        for (i = 0; i < 360; i++) {
+
+          table = {
+            'sin': Math.sin(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
+            'sinorig': Math.sin(i * Math.PI / 180),
+            'cos': Math.cos(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
+            'cosorig': Math.cos(i * Math.PI / 180),
+            'sininv': -1 * Math.sin(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
+            'cosinv': -1 * Math.cos(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
+          };
+
+          tables.push(table);
+
+
+        }
+
+        var asmString = "";
+        var index = 0;
+        // Sin table
+        separator = "";
+        tables.forEach(table => {
+          if (!index) asmString += "SIN_TABLE:\n";
+          asmString += "\tdc.w ";
+          var virgola = "";
+          columns.forEach(column => {
+            //console.log(column);
+            //console.log(getTrigCol(table,column));
+            asmString += virgola + parseInt(getTrigCol(table, column).toString());
+            virgola = ",";
+          });
+
+          asmString += "   ; " + index + " deg - True value: " + table.sinorig;
+          //asmString+=parseInt(table.sin)+","+parseInt(table.cos)+","+parseInt(table.sininv)+","+parseInt(table.cosinv)+"   ; "+index+" deg - True value: "+table.sinorig;
+          asmString += "\n";
+          index++;
+        });
+
+
+
+        document.getElementById("asmcode").innerHTML = asmString;
+
+      }
+
+      function getTrigCol(table, column) {
+        switch (parseInt(column)) {
+          case 0: return table.sin;
+          case 1: return table.sininv;
+          case 2: return table.cos;
+          case 3: return table.cosinv;
+          default: return table.sin;
+        }
+      }
+
+    </script>
+</body>
+
+</html>
