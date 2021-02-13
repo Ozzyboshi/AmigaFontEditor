@@ -2055,8 +2055,8 @@ AMIGAREGISTERS.push(
 			PMAXu.b:     110 110\n\
 			PMAXu.w:     110 111\n\
 			\n\
-			LSR.Q:       111 000\n\
-			LSL.Q:       111 001\n\
+			LSL.Q:       111 000\n\
+			LSR.Q:       111 001\n\
 			Slot libero: 111 010\n\
 			DTX:         111 011\n\
 			Slot libero: 111 100\n\
@@ -2084,8 +2084,8 @@ AMIGAREGISTERS.push(
 					description:"Op code"
 				},
 				{
-					name:"Op Code",
-					description:"0"
+					name:"Op",
+					description:"Op code"
 				},
 				{
 					name:"0",
