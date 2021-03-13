@@ -38,11 +38,31 @@
       Multiplier
 
       <input type="number" id="multiplier" name="multiplier" min="1" value="256">
-      <select id=trigcol>
+      Multiplier helper: <select id="multiplierhelper" size=1>
+        <option value=1>1 (2^0)</option>
+        <option valiue=2>2 (2^1)</option>
+        <option value=4>4 (2^2)</option>
+        <option value=8>8 (2^3)</option>
+        <option value=16>16 (2^4)</option>
+        <option value=32>32 (2^5)</option>
+        <option value=64>64 (2^6)</option>
+        <option value=128>128 (2^7)</option>
+        <option value=256>256 (2^8)</option>
+        <option value=512>512 (2^9)</option>
+        <option value=1024>1024 (2^10)</option>
+        <option value=2048>2048 (2^11)</option>
+        <option value=4096>4096 (2^12)</option>
+        <option value=8192>8192 (2^13)</option>
+        <option value=16384>16384 (2^14)</option>
+        <option value=32768>32768 (2^15)</option>
+        <option value=65536>65536 (2^16)</option>
+      </select>
+      &nbsp;&nbsp;Function: <select id=trigcol>
         <option value=0>Sin()</option>
         <option value=1>-Sin()</option>
         <option value=2>Cos()</option>
         <option value=3>-Cos()</option>
+        <option value=4>Zero</option>
       </select>
       <input type="button" id="generatetables" value="Add">
       <input type="button" id="removelast" value="Remove last">
@@ -58,6 +78,14 @@
 
       var tables = [];
       var columns = [];
+
+      obj = document.getElementById('multiplierhelper');
+      obj.onchange = function () {
+        var e = document.getElementById("multiplierhelper");
+        var helperNumber = e.options[e.selectedIndex].value;
+        document.getElementById("multiplier").value = helperNumber;
+        updateAsm();
+      }
 
       obj = document.getElementById('resettables');
       obj.onclick = function () {
@@ -92,6 +120,7 @@
             'cosorig': Math.cos(i * Math.PI / 180),
             'sininv': -1 * Math.sin(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
             'cosinv': -1 * Math.cos(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
+            'zero': 0
           };
 
           tables.push(table);
@@ -132,6 +161,7 @@
           case 1: return table.sininv;
           case 2: return table.cos;
           case 3: return table.cosinv;
+          case 4: return 0;
           default: return table.sin;
         }
       }
