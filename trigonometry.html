@@ -70,6 +70,7 @@
       &nbsp;&nbsp;Fixed point format: <select id=fixedpoint>
         <option value=0>Q16.0</option>
         <option value=6>Q10.6</option>
+        <option value=11>Q5.11</option>
       </select>
 
       <ul>
@@ -157,7 +158,7 @@
             {
               var qnumber = qformat(parseFloat(getTrigCol(table, column)),fraction);
               //console.log("entrooo"+qnumber);
-              asmString += virgola + parseFloat(getTrigCol(table, column).toString(2).substring(0,6));
+              asmString += virgola + "%" + qnumber;
             }
             else asmString += virgola + parseInt(getTrigCol(table, column).toString());
             virgola = ",";
@@ -188,84 +189,57 @@
 
       function qformat(number,fractionprecision)
       {
-        if (0 && number<0)
-        {
-          var integerPartBinary=number.toString(2);
+        //number=0.01745240643728351;
+        var integerPartBinary=number.toString(2);
+        if (integerPartBinary.includes("."))
           var integerPart=integerPartBinary.substr(0, integerPartBinary.indexOf('.'));
-          if (integerPartBinary.includes("."))
-            var fractionalPart=integerPartBinary.split('.')[1];
-          else
-            var fractionalPart="0";
-
-          fractionalPart=fractionalPart.substring(0,fractionprecision);
-
-          
-          //console.log(integerPartBinary);
-          
-          var integerPart = integerPart.substring(1).padStart(16-fractionprecision-1,'0');
-          console.log("Integer part:"+integerPart);
-          var integerPartFlipped="";
-          for (var i=0;i<integerPart.length;i++)
-          {
-            if (integerPart[i]=='0') integerPartFlipped+='1';
-            else if (integerPart[i]=='1') integerPartFlipped+='0';
-          }
-          console.log("Integer part flipped:"+integerPartFlipped);
-          var integerPartFlippedInt=parseInt(integerPartFlipped,2);
-          integerPartFlippedInt++;
-          console.log("Integer part flipped integer:"+integerPartFlippedInt.toString(2)+"..."+fractionalPart);
-          return "LOL";
-
-          var binaryString = number.toString(2);
-          binaryString=binaryString.substring(1);
-          var flippedBinayString="";
-          var copiedBinaryString="";
-          for (var i=0, pointFound=0;i<binaryString.length;i++)
-          {
-            if (pointFound==0)
-            {
-              if (binaryString[i]=='0') flippedBinayString+='1';
-              else if (binaryString[i]=='1') flippedBinayString+='0';
-            }
-            else
-            {
-              if (binaryString[i]=='0') copiedBinaryString+='0';
-              else if (binaryString[i]=='1') copiedBinaryString+='1';
-            }
-            if (binaryString[i]=='.') pointFound=1;
-            //if (flippedBinayString.length+copiedBinaryString.length>=16) break;
-          }
-          var moldule1String = flippedBinayString.padStart(16-fractionprecision,'0');
-          console.log(number+":"+binaryString+":::::"+moldule1String+"."+copiedBinaryString);
-        }
+        else
+          integerPart=integerPartBinary;
+        console.log("Numero:"+number+"##"+integerPart);
         if (number>=0)
         {
-          var integerPartBinary=number.toString(2);
-          var integerPart=integerPartBinary.substr(0, integerPartBinary.indexOf('.'));
+          var integerPartBinaryPadded = integerPart.padStart(16-fractionprecision-1,'0');
+          console.log("Integer part padded:"+integerPartBinaryPadded);
           if (integerPartBinary.includes("."))
+          {
             var fractionalPart=integerPartBinary.split('.')[1];
+            fractionalPart=fractionalPart.substring(0,fractionprecision);
+          }
           else
-            var fractionalPart="0";
+            var fractionalPart="".padStart(fractionprecision,'0');
 
-          fractionalPart=fractionalPart.substring(0,fractionprecision);
+          console.log("Parte frazionaria:"+fractionalPart);
+          return "0"+integerPartBinaryPadded+""+fractionalPart;
+        }
+        
+        var integerPartBinary=number.toString(2);
+        var integerPart=integerPartBinary.substr(0, integerPartBinary.indexOf('.'));
+        if (integerPartBinary.includes("."))
+          var fractionalPart=integerPartBinary.split('.')[1];
+        else
+          var fractionalPart="0";
+
+        fractionalPart=fractionalPart.substring(0,fractionprecision);
 
           
           //console.log(integerPartBinary);
           
-          var integerPart = integerPart.substring(1).padStart(16-fractionprecision-1,'0');
-          console.log("Integer part:"+integerPart);
-          var integerPartFlipped="";
-          for (var i=0;i<integerPart.length;i++)
-          {
-            if (integerPart[i]=='0') integerPartFlipped+='0';
-            else if (integerPart[i]=='1') integerPartFlipped+='1';
-          }
-          console.log("Integer part flipped:"+integerPartFlipped);
-          var integerPartFlippedInt=parseInt(integerPartFlipped,2);
-          console.log("Integer part flipped integer:"+integerPartFlippedInt.toString(2)+"..."+fractionalPart);
-          return "LOL";
+        var integerPart = integerPart.substring(1).padStart(16-fractionprecision-1,'0');
+        //console.log("Integer part:"+integerPart);
+        var integerPartFlipped="";
+        for (var i=0;i<integerPart.length;i++)
+        {
+          if (integerPart[i]=='0') integerPartFlipped+='1';
+          else if (integerPart[i]=='1') integerPartFlipped+='0';
         }
-        return "LOL";
+        console.log("Integer part flipped:"+integerPartFlipped);
+        var integerPartFlippedInt=parseInt(integerPartFlipped,2);
+        integerPartFlippedInt++;
+        //console.log("Integer part flipped integer:"+integerPartFlippedInt.toString(2)+"..."+fractionalPart);
+        return integerPartFlippedInt.toString(2)+"."+fractionalPart;
+
+         
+         
       }
 
       function dec2bin(dec) {
