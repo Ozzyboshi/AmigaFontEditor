@@ -126,7 +126,7 @@
 
         document.getElementById("asmcode").innerHTML = "";
         tables = [];
-        
+
 
         for (i = 0; i < 360; i++) {
 
@@ -154,9 +154,8 @@
           columns.forEach(column => {
             //console.log(column);
             //console.log(getTrigCol(table,column));
-            if (fraction>0)
-            {
-              var qnumber = qformat(parseFloat(getTrigCol(table, column)),fraction);
+            if (fraction > 0) {
+              var qnumber = qformat(parseFloat(getTrigCol(table, column)), fraction);
               //console.log("entrooo"+qnumber);
               asmString += virgola + "%" + qnumber;
             }
@@ -187,64 +186,61 @@
         }
       }
 
-      function qformat(number,fractionprecision)
-      {
+      function qformat(number, fractionprecision) {
         //number=0.01745240643728351;
-        var integerPartBinary=number.toString(2);
+        // number = -1;
+        var integerPartBinary = number.toString(2);
         if (integerPartBinary.includes("."))
-          var integerPart=integerPartBinary.substr(0, integerPartBinary.indexOf('.'));
+          var integerPart = integerPartBinary.substr(0, integerPartBinary.indexOf('.'));
         else
-          integerPart=integerPartBinary;
-        console.log("Numero:"+number+"##"+integerPart);
-        if (number>=0)
-        {
-          var integerPartBinaryPadded = integerPart.padStart(16-fractionprecision-1,'0');
-          console.log("Integer part padded:"+integerPartBinaryPadded);
-          if (integerPartBinary.includes("."))
-          {
-            var fractionalPart=integerPartBinary.split('.')[1];
-            fractionalPart=fractionalPart.substring(0,fractionprecision);
+          integerPart = integerPartBinary;
+        //console.log("Numero:" + number + "##" + integerPart);
+        //if (number>=0)
+        var isNegative = 0;
+        if (number < 0) {
+          isNegative = 1;
+          number *= -1;
+          integerPart = integerPart.replace('-','');
+        }
+        if (1) {
+          var integerPartBinaryPadded = integerPart.padStart(16 - fractionprecision - 1, '0');
+          console.log("Integer part padded:" + integerPartBinaryPadded);
+          if (integerPartBinary.includes(".")) {
+            var fractionalPart = integerPartBinary.split('.')[1];
+            fractionalPart = fractionalPart.substring(0, fractionprecision);
           }
           else
-            var fractionalPart="".padStart(fractionprecision,'0');
+            var fractionalPart = "".padStart(fractionprecision, '0');
 
-          console.log("Parte frazionaria:"+fractionalPart);
-          return "0"+integerPartBinaryPadded+""+fractionalPart;
+          //console.log("Parte frazionaria:" + fractionalPart);
+          var fractionalPartPadded = fractionalPart.padEnd(fractionprecision, '0');
+          var finalRes = "0" + integerPartBinaryPadded + "" + fractionalPartPadded;
+          if (isNegative == 0) return finalRes;
+          var finalResNeg = "";
+          for (var i = 0; i < finalRes.length; i++) {
+            if (finalRes[i] == '0') finalResNeg += "1";
+            else if (finalRes[i] == '1') finalResNeg += "0";
+          }
+
+          for (var i = finalResNeg.length - 1; i >= 0; i--) {
+            if (finalResNeg[i] == '0') {
+              finalResNeg=setCharAt(finalResNeg,i,'1');
+              break;
+            }
+            if (finalResNeg[i] == '1') {
+              finalResNeg=setCharAt(finalResNeg,i,'0');
+            }
+
+          }
+          return finalResNeg;
         }
-        
-        var integerPartBinary=number.toString(2);
-        var integerPart=integerPartBinary.substr(0, integerPartBinary.indexOf('.'));
-        if (integerPartBinary.includes("."))
-          var fractionalPart=integerPartBinary.split('.')[1];
-        else
-          var fractionalPart="0";
-
-        fractionalPart=fractionalPart.substring(0,fractionprecision);
-
-          
-          //console.log(integerPartBinary);
-          
-        var integerPart = integerPart.substring(1).padStart(16-fractionprecision-1,'0');
-        //console.log("Integer part:"+integerPart);
-        var integerPartFlipped="";
-        for (var i=0;i<integerPart.length;i++)
-        {
-          if (integerPart[i]=='0') integerPartFlipped+='1';
-          else if (integerPart[i]=='1') integerPartFlipped+='0';
-        }
-        console.log("Integer part flipped:"+integerPartFlipped);
-        var integerPartFlippedInt=parseInt(integerPartFlipped,2);
-        integerPartFlippedInt++;
-        //console.log("Integer part flipped integer:"+integerPartFlippedInt.toString(2)+"..."+fractionalPart);
-        return integerPartFlippedInt.toString(2)+"."+fractionalPart;
-
-         
-         
       }
 
-      function dec2bin(dec) {
-  return (dec >>> 0).toString(2);
-}
+      function setCharAt(str, index, chr) {
+        if (index > str.length -1) return str;
+        return str.substring(0, index) + chr + str.substring(index+1);
+      }
+
 
     </script>
 </body>
