@@ -409,6 +409,43 @@ function createFontTable(characters,palette,resolution)
 				this.fontArray[z].drawFontFromData(binaryArray);
 			}
 		},
+		clearRawImg: function () {
+			this.fontArray[0].clearAllSquares();
+		},
+		drawRawImg: function (rawData,nBitplanes,module=0) {
+			//console.log(rawData);
+
+			// Set resolution variables
+			var xres=this.resolution.x;
+			var yres=this.resolution.y;
+
+			var binaryArray = [nBitplanes];
+				for (var i=0;i<nBitplanes;i++)
+					binaryArray[i]=new Uint8Array(xres*yres/8);
+			//console.log("binary data allocaed");
+
+			for (var i=0;i<xres*yres/8;i++)
+			{
+				var byte=rawData[i];
+				if (byte>0)
+				{
+					binaryArray[0][i]=byte;
+					//console.log("bitplane 0: byte "+i+"is "+byte);
+				}
+
+				// For each additional bitplane
+				for (var contBitplane=1;contBitplane<nBitplanes;contBitplane++)
+				{
+					var byte=rawData[i+yres*40*contBitplane];
+					if (byte>0)
+					{
+						//console.log(i+yres*40*contBitplane+" bitplane "+contBitplane+": byte "+i+"is "+byte);
+						binaryArray[contBitplane][i]=byte;
+					}
+				}
+			}
+			this.fontArray[0].drawFontFromData(binaryArray);
+		},
 		updateColor: function (index,color) {
 			for (var i = 0; i < table.fontArray.length; i++)
 			{
