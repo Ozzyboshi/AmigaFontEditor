@@ -347,6 +347,19 @@ function createFontTable(characters,palette,resolution)
 				}
 			return binaryCharacters;
 		},
+		getBinaryDataStringAsm: function (nBitplanes) {
+			var binaryCharacters="";
+			for (var j=0;j<nBitplanes;j++)
+			{
+				binaryCharacters+="; Bitplane "+j+":\n";
+				for (var i = 0; i < table.fontArray.length; i++)
+				{
+					var canvas=this.fontArray[i].canvas;
+					binaryCharacters+=canvas.data.getBinaryDataStringForBitplaneASM(j);
+				}
+			}
+			return binaryCharacters;
+		},
 		getBinaryData: function (nBitplanes) {
 			var xres=this.resolution.x;
 			var yres=this.resolution.y;
@@ -822,6 +835,61 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				binaryCode=binaryCode.split("").reverse().join("");
 				res+=binaryCode[bitplaneNumber];
 			}
+			return res;
+		},
+		// Get a specific bitplane binarydata in string from
+		getBinaryDataStringForBitplaneASM: function (bitplaneNumber) {
+			var total=0;
+			var contbytes=0;
+			var byteIndex=7;
+			var contcomma=0;
+			var rowcount=0;
+			var res="dc.l $";
+			if (bitplaneNumber>this.palette.nBitplanes) return res;
+			for (var i = 0; i < this.squaresObjs.length; i++) 
+			{
+				var temp=0;
+				
+				var binaryCode=(this.squaresObjs[i].code >>> 0).toString(2);
+				while (binaryCode.length<this.palette.nBitplanes)
+					binaryCode="0"+binaryCode;
+				binaryCode=binaryCode.split("").reverse().join("");
+
+				if (binaryCode[bitplaneNumber]!='0')
+				{
+					temp=Math.pow(2, byteIndex);
+					total+=temp;
+				}
+				if (byteIndex==0)
+				{
+					byteIndex=7;
+					var number = total.toString(16);
+					res+=("0" + number).slice(-2);
+					/*if ((++contdollar)>=0)
+					{
+						res+="$"+number;
+						contdollar = 0;
+					}*/
+					total=0;
+					if ((++contcomma)>=4)
+					{
+						res+=",$";
+						contcomma=0;
+					}
+				}
+				else byteIndex--;
+
+				//res+=binaryCode[bitplaneNumber]+",";
+				// end of row
+				//if (i&&!(i%319))
+				if ((++contbytes)>=320)
+				{
+					res = res.slice(0, -2); 
+					res+=" ;row "+(rowcount++)+"\ndc.l $";
+					contbytes = 0;
+				}
+			}
+			res = res.slice(0, -7); 
 			return res;
 		},
 		// Get a specific bitplane binarydata in Uint8Array format

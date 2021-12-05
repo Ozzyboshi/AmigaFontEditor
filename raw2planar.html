@@ -29,11 +29,13 @@
 			After loading you should see which pixel are turned on into the Amiga planar screen</p>
 		<input type="button" class="hideshowcontrols" value="Hide Controls">
         <input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
+		<input type=button id=calculate value="Export to Raw" />
+		<input type=button id=calculate2 value="Export to 68k ASM" />
 		<input type="button" value="Clear all squares" onclick="clearAllSquares();" />
 
 		<div id="colorpalette" draggable="false" >
 			<input type="file" id="fileChooser" style="display:none;">
-			<input id="nbitplanes" type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :2</a>
+			<input id="nbitplanes" value=2 type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :2</a>
 			<ul id="colorslist">
 				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 00</li>
 				<li idcolor="1"><input type=color id="color1" value="#ff0000">Color 01</li>
@@ -77,9 +79,6 @@
 			<textarea id="resultpre"></textarea>
 			<input type=button id=copyresult value="Copy to Clipboard" />
 			<input type="button" class="hideshowcontrols" value="Hide Controls">
-            <input type=button id=calculate value="Generate Raw File" />
-
-
 		</div>
 		<ul id="fonttable"></ul>
 	</div>
@@ -181,9 +180,29 @@
 	calculate.onclick = function() {
 		var binaryData=table.getBinaryData(palette.nBitplanes);
 		//console.log(binaryData);
-		var fileName = prompt("Please enter the name of your export file", "Myfonts.fnt");
+		var fileName = prompt("Please enter the name of your export file", "Mybitplanes.raw");
 		if (fileName)
 			saveByteArray([binaryData], fileName);
+	};
+
+	// Handle file export click
+	var calculate2 = document.getElementById('calculate2');
+	calculate2.onclick = function() {
+		var binaryData=table.getBinaryDataStringAsm(palette.nBitplanes);
+		console.log(binaryData);
+		var fileName = prompt("Please enter the name of your export file", "MybitplanesASM.s");
+		if (fileName)
+		{
+			var blob = new Blob([binaryData],
+                { type: "text/plain;charset=utf-8" });
+				const a = document.createElement('a');
+				
+				a.href= URL.createObjectURL(blob);
+				a.download = fileName;
+				a.click();
+
+				URL.revokeObjectURL(a.href);
+		}
 	};
 
 	var saveByteArray = (function () {
@@ -255,17 +274,7 @@
 			if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
 			document.getElementById("resultpre").innerHTML += virgola+XCOORDINATES[i];
 		}
-		if (mirror)
-		{
-			document.getElementById("resultpre").innerHTML += '\nTABXMIRROR\n\tdc.w ';
-			for (var i=0;i<XCOORDINATES.length;i++)
-			{
-				var virgola="";
-				if (i>0) virgola=",";
-				if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
-				document.getElementById("resultpre").innerHTML += virgola+XCOORDINATES[XCOORDINATES.length-1-i];
-			}
-		}
+		
 		document.getElementById("resultpre").innerHTML += '\nFINETABX';
 
 		document.getElementById("resultpre").innerHTML += '\n\nTABY\n\tdc.w ';
@@ -275,19 +284,8 @@
 			if (i>0) virgola=",";
 			if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
 			document.getElementById("resultpre").innerHTML += virgola+YCOORDINATES[i];
-			
 		}
-		if (mirror)
-		{
-			document.getElementById("resultpre").innerHTML += '\n\nTABYMIRROR\n\tdc.w ';
-			for (var i=0;i<YCOORDINATES.length;i++)
-			{
-				var virgola="";
-				if (i>0) virgola=",";
-				if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
-				document.getElementById("resultpre").innerHTML += virgola+YCOORDINATES[YCOORDINATES.length-1-i];
-			}
-		}
+		
 		document.getElementById("resultpre").innerHTML += '\nFINETABY';
 	}
 	document.getElementById("colorpalette").addEventListener('dragover',dragfunction,false);
