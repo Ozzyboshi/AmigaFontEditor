@@ -33,7 +33,7 @@
 		<input type=button id=calculate2 value="Export to 68k ASM" />
 		<input type="button" value="Clear all squares" onclick="clearAllSquares();" />
 
-		<div id="colorpalette" draggable="false" >
+		<div id="colorpalette" draggable="true" >
 			<input type="file" id="fileChooser" style="display:none;">
 			<input id="nbitplanes" value=2 type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :2</a>
 			<ul id="colorslist">
@@ -231,7 +231,7 @@
 		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
 		reader.onloadend = function () {
 			table.drawRawImg(new Uint8Array(reader.result),2);
-			alert('File loaded succesfully');
+			alert('File '+fileName+' loaded succesfully');
 			document.getElementById('fileChooser').value = null;
 			return ;
 		}
@@ -288,12 +288,11 @@
 		
 		document.getElementById("resultpre").innerHTML += '\nFINETABY';
 	}
-	document.getElementById("colorpalette").addEventListener('dragover',dragfunction,false);
+	document.getElementById("colorpalette").addEventListener('dragend',dragfunction,false);
 	function dragfunction (data)
 	{
-		console.log(data);
-		 document.getElementById("colorpalette").style.left = data.screenX + 'px';
-    	document.getElementById("colorpalette").style.top = data.screenY + 'px';
+		document.getElementById("colorpalette").style.left = data.screenX + 'px';
+    	document.getElementById("colorpalette").style.top = data.screenY-173 + 'px';
 	}
 	// Manage slider for changing bitplane numbers
 	document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
