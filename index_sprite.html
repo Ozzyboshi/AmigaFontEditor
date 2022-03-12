@@ -74,7 +74,7 @@
 				<input type="button" value="Amiga colors code" id="amigacolorscode" />
 				<input type="button" value="Sprite binary code" id="spritebinarycode" />
 			</div>
-			<textarea id="resultpre"></textarea>
+			<textarea id="resultpre" style="overflow-y: auto;"></textarea>
 			<input type=button id=copyresult value="Copy to Clipboard" />
 			<input type=button id=calculate value="Generate Raw File" />
 			<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
@@ -257,18 +257,15 @@
 		for (var contBitplanes=0;contBitplanes<palette.nBitplanes;contBitplanes+=2)
 		{			
 			var hexCode="";
+			var vStop=table.resolution.y+48;
 			if (contBitplanes==0)
 			{
-				var vStop=table.resolution.y+48;
 				amigaCode = "MYSPRITE\nVSTART	dc.b $30\nHSTART\tdc.b $90\nVSTOP\tdc.b $"+vStop.toString(16)+",$00\n";
 				hexCode=totalHexCode.slice(0,totalResolution);
 			}
 			else
 			{
-				var vStop=table.resolution.y+48;
-
-				//amigaCode += "dc.b $30,$90,$"+vStop.toString(16)+",$80\n";
-				amigaCode = "MYSPRITE\nVSTART	dc.b $30\nHSTART\tdc.b\t$90\nVSTOP\tdc.b\t$"+vStop.toString(16)+",$80\n";
+				amigaCode += "MYSPRITE\nVSTART	dc.b $30\nHSTART\tdc.b\t$90\nVSTOP\tdc.b\t$"+vStop.toString(16)+",%10000000\n";
 				hexCode=totalHexCode.slice(totalResolution,totalResolution*2);
 			}
 			var imgLength=hexCode.length/2;
@@ -320,10 +317,10 @@
 	function showAmigaColors(evt) {
 		document.getElementById("resultpre").innerHTML = '';
 		var font=palette.getFontColorById(0);	
-		document.getElementById("resultpre").innerHTML += 'dc.w    $180,$'+font.amigaR+font.amigaG+font.amigaB+'    ; color transparency\n';
+		document.getElementById("resultpre").innerHTML += 'dc.w    $1a0,$'+font.amigaR+font.amigaG+font.amigaB+'    ; color transparency\n';
 		for (var i=0,startReg=418;i<palette.getTableSize()-1;startReg+=2,i++)
 		{
-			var contcolor=i+1;
+			var contcolor=i+17;
 			var font=palette.getFontColorById(i+1);	
 			document.getElementById("resultpre").innerHTML += 'dc.w    $'+startReg.toString(16)+',$'+font.amigaR+font.amigaG+font.amigaB+'    ; color'+contcolor+'\n';
 		}
