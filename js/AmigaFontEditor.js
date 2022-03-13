@@ -459,6 +459,8 @@ function createFontTable(characters,palette,resolution)
 			}
 			this.fontArray[0].drawFontFromData(binaryArray);
 		},
+
+		// Update each square with color currently selected (second parameter is unused)
 		updateColor: function (index,color) {
 			for (var i = 0; i < table.fontArray.length; i++)
 			{
@@ -470,6 +472,43 @@ function createFontTable(characters,palette,resolution)
 						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
 						if (index>0)
 							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFgFontColor());
+					}
+				}
+			}
+		},
+		// Update each square with color currently selected (second parameter is unused)
+		refreshColor: function (index,colorindex) {
+			for (var i = 0; i < table.fontArray.length; i++)
+			{
+				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
+				{
+					if (table.fontArray[i].squaresObjs[j].code==index)
+					{
+						//console.log(table.fontArray[i].squaresObjs[j].code);
+						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
+						if (index>0)
+							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFontColorById(index));
+					}
+				}
+			}
+		},
+		// Update each square color with color index
+		swapColors: function (index1,index2) {
+			for (var i = 0; i < table.fontArray.length; i++)
+			{
+				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
+				{
+					if (table.fontArray[i].squaresObjs[j].code==index1)
+					{
+						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
+						if (index2>0)
+							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFontColorById(index2));
+					}
+					else if (table.fontArray[i].squaresObjs[j].code==index2)
+					{
+						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
+						if (index1>0)
+							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFontColorById(index1));
 					}
 				}
 			}

@@ -66,6 +66,22 @@
 			</ul>
 			<input id="xres" type="range" min="16" max="16" step="8"/><a id="xreslabel">X resolution :8</a>
 			<input id="yres" type="range" min="8" max="256" step="2"/><a id="yreslabel">Y resolution :8</a>
+			<div id="swapbuttondiv" style="background-color: antiquewhite;">
+				Color 1: <select name=swapcolor1 id=swapcolor1>
+					<option value="0">Color 0</option>
+					<option value="1" SELECTED>Color 1</option>
+					<option value="2">Color 2</option>
+					<option value="3">Color 3</option>
+				</select>
+				<br>Color 2: <select name=swapcolor2 id=swapcolor2>
+					<option value="0">Color 0</option>
+					<option value="1">Color 1</option>
+					<option value="2" SELECTED>Color 2</option>
+					<option value="3">Color 3</option>
+				</select>
+				<br><input type=button id=swapcolors value="Swap colors" />
+				<br>Swap palette colors also<input type="checkbox" id="swappalette" />
+			</div>
 		</div>
 		<div id=result>
 			<div id="buttondiv">
@@ -126,14 +142,29 @@
 	  function handleChangeBitplaneNumber(event)
 	  {
 	  	palette.changeBitplanes(this.value*1);
+
+		var swap1elem = document.getElementById("swapcolor1");
+		for(i = swap1elem.options.length - 1; i >= 0; i--) swap1elem.remove(i);
+		var swap2elem = document.getElementById("swapcolor2");
+		for(i = swap2elem.options.length - 1; i >= 0; i--) swap2elem.remove(i);
 	  	
 	  	// Hide out of range palettes
 	  	for (i=0;i<NUMPALETTECOLORS;i++)
 	  	{
 	  		var liColor=document.querySelectorAll("#colorslist > li")[i];
 	  		if (i<Math.pow(2,this.value*1))
+			{
 	  			liColor.style = "display: show";
-	  		else
+				var option = document.createElement("option");
+				option.text = "Color "+i;
+				option.value = i;
+				swap1elem.add(option);
+				var option = document.createElement("option");
+				option.text = "Color "+i;
+				option.value = i;
+				swap2elem.add(option);
+			}
+			else
 	  			liColor.style = "display: none";
 	  		var colorObj=document.querySelectorAll("#colorslist > li > input[type=color]")[i];
 	  		palette.addFont24BitHexColorAtPos(colorObj.value,i);
@@ -333,6 +364,33 @@
 		ta.focus();
 		ta.select();
 	}
+
+	// Handle click on SHOWEXSTRING button
+	var swapcolors=document.getElementById('swapcolors');
+	swapcolors.onclick = function() {
+		var colorswap1 = document.getElementById("swapcolor1").value;
+		var colorswap2 = document.getElementById("swapcolor2").value;;
+		var color1 = document.getElementById('color'+colorswap1).value;
+		var color2 = document.getElementById('color'+colorswap2).value;
+		
+		console.log(color1);
+		console.log(color2);
+		
+		table.swapColors(colorswap1,colorswap2); // swap squares
+
+		if (document.getElementById("swappalette").checked)
+		{
+			palette.changeColor(colorswap2,color1);
+			document.getElementById('color'+colorswap2).value = color1;
+			table.refreshColor(colorswap2,color1);
+
+			palette.changeColor(colorswap1,color2);
+			document.getElementById('color'+colorswap1).value = color2;
+			table.refreshColor(colorswap1,color2);
+		}
+		
+		return ;
+	};
     </script>
   </body>
 </html>  
