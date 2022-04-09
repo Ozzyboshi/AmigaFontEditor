@@ -29,40 +29,25 @@
 		</div>
 		<div id="colorpalette">
 			<input type="file" id="fileChooser" style="display:none;">
+			<input type="file" id="fileChooserColors" style="display:none;">
 			<input id="nbitplanes" type="range" min="2" max="4" step="2"/><a id="bitplaneslabel">Bitplanes :5</a>
 			<ul id="colorslist">
-				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 00</li>
-				<li idcolor="1"><input type=color id="color1" value="#ff0000">Color 01</li>
-				<li idcolor="2"><input type=color id="color2" value="#00ff00">Color 02</li>
-				<li idcolor="3"><input type=color id="color3" value="#0000ff">Color 03</li>
-				<li idcolor="4"><input type=color id="color4" value="#000000">Color 04</li>
-				<li idcolor="5"><input type=color id="color5" value="#ff00ff">Color 05</li>
-				<li idcolor="6"><input type=color id="color6" value="#ff00ff">Color 06</li>
-				<li idcolor="7"><input type=color id="color7" value="#ff00ff">Color 07</li>
-				<li idcolor="8"><input type=color id="color8" value="#ff00ff">Color 08</li>
-				<li idcolor="9"><input type=color id="color9" value="#ff00ff">Color 09</li>
-				<li idcolor="10"><input type=color id="color10" value="#ff00ff">Color 10</li>
-				<li idcolor="11"><input type=color id="color11" value="#ff00ff">Color 11</li>
-				<li idcolor="12"><input type=color id="color12" value="#ff00ff">Color 12</li>
-				<li idcolor="13"><input type=color id="color13" value="#ff00ff">Color 13</li>
-				<li idcolor="14"><input type=color id="color14" value="#ff00ff">Color 14</li>
-				<li idcolor="15"><input type=color id="color15" value="#ff00ff">Color 15</li>
-				<li idcolor="16"><input type=color id="color16" value="#ff00ff">Color 16</li>
-				<li idcolor="17"><input type=color id="color17" value="#ff00ff">Color 17</li>
-				<li idcolor="18"><input type=color id="color18" value="#ff00ff">Color 18</li>
-				<li idcolor="19"><input type=color id="color19" value="#ff00ff">Color 19</li>
-				<li idcolor="20"><input type=color id="color20" value="#ff00ff">Color 20</li>
-				<li idcolor="21"><input type=color id="color21" value="#ff00ff">Color 21</li>
-				<li idcolor="22"><input type=color id="color22" value="#ff00ff">Color 22</li>
-				<li idcolor="23"><input type=color id="color23" value="#ff00ff">Color 23</li>
-				<li idcolor="24"><input type=color id="color24" value="#ff00ff">Color 24</li>
-				<li idcolor="25"><input type=color id="color25" value="#ff00ff">Color 25</li>
-				<li idcolor="26"><input type=color id="color26" value="#ff00ff">Color 26</li>
-				<li idcolor="27"><input type=color id="color27" value="#ff00ff">Color 27</li>
-				<li idcolor="28"><input type=color id="color28" value="#ff00ff">Color 28</li>
-				<li idcolor="29"><input type=color id="color29" value="#ff00ff">Color 29</li>
-				<li idcolor="30"><input type=color id="color30" value="#ff00ff">Color 30</li>
-				<li idcolor="31	"><input type=color id="color31" value="#ff00ff">Color 31</li>
+				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 16</li>
+				<li idcolor="1"><input type=color id="color1" value="#ff0000">Color 17</li>
+				<li idcolor="2"><input type=color id="color2" value="#00ff00">Color 18</li>
+				<li idcolor="3"><input type=color id="color3" value="#0000ff">Color 19</li>
+				<li idcolor="4"><input type=color id="color4" value="#000000">Color 20</li>
+				<li idcolor="5"><input type=color id="color5" value="#ff00ff">Color 21</li>
+				<li idcolor="6"><input type=color id="color6" value="#ff00ff">Color 22</li>
+				<li idcolor="7"><input type=color id="color7" value="#ff00ff">Color 23</li>
+				<li idcolor="8"><input type=color id="color8" value="#ff00ff">Color 24</li>
+				<li idcolor="9"><input type=color id="color9" value="#ff00ff">Color 25</li>
+				<li idcolor="10"><input type=color id="color10" value="#ff00ff">Color 26</li>
+				<li idcolor="11"><input type=color id="color11" value="#ff00ff">Color 27</li>
+				<li idcolor="12"><input type=color id="color12" value="#ff00ff">Color 28</li>
+				<li idcolor="13"><input type=color id="color13" value="#ff00ff">Color 29</li>
+				<li idcolor="14"><input type=color id="color14" value="#ff00ff">Color 30</li>
+				<li idcolor="15"><input type=color id="color15" value="#ff00ff">Color 31</li>
 			</ul>
 			<input id="xres" type="range" min="16" max="16" step="8"/><a id="xreslabel">X resolution :8</a>
 			<input id="yres" type="range" min="8" max="256" step="1"/><a id="yreslabel">Y resolution :8</a>
@@ -79,7 +64,7 @@
 					<option value="2" SELECTED>Color 2</option>
 					<option value="3">Color 3</option>
 				</select>
-				<br><input type=button id=swapcolors value="Swap colors" />
+				<br><input type=button id=swapcolors value="Swap colors" /> <input type=button id=importcolors value="Import colors from copperlist fragment" onclick="document.getElementById('fileChooserColors').click();" />
 				<br>Swap palette colors also<input type="checkbox" id="swappalette" />
 			</div>
 		</div>
@@ -99,7 +84,7 @@
 	</div>
     <script>
 	var NBITPLANES=2; // The program starts with 2 bitplanes
-	var NUMPALETTECOLORS=32; // Amiga internal registers manage up to 32 colors from DFF180 (color 00 to DFF1BE color 31)
+	var NUMPALETTECOLORS=16; // Amiga internal registers manage up to 16 colors for sprites
 	var SQUARE_PIXELS = 10; // Pixel needed to draw a square
 	var PIXEL_RESOLUTION=[16,16];
 
@@ -108,7 +93,7 @@
 	  document.getElementById('yres').value=PIXEL_RESOLUTION[1];
 	  document.getElementById('xreslabel').innerHTML='X Resolution :'+PIXEL_RESOLUTION[0];
 	  document.getElementById('yreslabel').innerHTML='Y Resolution :'+PIXEL_RESOLUTION[1];
-	  
+
 	  // Handle xres change
 	  document.getElementById('xres').addEventListener('change',handleChangeXres,false);
 	  function handleChangeXres(event)
@@ -136,7 +121,7 @@
 	  	else
 	  		liColor.style = "display: none";
 	  }
-	  
+
 	  // Manage slider for changing bitplane numbers
 	  document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
 	  function handleChangeBitplaneNumber(event)
@@ -147,7 +132,7 @@
 		for(i = swap1elem.options.length - 1; i >= 0; i--) swap1elem.remove(i);
 		var swap2elem = document.getElementById("swapcolor2");
 		for(i = swap2elem.options.length - 1; i >= 0; i--) swap2elem.remove(i);
-	  	
+
 	  	// Hide out of range palettes
 	  	for (i=0;i<NUMPALETTECOLORS;i++)
 	  	{
@@ -203,7 +188,7 @@
 	  	var fontLiObj=document.querySelectorAll("#colorslist > li")[i];
 	  	fontLiObj.addEventListener('click',handleChangeColor, false);
 	  }
-	  function handleChangeColor(event) { 
+	  function handleChangeColor(event) {
 	  for (i=0;i<NUMPALETTECOLORS;i++)
 	  {
 	  	document.querySelectorAll("#colorslist > li")[i].style.background='#9e9e9e';
@@ -286,7 +271,7 @@
 		var totalHexCode = table.getHexDataString(palette.nBitplanes);
 		var amigaCode="";
 		for (var contBitplanes=0;contBitplanes<palette.nBitplanes;contBitplanes+=2)
-		{			
+		{
 			var hexCode="";
 			var vStop=table.resolution.y+48;
 			if (contBitplanes==0)
@@ -343,16 +328,64 @@
 		}
 	}
 
+	document.querySelector("#fileChooserColors").addEventListener('change',filesChosenColors, false);
+	function filesChosenColors(evt){
+		var chosenFile = evt.target.files[0]; //get the first file in the FileList
+		var fileName = chosenFile.name; //the name of the file as a string
+		var fileSize = chosenFile.size; //the size of the file in bytes, as an integer
+		var fileModifiedDate = chosenFile.lastModifiedDate; //a Date object
+		//console.log(chosenFile);
+		reader = new FileReader();
+
+		reader.readAsText(document.querySelector("#fileChooserColors").files[0]);
+		reader.onloadend = function () {
+			console.log(reader.result);
+			var lines = reader.result.split('\n');
+			lines.forEach(function (item, index) {
+				var data = item.match(/([a-zA-Z0-9]+),\$([a-zA-Z0-9]+)/);
+				if (data && data[0] && data[1] && data[2])
+				{
+					var color = data[2];
+					var register = data[1];
+					var convertedcolor="#"+color[0]+""+color[0]+color[1]+""+color[1]+color[2]+""+color[2];
+					var convertedregister = "0";
+					if (register=="1a2") convertedregister = "1";
+					if (register=="1a4") convertedregister = "2";
+					if (register=="1a6") convertedregister = "3";
+					if (register=="1a8") convertedregister = "4";
+					if (register=="1aa") convertedregister = "5";
+					if (register=="1ac") convertedregister = "6";
+					if (register=="1ae") convertedregister = "7";
+					if (register=="1b0") convertedregister = "8";
+					if (register=="1b2") convertedregister = "9";
+					if (register=="1b4") convertedregister = "10";
+					if (register=="1b6") convertedregister = "11";
+					if (register=="1b8") convertedregister = "12";
+					if (register=="1ba") convertedregister = "13";
+					if (register=="1bc") convertedregister = "14";
+					if (register=="1be") convertedregister = "15";
+					console.log("Found color "+color+" converted color "+convertedcolor+" at register "+register);
+					document.getElementById("color"+convertedregister).value=convertedcolor;
+					palette.changeColor(parseInt(convertedregister),convertedcolor);
+					table.updateColor(parseInt(convertedregister),convertedcolor);
+				}
+			});
+			alert('File loaded succesfully');
+			document.getElementById('fileChooserColors').value = null;
+			return ;
+		}
+	}
+
 	// Handle show amiga colors button click
 	document.querySelector("#amigacolorscode").addEventListener('click',showAmigaColors, false);
 	function showAmigaColors(evt) {
 		document.getElementById("resultpre").innerHTML = '';
-		var font=palette.getFontColorById(0);	
+		var font=palette.getFontColorById(0);
 		document.getElementById("resultpre").innerHTML += 'dc.w    $1a0,$'+font.amigaR+font.amigaG+font.amigaB+'    ; color transparency\n';
 		for (var i=0,startReg=418;i<palette.getTableSize()-1;startReg+=2,i++)
 		{
 			var contcolor=i+17;
-			var font=palette.getFontColorById(i+1);	
+			var font=palette.getFontColorById(i+1);
 			document.getElementById("resultpre").innerHTML += 'dc.w    $'+startReg.toString(16)+',$'+font.amigaR+font.amigaG+font.amigaB+'    ; color'+contcolor+'\n';
 		}
 	}
@@ -372,10 +405,10 @@
 		var colorswap2 = document.getElementById("swapcolor2").value;;
 		var color1 = document.getElementById('color'+colorswap1).value;
 		var color2 = document.getElementById('color'+colorswap2).value;
-		
+
 		console.log(color1);
 		console.log(color2);
-		
+
 		table.swapColors(colorswap1,colorswap2); // swap squares
 
 		if (document.getElementById("swappalette").checked)
@@ -388,9 +421,9 @@
 			document.getElementById('color'+colorswap1).value = color2;
 			table.refreshColor(colorswap1,color2);
 		}
-		
+
 		return ;
 	};
     </script>
   </body>
-</html>  
+</html>
