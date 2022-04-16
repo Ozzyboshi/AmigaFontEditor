@@ -23,13 +23,14 @@
 	<div id="content" style="padding:25px">
 		<h2>Amiga sprite editor</h2>
 		<h4>Draw your sprite on the left grid and get the binary raw data to load into the Amiga copperlist</h4>
-		<div id="fontnavigator">
-			<ul id="fontulnavigator">
+		<div id="fontnavigator" style="display:none;">
+			<ul id="fontulnavigator" style="display:none;">
 			</ul>
 		</div>
 		<div id="colorpalette">
 			<input type="file" id="fileChooser" style="display:none;">
 			<input type="file" id="fileChooserColors" style="display:none;">
+			<input id="squaresize" type="range" min="10" max="25" step="1" value="10"/><a id="squaresizelabel"></a>
 			<input id="nbitplanes" type="range" min="2" max="4" step="2"/><a id="bitplaneslabel">Bitplanes :5</a>
 			<ul id="colorslist">
 				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 16</li>
@@ -108,6 +109,18 @@
 	  {
 	  	document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
 	  	table.changeFontYRes(parseInt(this.value));
+	  }
+
+	  // Set default square size
+	  document.getElementById('squaresize').value=SQUARE_PIXELS;
+	  document.getElementById('squaresizelabel').innerHTML='Square size :'+SQUARE_PIXELS;
+
+	  // Manage slider for changing bitplane numbers
+	  document.getElementById('squaresize').addEventListener('change',handleChangeSquareSize,false);
+	  function handleChangeSquareSize(event)
+	  {
+		table.updateSquareSize(this.value*1);
+		document.getElementById('squaresizelabel').innerHTML='Square size :'+SQUARE_PIXELS;
 	  }
 
 	  // Set default bitplanes in slider
@@ -424,6 +437,7 @@
 
 		return ;
 	};
+
     </script>
   </body>
 </html>

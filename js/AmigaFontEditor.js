@@ -513,6 +513,20 @@ function createFontTable(characters,palette,resolution)
 				}
 			}
 		},
+		updateSquareSize: function (newSize)
+		{
+			SQUARE_PIXELS = newSize;
+			table.square_pixels = SQUARE_PIXELS;
+			for (var i = 0; i < table.fontArray.length; i++)
+			{
+				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
+				{
+					table.fontArray[i].square_pixels=newSize;
+					table.fontArray[i].changeCanvasXResolution(table.fontArray[i].xres);
+					table.fontArray[i].changeCanvasYResolution(table.fontArray[i].yres);
+				}
+			}
+		},
 		updatePalette: function (newPalette) {
 			this.palette=newPalette;
 			for (var i = 0; i < table.fontArray.length; i++)
@@ -764,7 +778,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 		changeCanvasXResolution : function (newXres)
 		{
 
-			this.canvas.width  = square_pixels*newXres;
+			this.canvas.width  = this.square_pixels*newXres;
 			var newSquaresObj=[];
 			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
 				for (xsquarecont=0;xsquarecont<newXres;xsquarecont++)
@@ -787,7 +801,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 		},
 		changeCanvasYResolution : function (newYres)
 		{
-			this.canvas.height  = square_pixels*newYres;
+			this.canvas.height  = this.square_pixels*newYres;
 			var newSquaresObj=[];
 			for (ysquarecont=0;ysquarecont<newYres;ysquarecont++)
 				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
