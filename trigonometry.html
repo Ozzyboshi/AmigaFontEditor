@@ -157,15 +157,16 @@
             //console.log(column);
             //console.log(getTrigCol(table,column));
             if (fraction > 0) {
-              var qnumber = qformat(parseFloat(getTrigCol(table, column)), fraction);
-              //console.log("entrooo"+qnumber);
+              var qnumber = qformat(parseFloat(getTrigCol(table, column).toFixed(fraction)), fraction);
+              console.log(index+"####"+parseFloat(getTrigCol(table, column).toFixed(fraction))+"-----"+fraction);
               asmString += virgola + "%" + qnumber;
             }
             else asmString += virgola + parseInt(getTrigCol(table, column).toString());
             virgola = ",";
           });
 
-          asmString += "   ; " + index + " deg - True value: " + table.sinorig;
+          if (fraction > 0) asmString += "   ; " + index + " deg - True SIN value: " + parseFloat(table.sinorig).toFixed(fraction);
+          else asmString += "   ; " + index + " deg - True SIN value: " + table.sinorig;
           //asmString+=parseInt(table.sin)+","+parseInt(table.cos)+","+parseInt(table.sininv)+","+parseInt(table.cosinv)+"   ; "+index+" deg - True value: "+table.sinorig;
           asmString += "\n";
           index++;
