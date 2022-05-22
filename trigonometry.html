@@ -38,9 +38,9 @@
     <div style="background-color: beige;">
       Multiplier
 
-      <input type="number" id="multiplier" name="multiplier" min="1" value="256">
+      <input type="number" id="multiplier" name="multiplier" min="1" value="1">
       Multiplier helper: <select id="multiplierhelper" size=1>
-        <option value=1>1 (2^0)</option>
+        <option value=1 SELECTED>1 (2^0)</option>
         <option value=2>2 (2^1)</option>
         <option value=4>4 (2^2)</option>
         <option value=8>8 (2^3)</option>
@@ -48,7 +48,7 @@
         <option value=32>32 (2^5)</option>
         <option value=64>64 (2^6)</option>
         <option value=128>128 (2^7)</option>
-        <option value=256 SELECTED>256 (2^8)</option>
+        <option value=256>256 (2^8)</option>
         <option value=512>512 (2^9)</option>
         <option value=1024>1024 (2^10)</option>
         <option value=2048>2048 (2^11)</option>
@@ -75,18 +75,12 @@
         <option value=14>Q2.14</option>
       </select>
 
-      &nbsp;&nbsp;Add offset: <select id=offset>
-        <option value=0>0</option>
-        <option value=1>1</option>
-        <option value=2>2</option>
-        <option value=3>3</option>
-        <option value=4>4</option>
-        <option value=5>5</option>
-        <option value=6>6</option>
-        <option value=7>7</option>
-      </select>
+      &nbsp;&nbsp;Add offset: 
+      <input type = number value = 0 id = offset>
+      
 
       <ul>
+        <li><input type=button id=copy value="Copy to clipboard"></li>
         <li><input type="button" id="resettables" value="Reset tables"></li>
         <li><textarea id=asmcode style="width:100%;height:300px;"></textarea></li>
       </ul>
@@ -94,6 +88,12 @@
 
 
     <script>
+
+    document.getElementById("copy").onclick = function()
+    {
+      document.getElementById("asmcode").select();
+      document.execCommand('copy');
+    }
 
       var tables = [];
       var columns = [];
@@ -133,6 +133,16 @@
         updateAsm();
       }
 
+      function calculateSine(degrees) {
+	      var radians = (Math.PI / 180) * degrees;
+  	    return Math.sin(radians).toFixed(32);
+      }
+
+      function calculateCosine(degrees) {
+	      var radians = (Math.PI / 180) * degrees;
+  	    return Math.cos(radians).toFixed(32);
+      }
+
       function updateAsm() {
         var e = document.getElementById("fixedpoint");
         var fraction = parseFloat(e.options[e.selectedIndex].value);
@@ -145,14 +155,20 @@
         for (i = 0; i < 360; i++) {
 
           table = {
-            'sin': Math.sin(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
-            'sinorig': Math.sin(i * Math.PI / 180),
-            'cos': Math.cos(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
+            'sin': offset + (calculateSine(i) * parseInt(document.getElementById("multiplier").value)),
+            'sinorig': calculateSine(i),
+            'cos': offset + (calculateCosine(i) * parseInt(document.getElementById("multiplier").value)),
             'cosorig': Math.cos(i * Math.PI / 180),
-            'sininv': -1 * Math.sin(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
-            'cosinv': -1 * Math.cos(i * Math.PI / 180) * parseInt(document.getElementById("multiplier").value),
+            'sininv': offset + (-1 * calculateSine(i) * parseInt(document.getElementById("multiplier").value)),
+            'cosinv': offset + (-1 *calculateCosine(i) * parseInt(document.getElementById("multiplier").value)),
             'zero': 0
           };
+          var fraction = parseFloat(e.options[e.selectedIndex].value);
+
+          table.sin = table.sin.toFixed(fraction>0?fraction:32);
+          table.sininv = table.sininv.toFixed(fraction>0?fraction:32);
+          table.cos = table.cos.toFixed(fraction>0?fraction:32);
+          table.cosinv = table.cosinv.toFixed(fraction>0?fraction:32);
 
           tables.push(table);
         }
@@ -169,11 +185,11 @@
             //console.log(column);
             //console.log(getTrigCol(table,column));
             if (fraction > 0) {
-              var qnumber = qformat(offset+parseFloat(getTrigCol(table, column).toFixed(fraction)), fraction);
+              var qnumber = qformat(parseFloat(getTrigCol(table, column)), fraction);
               //console.log(index+"####"+parseFloat(getTrigCol(table, column).toFixed(fraction))+"-----"+fraction);
               asmString += virgola + "%" + qnumber;
             }
-            else asmString += virgola + parseInt(offset+getTrigCol(table, column).toString());
+            else asmString += virgola + parseInt(getTrigCol(table, column).toString());
             virgola = ",";
           });
 
