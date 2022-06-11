@@ -54,16 +54,16 @@
 			<input id="yres" type="range" min="8" max="256" step="1"/><a id="yreslabel">Y resolution :8</a>
 			<div id="swapbuttondiv" style="background-color: antiquewhite;">
 				Color 1: <select name=swapcolor1 id=swapcolor1>
-					<option value="0">Color 0</option>
-					<option value="1" SELECTED>Color 1</option>
-					<option value="2">Color 2</option>
-					<option value="3">Color 3</option>
+					<option value="0">Color 16</option>
+					<option value="1" SELECTED>Color 17</option>
+					<option value="2">Color 18</option>
+					<option value="3">Color 19</option>
 				</select>
 				<br>Color 2: <select name=swapcolor2 id=swapcolor2>
-					<option value="0">Color 0</option>
-					<option value="1">Color 1</option>
-					<option value="2" SELECTED>Color 2</option>
-					<option value="3">Color 3</option>
+					<option value="0">Color 16</option>
+					<option value="1">Color 17</option>
+					<option value="2" SELECTED>Color 18</option>
+					<option value="3">Color 19</option>
 				</select>
 				<br><input type=button id=swapcolors value="Swap colors" /> <input type=button id=importcolors value="Import colors from copperlist fragment" onclick="document.getElementById('fileChooserColors').click();" />
 				<br>Swap palette colors also<input type="checkbox" id="swappalette" />
@@ -154,11 +154,11 @@
 			{
 	  			liColor.style = "display: show";
 				var option = document.createElement("option");
-				option.text = "Color "+i;
+				option.text = "Color "+(i+16);
 				option.value = i;
 				swap1elem.add(option);
 				var option = document.createElement("option");
-				option.text = "Color "+i;
+				option.text = "Color "+(i+16);
 				option.value = i;
 				swap2elem.add(option);
 			}
@@ -419,8 +419,8 @@
 		var color1 = document.getElementById('color'+colorswap1).value;
 		var color2 = document.getElementById('color'+colorswap2).value;
 
-		console.log(color1);
-		console.log(color2);
+		//console.log(color1);
+		//console.log(color2);
 
 		table.swapColors(colorswap1,colorswap2); // swap squares
 
