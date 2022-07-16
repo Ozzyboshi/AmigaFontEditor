@@ -1,0 +1,228 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+	<script src="js/AmigaFontEditor.js"></script>
+	<script src="js/UPNG.js"></script>
+	<script src="js/pako.js"></script>
+  </head>
+  <body>
+	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+	<div class="topnav">
+	  <a href="index.html">Fonts</a>
+	  <a href="index_sprite.html">Sprite</a>
+	  <a href="index_sprite_position.html">Sprite position</a>
+	  <a  href="register_conversion.html">Register conversion</a>
+	  <a  href="copperlist_translator.html">Copperlist translator</a>
+	  <a  href="diwstartstop.html">Diwstart/stop</a>
+	  <a  href="projection.html">Point Projection</a>
+	  <a  href="trigonometry.html">Trigonometric tables</a>
+	  <a href="raw2planar.html">Raw 2 planar viewer</a>
+      <a class="active" href="#">RGB colors</a>
+	</div>
+
+	<div id="content" style="padding:25px">
+		<h2>Rgb Color handling</h2>
+		<h4>Select a color and try to darken/lighten it according to a percentage</h4>
+		<div id="fontnavigator" style="display:none;">
+			<ul id="fontulnavigator" style="display:none;">
+			</ul>
+		</div>
+		<div id="colorpalette" style="position:fixed; left:100px; float:left; top:160px; width:435px; left:40px;">	
+			<input id="darken_factor" type="range" min="0" max="100" step="1" value=0 /><a id="darken_factor_anchor">Darken factor :0</a>
+			<br><input id="tint_factor" type="range" min="0" max="100" step="1" value=0 /><a id="tint_factor_anchor">Tint factor :0</a>
+			<ul id="colorslist">
+				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 00 <input type="button" id="rgb0" class="inpputrgb" value="RGB"></li>
+				<li idcolor="1"><input type=color id="color1" value="#ff0000">Color 01 <input type="button" id="rgb1" class="inpputrgb" value="RGB"></li>
+				<li idcolor="2"><input type=color id="color2" value="#00ff00">Color 02 <input type="button" id="rgb2" class="inpputrgb" value="RGB"></li>
+				<li idcolor="3"><input type=color id="color3" value="#0000ff">Color 03 <input type="button" id="rgb3" class="inpputrgb" value="RGB"></li>
+				<li idcolor="4"><input type=color id="color4" value="#000000">Color 04 <input type="button" id="rgb4" class="inpputrgb" value="RGB"></li>
+				<li idcolor="5"><input type=color id="color5" value="#ff00ff">Color 05 <input type="button" id="rgb5" class="inpputrgb" value="RGB"></li>
+				<li idcolor="6"><input type=color id="color6" value="#ff00ff">Color 06 <input type="button" id="rgb6" class="inpputrgb" value="RGB"></li>
+				<li idcolor="7"><input type=color id="color7" value="#ff00ff">Color 07 <input type="button" id="rgb7" class="inpputrgb" value="RGB"></li>
+				<li idcolor="8"><input type=color id="color8" value="#ff00ff">Color 08 <input type="button" id="rgb8" class="inpputrgb" value="RGB"></li>
+				<li idcolor="9"><input type=color id="color9" value="#ff00ff">Color 09 <input type="button" id="rgb9" class="inpputrgb" value="RGB"></li>
+				<li idcolor="10"><input type=color id="color10" value="#ff00ff">Color 10 <input type="button" id="rgb10" class="inpputrgb" value="RGB"></li>
+				<li idcolor="11"><input type=color id="color11" value="#ff00ff">Color 11 <input type="button" id="rgb11" class="inpputrgb" value="RGB"></li>
+				<li idcolor="12"><input type=color id="color12" value="#ff00ff">Color 12 <input type="button" id="rgb12" class="inpputrgb" value="RGB"></li>
+				<li idcolor="13"><input type=color id="color13" value="#ff00ff">Color 13 <input type="button" id="rgb13" class="inpputrgb" value="RGB"></li>
+				<li idcolor="14"><input type=color id="color14" value="#ff00ff">Color 14 <input type="button" id="rgb14" class="inpputrgb" value="RGB"></li>
+				<li idcolor="15"><input type=color id="color15" value="#ff00ff">Color 15 <input type="button" id="rgb15" class="inpputrgb" value="RGB"></li>
+                <li idcolor="16"><input type=color id="color16" value="#ff00ff">Color 16 <input type="button" id="rgb16" class="inpputrgb" value="RGB"></li>
+                <li idcolor="17"><input type=color id="color17" value="#ff00ff">Color 17 <input type="button" id="rgb17" class="inpputrgb" value="RGB"></li>
+                <li idcolor="18"><input type=color id="color18" value="#ff00ff">Color 18 <input type="button" id="rgb18" class="inpputrgb" value="RGB"></li>
+                <li idcolor="19"><input type=color id="color19" value="#ff00ff">Color 19 <input type="button" id="rgb19" class="inpputrgb" value="RGB"></li>
+                <li idcolor="20"><input type=color id="color20" value="#ff00ff">Color 20 <input type="button" id="rgb20" class="inpputrgb" value="RGB"></li>
+                <li idcolor="21"><input type=color id="color21" value="#ff00ff">Color 21 <input type="button" id="rgb21" class="inpputrgb" value="RGB"></li>
+                <li idcolor="22"><input type=color id="color22" value="#ff00ff">Color 22 <input type="button" id="rgb22" class="inpputrgb" value="RGB"></li>
+                <li idcolor="23"><input type=color id="color23" value="#ff00ff">Color 23 <input type="button" id="rgb23" class="inpputrgb" value="RGB"></li>
+                <li idcolor="24"><input type=color id="color24" value="#ff00ff">Color 24 <input type="button" id="rgb24" class="inpputrgb" value="RGB"></li>
+                <li idcolor="25"><input type=color id="color25" value="#ff00ff">Color 25 <input type="button" id="rgb25" class="inpputrgb" value="RGB"></li>
+                <li idcolor="26"><input type=color id="color26" value="#ff00ff">Color 26 <input type="button" id="rgb26" class="inpputrgb" value="RGB"></li>
+                <li idcolor="27"><input type=color id="color27" value="#ff00ff">Color 27 <input type="button" id="rgb27" class="inpputrgb" value="RGB"></li>
+                <li idcolor="28"><input type=color id="color28" value="#ff00ff">Color 28 <input type="button" id="rgb28" class="inpputrgb" value="RGB"></li>
+                <li idcolor="29"><input type=color id="color29" value="#ff00ff">Color 29 <input type="button" id="rgb29" class="inpputrgb" value="RGB"></li>
+                <li idcolor="30"><input type=color id="color30" value="#ff00ff">Color 30 <input type="button" id="rgb30" class="inpputrgb" value="RGB"></li>
+                <li idcolor="31"><input type=color id="color31" value="#ff00ff">Color 31 <input type="button" id="rgb31" class="inpputrgb" value="RGB"></li>
+
+			</ul>
+
+            
+		</div>
+        <div id="colorpalettenew" style="top:180px">	
+            <ul id="colorslistnew">
+				<li idcolor="new0"><input type=color id="newcolor0" value="#EEE8AA">Color 00</li>
+				<li idcolor="new1"><input type=color id="newcolor1" value="#ff0000">Color 01</li>
+				<li idcolor="new2"><input type=color id="newcolor2" value="#00ff00">Color 02</li>
+				<li idcolor="new3"><input type=color id="newcolor3" value="#0000ff">Color 03</li>
+				<li idcolor="new4"><input type=color id="newcolor4" value="#000000">Color 04</li>
+				<li idcolor="new5"><input type=color id="newcolor5" value="#ff00ff">Color 05</li>
+				<li idcolor="new6"><input type=color id="newcolor6" value="#ff00ff">Color 06</li>
+				<li idcolor="new7"><input type=color id="newcolor7" value="#ff00ff">Color 07</li>
+				<li idcolor="new8"><input type=color id="newcolor8" value="#ff00ff">Color 08</li>
+				<li idcolor="new9"><input type=color id="newcolor9" value="#ff00ff">Color 09</li>
+				<li idcolor="new10"><input type=color id="newcolor10" value="#ff00ff">Color 10</li>
+				<li idcolor="new11"><input type=color id="newcolor11" value="#ff00ff">Color 11</li>
+				<li idcolor="new12"><input type=color id="newcolor12" value="#ff00ff">Color 12</li>
+				<li idcolor="new13"><input type=color id="newcolor13" value="#ff00ff">Color 13</li>
+				<li idcolor="new14"><input type=color id="newcolor14" value="#ff00ff">Color 14</li>
+				<li idcolor="new15"><input type=color id="newcolor15" value="#ff00ff">Color 15</li>
+                <li idcolor="new16"><input type=color id="newcolor16" value="#ff00ff">Color 16</li>
+                <li idcolor="new17"><input type=color id="newcolor17" value="#ff00ff">Color 17</li>
+                <li idcolor="new18"><input type=color id="newcolor18" value="#ff00ff">Color 18</li>
+                <li idcolor="new19"><input type=color id="newcolor19" value="#ff00ff">Color 19</li>
+                <li idcolor="new20"><input type=color id="newcolor20" value="#ff00ff">Color 20</li>
+                <li idcolor="new21"><input type=color id="newcolor21" value="#ff00ff">Color 21</li>
+                <li idcolor="new22"><input type=color id="newcolor22" value="#ff00ff">Color 22</li>
+                <li idcolor="new23"><input type=color id="newcolor23" value="#ff00ff">Color 23</li>
+                <li idcolor="new24"><input type=color id="newcolor24" value="#ff00ff">Color 24</li>
+                <li idcolor="new25"><input type=color id="newcolor25" value="#ff00ff">Color 25</li>
+                <li idcolor="new26"><input type=color id="newcolor26" value="#ff00ff">Color 26</li>
+                <li idcolor="new27"><input type=color id="newcolor27" value="#ff00ff">Color 27</li>
+                <li idcolor="new28"><input type=color id="newcolor28" value="#ff00ff">Color 28</li>
+                <li idcolor="new29"><input type=color id="newcolor29" value="#ff00ff">Color 29</li>
+                <li idcolor="new30"><input type=color id="newcolor30" value="#ff00ff">Color 30</li>
+                <li idcolor="new31"><input type=color id="newcolor31" value="#ff00ff">Color 31</li>
+
+			</ul>
+            </div>
+		<div id=result>
+			<div id="buttondiv">				
+				<input type="button" value="Calculate" id="amigacolorscode" />
+				<input type=button id=copyresult value="Copy to Clipboard" />
+			</div>
+			<textarea id="resultpre" style="overflow-y: auto;"></textarea>
+		</div>
+	</div>
+    <script>
+
+	var elements = document.getElementsByClassName("inpputrgb");
+	for (var i = 0; i < elements.length; i++) {
+    	elements[i].addEventListener('click', inputRgb, false);
+	}
+	function inputRgb(evt) {
+		var outelement = "color"+this.id.substring(3);
+
+		var argb = prompt("Enter Amiga RGB format color :", "$0FFF");
+		if (argb[0] < '0' || argb[0] > '9')  argb = argb.substring(1);
+		if (argb.length == 4) argb = argb.substring(1);
+		if (argb.length != 3)
+		{
+			alert("Wrong format, must be amiga RGB format for example $0FFF");
+			return;
+		}
+
+		var newcolor="#"+argb[0]+argb[0]+argb[1]+argb[1]+argb[2]+argb[2];
+		document.getElementById(outelement).value = newcolor;
+	}
+
+	// Handle show amiga colors button click
+	document.querySelector("#amigacolorscode").addEventListener('click',showAmigaColors, false);
+	function showAmigaColors(evt) {
+
+		document.getElementById("resultpre").innerHTML = '';
+
+		for (var i = 0 ; i < 32; i++)
+		{
+			var color = document.getElementById("color"+i).value;
+			console.log(color);
+
+			var red = color.substring(1,3);
+			var green = color.substring(3,5);
+			var blue = color.substring(5,7);
+
+			/*console.log("red:"+red);
+			console.log("green:"+green);
+			console.log("blue:"+blue);*/
+
+			red = Number("0x"+red);
+			green = Number("0x"+green);
+			blue = Number("0x"+blue);
+
+			/*console.log("red dec:"+red);
+			console.log("green dec :"+green);
+			console.log("blue dec:"+blue);*/
+
+			var factor = parseInt(document.getElementById("darken_factor").value) / 100;
+
+			var newred = Darken(red, factor);
+			var newgreen = Darken(green, factor);
+			var newblue = Darken(blue, factor);
+
+			/*console.log("newred:"+newred);
+			console.log("newgreen:"+newgreen);
+			console.log("newblue:"+newblue);*/
+
+			var factor = parseInt(document.getElementById("tint_factor").value) / 100;
+			newred = Tint(newred, factor);
+			newgreen = Tint(newgreen, factor);
+			newblue = Tint(newblue, factor);
+			
+			/*console.log("newred:"+newred);
+			console.log("newgreen:"+newgreen);
+			console.log("newblue:"+newblue);*/
+
+			var oldcolor = '#'+red.toString(16).padStart(2,'0')+""+green.toString(16).padStart(2,'0')+""+blue.toString(16).padStart(2,'0');
+			var newcolor = '#'+newred.toString(16).padStart(2,'0')+""+newgreen.toString(16).padStart(2,'0')+""+newblue.toString(16).padStart(2,'0');
+			//console.log("Newcolor:"+newcolor);
+
+			document.getElementById("newcolor"+i).value = newcolor;
+			document.getElementById("resultpre").innerHTML +="Color"+i+"_Original: $"+oldcolor[1]+oldcolor[3]+oldcolor[5]+"\nColor"+i+"_Modified: $"+newcolor[1]+newcolor[3]+newcolor[5]+"\n";
+		}
+	}
+
+	function Darken(color,factor)
+	{
+		return parseInt( color * ( 1 - factor));
+	}
+
+	function Tint(color,factor)
+	{
+		return parseInt(color + ( 255 - color) * ( factor ));
+	}
+
+	// Manage slider for changing darken factor
+	document.getElementById('darken_factor').addEventListener('change',handleChangeDarkenFactor,false);
+	function handleChangeDarkenFactor(event)
+	{
+		document.getElementById('darken_factor_anchor').innerHTML='Darken factor :'+this.value;
+	}
+
+	// Manage slider for changing tint factor
+	document.getElementById('tint_factor').addEventListener('change',handleChangeTintFactor,false);
+	function handleChangeTintFactor(event)
+	{
+		document.getElementById('tint_factor_anchor').innerHTML='Tint factor :'+this.value;
+	}
+
+	document.querySelector("#copyresult").addEventListener('click',copyToClipboard,false);
+	function copyToClipboard()
+	{
+		var ta = document.getElementById('resultpre');
+		ta.focus();
+		ta.select();
+	}
+
+    </script>
+  </body>
+</html>
