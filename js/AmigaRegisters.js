@@ -1233,6 +1233,67 @@ Bits written with a zero are unchanged"
 });
 
 AMIGAREGISTERS.push(
+	{
+		address: "DFF09C",
+		name:	 "INTREQ",
+		description:	"This register contains interrupt request bits (or flags). These bits may be polled by the processor, and if enabled by the bits listed in the next register, they may cause processor interrupts. Both a set and clear operation are required to load arbitrary data into this register.",
+		note : "",
+		bits:[
+			{
+				name:"TBE",
+				description:"Serial port transmit buffer empty (level 1)"
+			},{
+				name:"DSKBLK",
+				description:"Disk block finished (level 1)"
+			},{
+				name:"SOFT",
+				description:"Reserved for software initiated interrupt (level 1)"
+			},{
+				name:"PORTS",
+				description:"I/O Ports and timers (level 2)"
+			},{
+				name:"COPER",
+				description:"Coprocessor (level 3)"
+			},{
+				name:"VERTB",
+				description:"Start of vertical blank (level 3)"
+			},{
+				name:"BLIT",
+				description:"Blitter has finished (level 3)"
+			},{
+				name:"AUD0",
+				description:"Audio channel 0 block finished (level 4)"
+			},{
+				name:"AUD1",
+				description:"Audio channel 1 block finished (level 4)"
+			},{
+				name:"AUD2",
+				description:"Audio channel 2 block finished (level 4)"
+			},{
+				name:"AUD3",
+				description:"Audio channel 3 block finished (level 4)"
+			},{
+				name:"RBF",
+				description:"Serial port receive buffer full (level 5)"
+			},{
+				name:"DSKSYN",
+				description:"Disk sync register (DSKSYNC) matches disk (level 5)"
+			},{
+				name:"EXTER",
+				description:"External interrupt (Level 6)"
+			},{
+				name:"INTEN",
+				description:"Master interrupt (enable only, no request)"
+			},{
+				name:"SET/CLR	",
+				description:"Set/Clear control bit. Determines if bits\n\
+	written with a 1 get set or cleared\n\
+	Bits written with a zero are unchanged"
+			}
+		]
+	});
+
+AMIGAREGISTERS.push(
 {
 	address: "DFF0E0",
 	name:	 "BPL1PTH",
