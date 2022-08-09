@@ -449,7 +449,7 @@ function createFontTable(characters,palette,resolution)
 				// For each additional bitplane
 				for (var contBitplane=1;contBitplane<nBitplanes;contBitplane++)
 				{
-					var byte=rawData[i+yres*40*contBitplane];
+					var byte=rawData[i+yres*(xres/8)*contBitplane];
 					if (byte>0)
 					{
 						//console.log(i+yres*40*contBitplane+" bitplane "+contBitplane+": byte "+i+"is "+byte);

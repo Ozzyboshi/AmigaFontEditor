@@ -26,7 +26,7 @@
 	<div id="content" style="padding:25px">
 		<h2>Raw 2 planar viewer</h2>
 		<p style="white-space: pre-line;">Upload here your raw file containing bitplanes data.
-			Each bitplane must be Lowpal Res (320X256) not interleaved.
+			Each bitplane must be not interleaved.
 			After loading you should see which pixel are turned on into the Amiga planar screen</p>
 		<input type="button" class="hideshowcontrols" value="Hide Controls">
         <input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
@@ -75,6 +75,33 @@
 			X: 0
 			Y: 0
 			</pre>
+
+			<div id="swapbuttondiv" style="background-color: antiquewhite;">
+				Color 1: <select name=swapcolor1 id=swapcolor1>
+					<option value="0">Color 0</option>
+					<option value="1" SELECTED>Color 1</option>
+					<option value="2">Color 2</option>
+					<option value="3">Color 3</option>
+					<option value="4">Color 4</option>
+					<option value="5">Color 5</option>
+					<option value="6">Color 6</option>
+					<option value="7">Color 7</option>
+				</select>
+				<br>Color 2: <select name=swapcolor2 id=swapcolor2>
+					<option value="0">Color 0</option>
+					<option value="1">Color 1</option>
+					<option value="2" SELECTED>Color 2</option>
+					<option value="3">Color 3</option>
+					<option value="4">Color 4</option>
+					<option value="5">Color 5</option>
+					<option value="6">Color 6</option>
+					<option value="7">Color 7</option>
+				</select>
+				<br><input type=button id=swapcolors value="Swap colors" />
+				<br>Swap palette colors also<input type="checkbox" id="swappalette" />
+				<input id="xres" type="range" min="0" max="320" step="8" value="320" /><a id="xreslabel">X resolution :320</a>
+				<input id="yres" type="range" min="0" max="256" step="1"value="256" /><a id="yreslabel">Y resolution :255</a>
+			</div>
 		</div>
 		<div id=result style="display:none;">
 			<textarea id="resultpre"></textarea>
@@ -99,7 +126,7 @@
 	  	else
 	  		liColor.style = "display: none";
 	  }
-	  
+
 	  // Manage palette change color
 	  var palette = new FontColorsTable(NBITPLANES);
 
@@ -197,7 +224,7 @@
 			var blob = new Blob([binaryData],
                 { type: "text/plain;charset=utf-8" });
 				const a = document.createElement('a');
-				
+
 				a.href= URL.createObjectURL(blob);
 				a.download = fileName;
 				a.click();
@@ -231,14 +258,14 @@
 		//reader.addEventListener("load", readFile, false);
 		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
 		reader.onloadend = function () {
-			table.drawRawImg(new Uint8Array(reader.result),2);
+			table.drawRawImg(new Uint8Array(reader.result),parseInt(document.getElementById("nbitplanes").value));
 			alert('File '+fileName+' loaded succesfully');
 			document.getElementById('fileChooser').value = null;
 			return ;
 		}
 	}
 
-	
+
 	document.querySelector("#copyresult").addEventListener('click',copyToClipboard,false);
 	function copyToClipboard()
 	{
@@ -247,7 +274,7 @@
 		ta.select();
 	}
 
-	
+
 	//document.querySelector(".hideshowcontrols").addEventListener('click',hideshowcontrols,false);
 	var classname = document.getElementsByClassName("hideshowcontrols");
 	for (var i = 0; i < classname.length; i++) {
@@ -275,7 +302,7 @@
 			if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
 			document.getElementById("resultpre").innerHTML += virgola+XCOORDINATES[i];
 		}
-		
+
 		document.getElementById("resultpre").innerHTML += '\nFINETABX';
 
 		document.getElementById("resultpre").innerHTML += '\n\nTABY\n\tdc.w ';
@@ -286,7 +313,7 @@
 			if (i>0 && i%10==0) { document.getElementById("resultpre").innerHTML +='\n\tdc.w '; virgola="";}
 			document.getElementById("resultpre").innerHTML += virgola+YCOORDINATES[i];
 		}
-		
+
 		document.getElementById("resultpre").innerHTML += '\nFINETABY';
 	}
 	document.getElementById("colorpalette").addEventListener('dragend',dragfunction,false);
@@ -300,18 +327,32 @@
 	function handleChangeBitplaneNumber(event)
 	{
 		palette.changeBitplanes(this.value*1);
-	  	
+
+		var swap1elem = document.getElementById("swapcolor1");
+		for(i = swap1elem.options.length - 1; i >= 0; i--) swap1elem.remove(i);
+		var swap2elem = document.getElementById("swapcolor2");
+		for(i = swap2elem.options.length - 1; i >= 0; i--) swap2elem.remove(i);
+
 	  	// Hide out of range palettes
 	  	for (i=0;i<NUMPALETTECOLORS;i++)
 	  	{
 	  		var liColor=document.querySelectorAll("#colorslist > li")[i];
 	  		if (i<Math.pow(2,this.value*1))
+			{
 	  			liColor.style = "display: show";
-	  		else
+				var option = document.createElement("option");
+				option.text = "Color "+(i+0);
+				option.value = i;
+				swap1elem.add(option);
+				var option = document.createElement("option");
+				option.text = "Color "+(i+0);
+				option.value = i;
+				swap2elem.add(option);
+			}
+			else
 	  			liColor.style = "display: none";
 	  		var colorObj=document.querySelectorAll("#colorslist > li > input[type=color]")[i];
 	  		palette.addFont24BitHexColorAtPos(colorObj.value,i);
-
 	  	}
 
 	  	//Bitplane label update
@@ -325,6 +366,48 @@
 	{
 		table.clearRawImg();
 	}
+
+	var swapcolors=document.getElementById('swapcolors');
+	swapcolors.onclick = function() {
+		var colorswap1 = document.getElementById("swapcolor1").value;
+		var colorswap2 = document.getElementById("swapcolor2").value;;
+		var color1 = document.getElementById('color'+colorswap1).value;
+		var color2 = document.getElementById('color'+colorswap2).value;
+
+		//console.log(color1);
+		//console.log(color2);
+
+		table.swapColors(colorswap1,colorswap2); // swap squares
+
+		if (document.getElementById("swappalette").checked)
+		{
+			palette.changeColor(colorswap2,color1);
+			document.getElementById('color'+colorswap2).value = color1;
+			table.refreshColor(colorswap2,color1);
+
+			palette.changeColor(colorswap1,color2);
+			document.getElementById('color'+colorswap1).value = color2;
+			table.refreshColor(colorswap1,color2);
+		}
+
+		return ;
+	};
+
+	// Handle xres change
+	document.getElementById('xres').addEventListener('change',handleChangeXres,false);
+	function handleChangeXres(event)
+	{
+		document.getElementById('xreslabel').innerHTML='X Resolution :'+this.value;
+	  	table.changeFontXRes(parseInt(this.value));
+	}
+
+	// Handle yres change
+	document.getElementById('yres').addEventListener('change',handleChangeYres,false);
+	function handleChangeYres(event)
+	{
+		document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
+	  	table.changeFontYRes(parseInt(this.value));
+	}
     </script>
   </body>
-</html>  
+</html>
