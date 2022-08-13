@@ -29,6 +29,7 @@
 			Each bitplane must be not interleaved.
 			After loading you should see which pixel are turned on into the Amiga planar screen</p>
 		<input type="button" class="hideshowcontrols" value="Hide Controls">
+		<input type="button" id="hidehex" value="Show Hex">
         <input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
 		<input type=button id=calculate value="Export to Raw" />
 		<input type=button id=calculate2 value="Export to 68k ASM" />
@@ -101,6 +102,8 @@
 				<br>Swap palette colors also<input type="checkbox" id="swappalette" />
 				<input id="xres" type="range" min="0" max="320" step="8" value="320" /><a id="xreslabel">X resolution :320</a>
 				<input id="yres" type="range" min="0" max="256" step="1"value="256" /><a id="yreslabel">Y resolution :255</a>
+				<input type=button id=showhex value="Show Hex" />
+				<br><input id="squaresize" type="range" min="10" max="25" step="1" value="5"/><a id="squaresizelabel"></a>
 			</div>
 		</div>
 		<div id=result style="display:none;">
@@ -408,6 +411,60 @@
 		document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
 	  	table.changeFontYRes(parseInt(this.value));
 	}
+
+	// Handle click on SHOWEXSTRING button
+	var showhex=document.getElementById('showhex');
+	showhex.onclick = function() {
+		var formattedHex=chunk(table.getHexDataString(palette.nBitplanes), 2).join(' ');
+		var formattedHex=chunk(formattedHex, 24).join('\n');
+		document.getElementById("resultpre").innerHTML = formattedHex;
+		document.getElementById("result").style.display="block";
+		return ;
+	};
+	function chunk(str, n) {
+		var ret = [];
+		var i;
+		var len;
+
+		for(i = 0, len = str.length; i < len; i += n) {
+		   ret.push(str.substr(i, n))
+		}
+
+		return ret
+   	};
+
+	// Set default square size
+	document.getElementById('squaresize').value=SQUARE_PIXELS;
+	document.getElementById('squaresizelabel').innerHTML='Square size :'+SQUARE_PIXELS;
+
+	// Manage slider for changing bitplane numbers
+	document.getElementById('squaresize').addEventListener('change',handleChangeSquareSize,false);
+	function handleChangeSquareSize(event)
+	{
+		table.updateSquareSize(this.value*1);
+		document.getElementById('squaresizelabel').innerHTML='Square size :'+SQUARE_PIXELS;
+	}
+
+	document.getElementById('hidehex').addEventListener('click',handleChangeHideHex,false);
+	function handleChangeHideHex(event)
+	{
+		if (document.getElementById('result').style.display=='none')
+		{
+			var formattedHex=chunk(table.getHexDataString(palette.nBitplanes), 2).join(' ');
+			var formattedHex=chunk(formattedHex, 24).join('\n');
+			document.getElementById("resultpre").innerHTML = formattedHex;
+			document.getElementById("result").style.display="block";
+			document.getElementById('result').style.display='block';
+			document.getElementById('hidehex').value="Hide hex";
+		}
+		else
+		{
+			var formattedHex=chunk(table.getHexDataString(palette.nBitplanes), 2).join(' ');
+			document.getElementById('result').style.display='none';
+			document.getElementById('hidehex').value="Show hex";
+		}
+	}
+
     </script>
   </body>
 </html>
