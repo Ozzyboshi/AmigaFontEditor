@@ -75,10 +75,6 @@
       document.execCommand('copy');
     }
 
-      var tables = [];
-      var columns = [];
-
-     
       obj = document.getElementById('generatetables');
       obj.onclick = function () {
         var e = document.getElementById("fixedpoint");
@@ -86,8 +82,8 @@
         var integerpart = e.options[e.selectedIndex].getAttribute("integerpart");
         var decimalpart = e.options[e.selectedIndex].getAttribute("decimalpart");
         var indexcounter = 0;
-        console.log(integerpart);
-        console.log(decimalpart);
+        //console.log(integerpart);
+        //console.log(decimalpart);
         var outputstring = "SQRT_TABLE:\n";
 
         var integercombinations = Math.pow(2, integerpart);
@@ -103,7 +99,7 @@
 
               var binaryconversion = translateToBinary(Math.sqrt(number),integerpart,decimalpart);
               var binaryindex = integercounter.toString(2).padStart(integerpart, '0')+decimalcounter.toString(2).padStart(decimalpart, '0')
-              outputstring += "dc.w %"+binaryconversion+" ; index = SQRT_TABLE+"+indexcounter+" ("+binaryindex+") "+number+" - sqrt: "+Math.sqrt(number);
+              outputstring += "  dc.w %"+binaryconversion+" ; index = SQRT_TABLE+"+indexcounter+" ("+binaryindex+") "+number+" - sqrt: "+Math.sqrt(number);
               outputstring+="\n";
               indexcounter += 2;
             }
@@ -148,7 +144,6 @@
         }
         return parseInt(integercounter)+tmp;
       }
-
 
     </script>
 </body>
