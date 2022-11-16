@@ -84,11 +84,11 @@
         var indexcounter = 0;
         //console.log(integerpart);
         //console.log(decimalpart);
-        var outputstring = "SQRT_TABLE:\n";
+        var outputstring = "SQRT_TABLE_"+e.options[e.selectedIndex].text.replace(/\./g, "_")+":\n";
 
         var integercombinations = Math.pow(2, integerpart);
         var decimalcombinations = Math.pow(2, decimalpart);
-        console.log(integercombinations);
+        //console.log(integercombinations);
         for (var integercounter = 0; integercounter < integercombinations; integercounter++)
         {
             outputnumber = integercounter.toString(2).padStart(integerpart, '0');
@@ -99,7 +99,7 @@
 
               var binaryconversion = translateToBinary(Math.sqrt(number),integerpart,decimalpart);
               var binaryindex = integercounter.toString(2).padStart(integerpart, '0')+decimalcounter.toString(2).padStart(decimalpart, '0')
-              outputstring += "  dc.w %"+binaryconversion+" ; index = SQRT_TABLE+"+indexcounter+" ("+binaryindex+") "+number+" - sqrt: "+Math.sqrt(number);
+              outputstring += "  dc.w %"+binaryconversion+" ; (hex value of sqrt is $"+parseInt(binaryconversion, 2).toString(16) +") index = SQRT_TABLE+"+indexcounter+" ("+binaryindex+") "+number+" - sqrt: "+Math.sqrt(number);
               outputstring+="\n";
               indexcounter += 2;
             }
