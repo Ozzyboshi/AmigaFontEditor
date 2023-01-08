@@ -38,6 +38,7 @@
 
 		<div id="colorpalette" draggable="true" >
 			<input type="file" id="fileChooser" style="display:none;">
+			<input type="file" id="fileChooserColors" style="display:none;">
 			<input id="nbitplanes" value=2 type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :2</a>
 			<ul id="colorslist">
 				<li idcolor="0"><input type=color id="color0" value="#EEE8AA">Color 00</li>
@@ -105,6 +106,7 @@
 				<input id="yres" type="range" min="0" max="256" step="1"value="256" /><a id="yreslabel">Y resolution :255</a>
 				<input type=button id=showhex value="Show Hex" />
 				<br><input id="squaresize" type="range" min="10" max="25" step="1" value="5"/><a id="squaresizelabel"></a>
+				<br><input type=button id=importcolors value="Import colors from raw file" onclick="document.getElementById('fileChooserColors').click();" />
 			</div>
 		</div>
 		<div id=result style="display:none;">
@@ -463,6 +465,59 @@
 			var formattedHex=chunk(table.getHexDataString(palette.nBitplanes), 2).join(' ');
 			document.getElementById('result').style.display='none';
 			document.getElementById('hidehex').value="Show hex";
+		}
+	}
+	document.querySelector("#fileChooserColors").addEventListener('change',filesChosenColors, false);
+	function filesChosenColors(evt){
+		var chosenFile = evt.target.files[0]; //get the first file in the FileList
+		var fileName = chosenFile.name; //the name of the file as a string
+		var fileSize = chosenFile.size; //the size of the file in bytes, as an integer
+		var fileModifiedDate = chosenFile.lastModifiedDate; //a Date object
+		//console.log(chosenFile);
+		reader = new FileReader();
+
+		reader.readAsArrayBuffer(document.querySelector("#fileChooserColors").files[0]);
+		reader.onloadend = function () {
+			var colors = new Uint8Array(reader.result);
+			var colindex=0;
+			for (var colcounter = 0; colcounter < colors.byteLength ; colcounter += 2)
+			{
+				console.log("Processing color "+colindex);
+				// get red
+				var byte = colors[colcounter];
+				byte&=0x0f;
+				var byte2=byte;
+				byte2=byte2 << 4;
+				byte = byte|byte2;
+				var red = byte;
+				console.log("Red is "+red.toString(16));
+
+				byte = colors[colcounter+1];
+				byte &= 0xf0;
+				byte2 = byte;
+				byte2 = byte2 >> 4;
+				var green = byte|byte2;
+				console.log("Green is"+green.toString(16));
+
+				byte = colors[colcounter+1];
+				byte &= 0x0f;
+				byte2 = byte;
+				byte2 = byte2 << 4;
+				var blue = byte|byte2;
+				console.log("Blue is"+blue.toString(16));
+
+				var convertedcolor="#"+red.toString(16).padStart(2, '0')+green.toString(16).padStart(2, '0')+blue.toString(16).padStart(2, '0');
+				console.log("converted color is "+convertedcolor);
+
+				document.getElementById("color"+colindex).value=convertedcolor;
+				palette.changeColor(parseInt(colindex),convertedcolor);
+				table.updateColor(parseInt(colindex),convertedcolor);
+
+				colindex++;
+			}
+			alert('File '+fileName+' loaded succesfully');
+			document.getElementById('fileChooserColors').value = null;
+			return ;
 		}
 	}
 
