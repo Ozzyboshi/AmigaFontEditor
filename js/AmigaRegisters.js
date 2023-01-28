@@ -300,6 +300,73 @@ AMIGAREGISTERS.push(
 });
 
 AMIGAREGISTERS.push(
+	{
+		address: "DFF016",
+		name:	 "POTGOR (formerly POTINP)",
+		description:	"Read only register for POT CONTROL.",
+		note: "JOY/Mouse/Paddle controller read and interpretation",
+		bits:[
+			{
+				name:"START",
+				description:"Start pots (dump capacitors, start counters)."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},
+			{
+				name:"DATLX",
+				description:"data for port 1, pin 5 (middle  mouse button )."
+			},
+			{
+				name:"OUTLX",
+				description:"Output enable for bit 8."
+			},
+			{
+				name:"DATLY",
+				description:"data for port 1, pin 9 (right  mouse button )."
+			},
+			{
+				name:"OUTLY",
+				description:"Output enable for bit 10."
+			},
+			{
+				name:"DATRX",
+				description:"data for port 2, pin 5."
+			},
+			{
+				name:"OUTRX",
+				description:"Output enable for bit 12."
+			},
+			{
+				name:"DATRY",
+				description:"data for port 2, pin 9."
+			},
+			{
+				name:"OUTRY",
+				description:"Output enable for bit 14 (1=output)."
+			}
+		]
+	});
+	
+AMIGAREGISTERS.push(
 {
 	address: "DFF018",
 	name:	 "SERDATR",
@@ -424,6 +491,73 @@ The length of the data word is set by the position of the stop bit.\n",
 		}
 	]
 });
+
+AMIGAREGISTERS.push(
+	{
+		address: "DFF034",
+		name:	 "POTGO ",
+		description:	"Write only register for POT CONTROL.",
+		note: "JOY/Mouse/Paddle controller read and interpretation",
+		bits:[
+			{
+				name:"START",
+				description:"Start pots (dump capacitors, start counters)."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},{
+				name:"X",
+				description:"chip revision identification number."
+			},
+			{
+				name:"DATLX",
+				description:"data for port 1, pin 5 (middle  mouse button )."
+			},
+			{
+				name:"OUTLX",
+				description:"Output enable for bit 8."
+			},
+			{
+				name:"DATLY",
+				description:"data for port 1, pin 9 (right  mouse button )."
+			},
+			{
+				name:"OUTLY",
+				description:"Output enable for bit 10."
+			},
+			{
+				name:"DATRX",
+				description:"data for port 2, pin 5."
+			},
+			{
+				name:"OUTRX",
+				description:"Output enable for bit 12."
+			},
+			{
+				name:"DATRY",
+				description:"data for port 2, pin 9."
+			},
+			{
+				name:"OUTRY",
+				description:"Output enable for bit 14 (1=output)."
+			}
+		]
+	});
 
 AMIGAREGISTERS.push(
 {
