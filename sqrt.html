@@ -40,21 +40,22 @@
     <div style="background-color: beige;">
      
       &nbsp;&nbsp;Fixed point format: <select id=fixedpoint>
-        <option integerpart=15 decimalpart=1 value=0>Q15.1</option>
-        <option integerpart=14 decimalpart=2 value=1>Q14.2</option>
-        <option integerpart=13 decimalpart=3 value=2>Q13.3</option>
-        <option integerpart=12 decimalpart=4 value=3>Q12.4</option>
-        <option integerpart=11 decimalpart=5 value=4>Q11.5</option>
-        <option integerpart=10 decimalpart=6 value=5>Q10.6</option>
-        <option integerpart=09 decimalpart=7 value=6>Q9.7</option>
-        <option integerpart=8 decimalpart=8 value=0>Q8.8</option>
-        <option integerpart=7 decimalpart=9 value=0>Q7.9</option>
-        <option integerpart=6 decimalpart=10 value=0>Q6.10</option>
-        <option integerpart=5 decimalpart=11 value=0>Q5.11</option>
-        <option integerpart=4 decimalpart=12 value=0>Q4.12</option>
-        <option integerpart=3 decimalpart=13 value=0>Q3.13</option>
-        <option integerpart=2 decimalpart=14 value=0>Q2.14</option>
-        <option integerpart=1 decimalpart=15 value=0>Q1.15</option>
+        <option integerpart=16 decimalpart=0 format=b value=0>Q16.0</option>
+        <option integerpart=15 decimalpart=1 format=w value=0>Q15.1</option>
+        <option integerpart=14 decimalpart=2 format=w value=1>Q14.2</option>
+        <option integerpart=13 decimalpart=3 format=w value=2>Q13.3</option>
+        <option integerpart=12 decimalpart=4 format=w value=3>Q12.4</option>
+        <option integerpart=11 decimalpart=5 format=w value=4>Q11.5</option>
+        <option integerpart=10 decimalpart=6 format=w value=5>Q10.6</option>
+        <option integerpart=09 decimalpart=7 format=w value=6>Q9.7</option>
+        <option integerpart=8 decimalpart=8 format=w value=0>Q8.8</option>
+        <option integerpart=7 decimalpart=9 format=w value=0>Q7.9</option>
+        <option integerpart=6 decimalpart=10 format=w value=0>Q6.10</option>
+        <option integerpart=5 decimalpart=11 format=w value=0>Q5.11</option>
+        <option integerpart=4 decimalpart=12 format=w value=0>Q4.12</option>
+        <option integerpart=3 decimalpart=13 format=w value=0>Q3.13</option>
+        <option integerpart=2 decimalpart=14 format=w value=0>Q2.14</option>
+        <option integerpart=1 decimalpart=15 format=w value=0>Q1.15</option>
       </select>
 
       <input type="button" id="generatetables" value="Generate">
@@ -81,6 +82,7 @@
         var value = e.value;
         var integerpart = e.options[e.selectedIndex].getAttribute("integerpart");
         var decimalpart = e.options[e.selectedIndex].getAttribute("decimalpart");
+        var dsign = e.options[e.selectedIndex].getAttribute("format");
         var indexcounter = 0;
         //console.log(integerpart);
         //console.log(decimalpart);
@@ -99,7 +101,8 @@
 
               var binaryconversion = translateToBinary(Math.sqrt(number),integerpart,decimalpart);
               var binaryindex = integercounter.toString(2).padStart(integerpart, '0')+decimalcounter.toString(2).padStart(decimalpart, '0')
-              outputstring += "  dc.w %"+binaryconversion+" ; (hex value of sqrt is $"+parseInt(binaryconversion, 2).toString(16) +") index = SQRT_TABLE+"+indexcounter+" ("+binaryindex+") "+number+" - sqrt: "+Math.sqrt(number);
+              if (dsign == "b") binaryconversion = binaryconversion.slice(-8);
+              outputstring += "  dc."+dsign+" %"+binaryconversion+" ; (hex value of sqrt is $"+parseInt(binaryconversion, 2).toString(16) +") index = SQRT_TABLE+"+indexcounter+" ("+binaryindex+") "+number+" - sqrt: "+Math.sqrt(number);
               outputstring+="\n";
               indexcounter += 2;
             }
