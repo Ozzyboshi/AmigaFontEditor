@@ -104,7 +104,8 @@
               if (dsign == "b") binaryconversion = binaryconversion.slice(-8);
               outputstring += "  dc."+dsign+" %"+binaryconversion+" ; (hex value of sqrt is $"+parseInt(binaryconversion, 2).toString(16) +") index = SQRT_TABLE+"+indexcounter+" ("+binaryindex+") "+number+" - sqrt: "+Math.sqrt(number);
               outputstring+="\n";
-              indexcounter += 2;
+              if (dsign == "b") indexcounter++;
+              else indexcounter += 2;
             }
         }
         //console.log(outputstring);
