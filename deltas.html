@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html>
+
+<style>
+  pre code {
+    background-color: #eee;
+    border: 1px solid #999;
+    display: block;
+    padding: 20px;
+  }
+</style>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+  <script src="js/AmigaFontEditor.js"></script>
+</head>
+
+<body>
+  <a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;"
+      src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
+      alt="Fork me on GitHub"
+      data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+  <div class="topnav">
+    <a href="index.html">Fonts</a>
+    <a href="index_sprite.html">Sprite</a>
+    <a href="index_sprite_position.html">Sprite position</a>
+    <a href="register_conversion.html">Register conversion</a>
+    <a href="copperlist_translator.html">Copperlist translator</a>
+    <a href="diwstartstop.html">Diwstart/stop</a>
+    <a href="projection.html">Point Projection</a>
+    <a href="trigonometry.html">Trigonometric tables</a>
+    <a href="raw2planar.html">Raw 2 planar viewer</a>
+    <a href="rgbcolors.html">RGB Colors</a>
+    <a href="sqrt.html">Square root tables</a>
+    <a class="active" href="deltas.html">Deltas table calculator</a>
+  </div>
+  <div id="content" style="padding:25px">
+    <h2>Amiga delta table calculator</h2>
+    <h4>This little tool helps you to recalculate tables according to the difference between each entry.<br>
+        This is useful to help compressors to shrink data since we assume deltas are more redundant than single entryes of the table.<br>
+        <br>
+        Fill the upper textarea with the table entries for example:
+
+        <xmp>
+            dc.b %10000000 ; X:1 Y:1 InputValue: 0.250000
+            dc.b %11001011 ; X:1 Y:3 InputValue: 0.397584
+            ...
+        </xmp>
+
+        Then press the "Generate" button.<br>
+        On the bottom textarea you will see the difference between the current entry and the previous, ready to be copied/pasted into your program.
+        <br> The following is a little m68k ASM snippet/example that can reconstruct the original table.
+        <xmp>
+            lea DATASRC,a0
+            lea DATADST,a1
+            moveq #0,d1
+            move.w #4096-1,d7
+        loop:
+            move.w (a0)+,d0
+            add.w d1,d0
+            move.w d0,(a1)+
+            move.w d0,d1
+            dbra d7,loop
+            ...
+        DATADST:
+            dcb.w 4096,0
+        DATASRC:
+            dc.w 128 ; X:1 Y:1 InputValue: 0.250000
+            ...
+        </xmp>
+    </h4>
+
+    <div style="background-color: beige;">
+
+      <input type="button" id="generatetables" value="Generate">
+      <ul>
+        <li><textarea id=asmcode style="width:100%;height:300px;"></textarea></li>
+      </ul>
+
+      <ul>
+        <li><textarea id=deltatable style="width:100%;height:300px;"></textarea></li>
+      </ul>
+
+    </div>
+
+
+    <script>
+    obj = document.getElementById('generatetables');
+    obj.onclick = function () 
+    {
+        //console.log(outputstring);
+        var inputTextarea = document.getElementById('asmcode');
+        var inputLines = inputTextarea.value.split('\n');
+        var previousNumber = 0;
+
+        var outputTextarea = document.getElementById('deltatable');
+        outputTextarea.value = "";
+
+        for(var i = 0;i < inputLines.length;i++)
+        {
+            var regex = /dc\.b\s+(.*?)(?:\s*;.*)?$/;
+            var match = inputLines[i].match(regex);
+            if (match)
+            {
+                if (translateToDelta(match[1]) != null)
+                {
+                    var numToPrint = parseInt(translateToDelta(match[1])) - previousNumber;
+                    if (outputTextarea.value == "")
+                    {
+                        outputTextarea.value = "dc.w "+numToPrint.toString();
+                    }
+                    else
+                    {
+                        outputTextarea.value += "dc.w "+numToPrint.toString();
+                    }
+                    var indexOfSemicolon = inputLines[i].indexOf(';');
+                    if (indexOfSemicolon !== -1)
+                        outputTextarea.value += " "+inputLines[i].substring(indexOfSemicolon);
+
+                    previousNumber = parseInt(translateToDelta(match[1]));
+                    outputTextarea.value += "\n";
+                }
+            }
+        }
+    }
+    function translateToDelta(input)
+    {
+        // If decimal
+        if (input[0]>='0' && input[0]<='9')
+        {
+            if (input.match(/^[0-9]+$/) == null) return null;
+            return input;
+        }
+
+        // If binary
+        else if (input[0]=='%')
+        {
+            input=input.slice(1);
+            if (input.match(/^[0-1]+$/) == null) return null;
+            return parseInt(input, 2).toString();
+        }
+
+        // If hex
+        else if (input[0]=='$')
+        {
+            input=input.slice(1);
+            if (input.match(/^[0-9a-fA-F]+$/) == null) return null;
+            return parseInt(input, 16).toString();
+        }
+
+        return null;
+    }
+    </script>
+</body>
+
+</html>
