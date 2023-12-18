@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+
+<style>
+  pre code {
+    background-color: #eee;
+    border: 1px solid #999;
+    display: block;
+    padding: 20px;
+  }
+</style>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+  <script src="js/AmigaFontEditor.js"></script>
+</head>
+
+<body>
+  <a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;"
+      src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67"
+      alt="Fork me on GitHub"
+      data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+  <div class="topnav">
+    <a href="index.html">Fonts</a>
+    <a href="index_sprite.html">Sprite</a>
+    <a href="index_sprite_position.html">Sprite position</a>
+    <a href="register_conversion.html">Register conversion</a>
+    <a href="copperlist_translator.html">Copperlist translator</a>
+    <a href="diwstartstop.html">Diwstart/stop</a>
+    <a href="projection.html">Point Projection</a>
+    <a href="trigonometry.html">Trigonometric tables</a>
+    <a href="raw2planar.html">Raw 2 planar viewer</a>
+    <a href="rgbcolors.html">RGB Colors</a>
+    <a href="sqrt.html">Square root tables</a>
+    <a href="deltas.html">Deltas table calculator</a>
+    <a class="active" href="number_interpreter.html">Number interpreter</a>
+  </div>
+  <div id="content" style="padding:25px">
+    <h2>Amiga number interpreter</h2>
+    <h4>Put a word in hex format inside the hex input area and click generate.<br>
+      The number will be interpreted in various different formats.
+    </h4>
+
+    <div style="background-color: beige;">
+
+      <ul>
+        <li>
+            Hex: <input maxlength=4 type="text" id="hexInput" name="hexInput">
+            <input type="button" id="generatefromhex" value="Generate">
+        </li>
+        <li>
+            Bin unsigned: <input maxlength=16 type="text" id="binInput" name="binInput">
+            <input disabled type="button" id="generatefrombin" value="Generate">
+        </li>
+        <li>
+            Bin signed: <input maxlength=16 type="text" id="binsignedInput" name="binsignedInput">
+            <input disabled type="button" id="generatefrombinsigned" value="Generate">
+        </li>
+        <li>
+            Decimal unsigned: <input maxlength=5 type="text" id="decunsignedInput" name="decunsignedInput">
+            <input disabled type="button" id="generatefromdecunsigned" value="Generate">
+        </li>
+        <li>
+            Decimal signed: <input maxlength=5 type="text" id="decsignedInput" name="decsignedInput">
+            <input disabled type="button" id="generatefromdecsigned" value="Generate">
+        </li>
+      </ul>
+    </div>
+
+
+    <script>
+    // hex generation
+    obj = document.getElementById('generatefromhex');
+    obj.onclick = function () 
+    {
+        hexInput = document.getElementById('hexInput');
+        const decimalNumber = Number("0x"+hexInput.value);
+        if (!isNaN(decimalNumber)) {
+            binInput = document.getElementById('binInput');
+            binInput.value=decimalNumber.toString(2).padStart(16, '0');
+            decInput = document.getElementById('decunsignedInput');
+            decInput.value=decimalNumber.toString(10);
+            if (decimalNumber>=32768)
+            {
+                const twosComplement = decimalNumber-1;
+                const a = (new Uint16Array([~twosComplement]))[0];
+                decInput = document.getElementById('decsignedInput');
+                decInput.value="-"+a.toString(10);
+                decInput = document.getElementById('binsignedInput');
+                decInput.value="-"+a.toString(2).padStart(16, '0');
+            }
+            else
+            {
+                decInput = document.getElementById('decsignedInput');
+                decInput.value="+"+decimalNumber.toString(10);
+                decInput = document.getElementById('binsignedInput');
+                decInput.value="+"+decimalNumber.toString(2).padStart(16, '0');;
+            }
+        }
+    }
+
+    
+    </script>
+</body>
+
+</html>
