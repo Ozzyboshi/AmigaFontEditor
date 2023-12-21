@@ -99,7 +99,7 @@
 
         for(var i = 0;i < inputLines.length;i++)
         {
-            var regex = /dc\.b\s+(.*?)(?:\s*;.*)?$/;
+            var regex = /dc\.[b|w|l]\s+(.*?)(?:\s*;.*)?$/;
             var match = inputLines[i].match(regex);
             if (match)
             {
