@@ -27,13 +27,18 @@
 	<div id="content" style="padding:25px">
 		<h2>Amiga sprite editor</h2>
 		<h4>Draw your sprite on the left grid and get the binary raw data to load into the Amiga copperlist</h4>
+		<input type="button" id="loadpngsprite" value="Load png sprite" onClick="document.getElementById('loadpngspritereal').click();" DISABLED>
+		<input type=file id="loadpngspritereal" style="display:none;">
+		<input type="button" class="hideshowcontrols" value="Hide Controls">
+
 		<div id="fontnavigator" style="display:none;">
 			<ul id="fontulnavigator" style="display:none;">
 			</ul>
 		</div>
-		<div id="colorpalette">
+		<div id="colorpalette" draggable=false>
 			<input type="file" id="fileChooser" style="display:none;">
 			<input type="file" id="fileChooserColors" style="display:none;">
+			<input id="numattachedsprites" type="range" min="0" max="7" step="1" value="0"/><a id="numattachedspriteslabel"></a>
 			<input id="squaresize" type="range" min="10" max="25" step="1" value="10"/><a id="squaresizelabel"></a>
 			<input id="nbitplanes" type="range" min="2" max="4" step="2"/><a id="bitplaneslabel">Bitplanes :5</a>
 			<ul id="colorslist">
@@ -88,10 +93,11 @@
 		<ul id="fonttable"></ul>
 	</div>
     <script>
-	var NBITPLANES=2; // The program starts with 2 bitplanes
-	var NUMPALETTECOLORS=16; // Amiga internal registers manage up to 16 colors for sprites
-	var SQUARE_PIXELS = 10; // Pixel needed to draw a square
-	var PIXEL_RESOLUTION=[16,16];
+	  var NBITPLANES=2; // The program starts with 2 bitplanes
+	  var NUMPALETTECOLORS=16; // Amiga internal registers manage up to 16 colors for sprites
+	  var SQUARE_PIXELS = 10; // Pixel needed to draw a square
+	  var PIXEL_RESOLUTION=[16,16];
+	  var NUMATTACHEDSPRITES = 0;
 
 	  // set default xres-yres in sliders
 	  document.getElementById('xres').value=PIXEL_RESOLUTION[0];
@@ -113,6 +119,49 @@
 	  {
 	  	document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
 	  	table.changeFontYRes(parseInt(this.value));
+	  }
+
+	  // Set default num attached sprites
+	  document.getElementById('numattachedsprites').value=NUMATTACHEDSPRITES;
+	  document.getElementById('numattachedspriteslabel').innerHTML='Attached sprites :'+NUMATTACHEDSPRITES;
+
+	  // Manage slider for changing bitplane numbers
+	  document.getElementById('numattachedsprites').addEventListener('change',handleChangeNumAttachedSprites,false);
+	  function handleChangeNumAttachedSprites(event)
+	  {
+		var ulElement = document.getElementById("fonttable");
+		if (ulElement) 
+		{
+  			while (ulElement.firstChild) 
+			{
+    			ulElement.removeChild(ulElement.firstChild);
+  			}
+		}
+		//table.updateSquareSize(this.value*1);
+		NUMATTACHEDSPRITES = parseInt(document.getElementById('numattachedsprites').value);
+
+		var charset = [];
+		for (var i = 48; i <= 48+NUMATTACHEDSPRITES; i++) charset.push(i);
+		table=createSpriteTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
+		table.createList(document.getElementById("fonttable"));
+		table.appendListToUl(document.getElementById('fontnavigator'));
+
+		// Set change palette callback to update gui if palette changes
+		table.setChangePaletteCallback(
+			function (paletteArray) {
+				for (var i=0;i<paletteArray.length;i++)
+				{
+					document.querySelectorAll("#colorslist > li > input[type=color]")[i].value=paletteArray[i];
+					palette.setBgColorIndex(0);
+					palette.setFgColorIndex(i);
+					palette.changeColor(i,paletteArray[i]);
+					table.updateColor(i,paletteArray[i]);
+				}
+			}
+		);
+		document.getElementById('numattachedspriteslabel').innerHTML='Attached sprites :'+NUMATTACHEDSPRITES;
+		document.getElementById('loadpngsprite').disabled = NUMATTACHEDSPRITES>0?false:true;
+	  	table.changeFontYRes(parseInt(document.getElementById('yres').value));
 	  }
 
 	  // Set default square size
@@ -215,12 +264,8 @@
 
 	}
 
-	//Create fonts table for characters from ascii 32 to 127
-	var charset = [];
-	for (var i = 48; i <= 48; i++) charset.push(i);
-	//var spriteTable=createSpriteTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
-	//spriteTable.createList();
-	var table=createSpriteTable(charset,palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
+	//Create fonts table for characters from ascii 32 to 12
+	var table=createSpriteTable([48],palette,{x:PIXEL_RESOLUTION[0],y: PIXEL_RESOLUTION[1]});
 	table.createList(document.getElementById("fonttable"));
 	table.appendListToUl(document.getElementById('fontnavigator'));
 
@@ -241,11 +286,24 @@
 	// Handle file export click
 	var calculate = document.getElementById('calculate');
 	calculate.onclick = function() {
-		var binaryData=table.getBinaryData(palette.nBitplanes);
-		//console.log(binaryData);
+		let arrayResult = new Uint8Array();
+
+		for (contfont = 0 ; contfont <= NUMATTACHEDSPRITES; contfont++)
+		{
+			var binaryData=table.getBinaryDataByFont(contfont,palette.nBitplanes);
+			var concatenatedArray = new Uint8Array(arrayResult.length + binaryData.length);
+			//concatenatedArray.set(binaryData, 0);
+			//concatenatedArray.set(arrayResult, binaryData.length);
+			concatenatedArray.set(arrayResult, 0);
+			concatenatedArray.set(binaryData, arrayResult.length);
+
+			arrayResult = concatenatedArray;
+
+			//console.log(binaryData);
+		}
 		var fileName = prompt("Please enter the name of your export file", "Myfonts.fnt");
 		if (fileName)
-			saveByteArray([binaryData], fileName);
+			saveByteArray([arrayResult], fileName);
 	};
 
 	var saveByteArray = (function () {
@@ -265,53 +323,69 @@
 	// Handle click on SHOWBINARYSTRING button
 	var showbin=document.getElementById('showbin');
 	showbin.onclick = function() {
-		var formattedBinary=chunk(table.getBinaryDataString(palette.nBitplanes),8).join(' ');
-		formattedBinary=chunk(formattedBinary, 72).join('\n');
-		document.getElementById("resultpre").innerHTML = formattedBinary;
+		document.getElementById("resultpre").innerHTML = "";
+		for (contfont = 0 ; contfont <= NUMATTACHEDSPRITES; contfont++)
+		{
+			var data = table.getBinaryDataStringByFont(contfont,palette.nBitplanes);
+			var formattedBinary=chunk(data,8).join(' ');
+			formattedBinary=chunk(formattedBinary, 72).join('\n');
+			if (contfont) document.getElementById("resultpre").innerHTML += "\n";
+			document.getElementById("resultpre").innerHTML += formattedBinary;
+		}
 	};
 
 	// Handle click on SHOWEXSTRING button
 	var showhex=document.getElementById('showhex');
 	showhex.onclick = function() {
-		var formattedHex=chunk(table.getHexDataString(palette.nBitplanes), 2).join(' ');
-		var formattedHex=chunk(formattedHex, 24).join('\n');
-		document.getElementById("resultpre").innerHTML = formattedHex;
+		document.getElementById("resultpre").innerHTML = "";
+		for (contfont = 0 ; contfont <= NUMATTACHEDSPRITES; contfont++)
+		{
+			var data = table.getHexDataStringByFont(contfont,palette.nBitplanes)
+			var formattedHex=chunk(data, 2).join(' ');
+			var formattedHex=chunk(formattedHex, 24).join('\n');
+			if (contfont) document.getElementById("resultpre").innerHTML += "\n";
+			document.getElementById("resultpre").innerHTML += formattedHex;
+		}
 		return ;
 	};
 
 	// Handle click on Show amiga binary code button
 	var spritebinarycode=document.getElementById('spritebinarycode');
 	spritebinarycode.onclick = function() {
-		var totalResolution=table.resolution.x*table.resolution.y*palette.nBitplanes/4;
-		totalResolution/=(palette.nBitplanes/2);
-		console.log("res = "+totalResolution);
-		var totalHexCode = table.getHexDataString(palette.nBitplanes);
-		var amigaCode="";
-		for (var contBitplanes=0;contBitplanes<palette.nBitplanes;contBitplanes+=2)
+		document.getElementById("resultpre").innerHTML = "";
+		for (contfont = 0 ; contfont <= NUMATTACHEDSPRITES; contfont++)
 		{
-			var hexCode="";
-			var vStop=table.resolution.y+48;
-			if (contBitplanes==0)
+			var totalResolution=table.resolution.x*table.resolution.y*palette.nBitplanes/4;
+			totalResolution/=(palette.nBitplanes/2);
+			console.log("res = "+totalResolution);
+			var totalHexCode = table.getHexDataStringByFont(contfont,palette.nBitplanes);
+			var amigaCode="";
+			for (var contBitplanes=0;contBitplanes<palette.nBitplanes;contBitplanes+=2)
 			{
-				amigaCode = "MYSPRITE\nVSTART	dc.b $30\nHSTART\tdc.b $90\nVSTOP\tdc.b $"+vStop.toString(16)+",$00\n";
-				hexCode=totalHexCode.slice(0,totalResolution);
+				var hexCode="";
+				var vStop=table.resolution.y+48;
+				if (contBitplanes==0)
+				{
+					amigaCode = "MYSPRITE"+contfont+"\nVSTART	dc.b $30\nHSTART\tdc.b $90\nVSTOP\tdc.b $"+vStop.toString(16)+",$00\n";
+					hexCode=totalHexCode.slice(0,totalResolution);
+				}
+				else
+				{
+					amigaCode += "MYSPRITE"+contfont+"\nVSTART	dc.b $30\nHSTART\tdc.b\t$90\nVSTOP\tdc.b\t$"+vStop.toString(16)+",%10000000\n";
+					hexCode=totalHexCode.slice(totalResolution,totalResolution*2);
+				}
+				var imgLength=hexCode.length/2;
+				var line=0;
+				for (var i=0;i<imgLength;i+=4)
+				{
+					line++;
+					amigaCode+="\tdc.w $"+hexCode[i]+hexCode[i+1]+hexCode[i+2]+hexCode[i+3]+",$"+hexCode[i+imgLength]+hexCode[i+1+imgLength]+hexCode[i+2+imgLength]+hexCode[i+3+imgLength]+" ; line "+line+"\n";
+				}
+				amigaCode+="\tdc.w 0,0\n";
 			}
-			else
-			{
-				amigaCode += "MYSPRITE\nVSTART	dc.b $30\nHSTART\tdc.b\t$90\nVSTOP\tdc.b\t$"+vStop.toString(16)+",%10000000\n";
-				hexCode=totalHexCode.slice(totalResolution,totalResolution*2);
-			}
-			var imgLength=hexCode.length/2;
-			var line=0;
-			for (var i=0;i<imgLength;i+=4)
-			{
-				line++;
-				amigaCode+="\tdc.w $"+hexCode[i]+hexCode[i+1]+hexCode[i+2]+hexCode[i+3]+",$"+hexCode[i+imgLength]+hexCode[i+1+imgLength]+hexCode[i+2+imgLength]+hexCode[i+3+imgLength]+" ; line "+line+"\n";
-			}
-			amigaCode+="\tdc.w 0,0\n";
+			console.log(amigaCode);
+			document.getElementById("resultpre").innerHTML += amigaCode;
 		}
-		console.log(amigaCode);
-		document.getElementById("resultpre").innerHTML = amigaCode;
 		return ;
 	};
 
@@ -337,12 +411,40 @@
 		reader = new FileReader();
 		//reader.addEventListener("load", readFile, false);
 		reader.readAsArrayBuffer(document.querySelector("#fileChooser").files[0]);
-		reader.onloadend = function () {
-			table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes);
-			alert('File loaded succesfully');
-			document.getElementById('fileChooser').value = null;
+		reader.onloadend = function () 
+		{
+			for (var i = 0; i<NUMATTACHEDSPRITES+1; i++)
+			{
+				var FullArray = new Uint8Array(reader.result);
+				//table.drawRawData(i,new Uint8Array(reader.result),palette.nBitplanes);
+				console.log(divideUint8Array2(FullArray, NUMATTACHEDSPRITES+1, i+1));
+				table.drawRawDataByFont(i,divideUint8Array(FullArray, NUMATTACHEDSPRITES+1, i+1), palette.nBitplanes);
+				alert('File loaded succesfully');
+				document.getElementById('fileChooser').value = null;
+			}
 			return ;
 		}
+	}
+	function divideUint8Array2(array, numberOfParts, partNumber) 
+	{
+		let splicedArray = new Uint8Array(88);
+		splicedArray.set(array.subarray(0, 88));
+		return splicedArray;
+	}
+
+
+	function divideUint8Array(array, numberOfParts, partNumber) 
+	{
+    	if (partNumber < 1 || partNumber > numberOfParts) {
+        	throw new Error("partNumber deve essere compreso tra 1 e numberOfParts");
+    	}
+
+    	const totalLength = array.length;
+    	const partLength = Math.ceil(totalLength / numberOfParts);
+    	const startIndex = (partNumber - 1) * partLength;
+    	const endIndex = Math.min(startIndex + partLength, totalLength);
+
+    	return array.subarray(startIndex, endIndex);
 	}
 
 	document.querySelector("#fileChooserColors").addEventListener('change',filesChosenColors, false);
@@ -441,6 +543,144 @@
 
 		return ;
 	};
+
+	document.getElementById("colorpalette").addEventListener('dragover',dragfunction,false);
+	function dragfunction (data)
+	{
+		console.log(data);
+		document.getElementById("colorpalette").style.left = data.screenX + 'px';
+    	document.getElementById("colorpalette").style.top = data.screenY + 'px';
+	}
+
+	var classname = document.getElementsByClassName("hideshowcontrols");
+	for (var i = 0; i < classname.length; i++) {
+    	classname[i].addEventListener('click', hideshowcontrols, false);
+	}
+	function hideshowcontrols()
+	{
+		if (this.value=="Hide Controls")
+		{
+			document.querySelector(".hideshowcontrols").value="Show Controls";
+			document.querySelector("#colorpalette").style.display = "none";
+			document.querySelector("#result").style.display = "none";
+			return;
+		}
+		document.querySelector(".hideshowcontrols").value="Hide Controls";
+		document.querySelector("#colorpalette").style.display = "block";
+		document.querySelector("#result").style.display = "block";
+	}
+
+	document.getElementById("loadpngspritereal").addEventListener('change',selectpngfunction,false);
+	function selectpngfunction()
+	{
+		var fileReader = new FileReader();
+		fileReader.onloadend = function (e) 
+		{
+			var arrayCounters = [];
+			for (var i = 0; i < NUMATTACHEDSPRITES+1; i++) 
+			{
+    			arrayCounters.push(0);
+			}
+
+			NUMATTACHEDSPRITES = parseInt(document.getElementById('numattachedsprites').value);
+			var xres = parseInt(document.getElementById('xres').value);
+			var yres = parseInt(document.getElementById('yres').value);
+    		var arrayBuffer = e.target.result;
+			//console.log(arrayBuffer);
+			var img = UPNG.decode(arrayBuffer);
+			if (img.width!=xres*(NUMATTACHEDSPRITES+1) || img.height!=yres)
+			{
+				alert('Image resolution invalid, png resolution : '+img.width+'X'+img.height+' pixels, change the png resolution or adjust settings in this page, width should be '+xres*(NUMATTACHEDSPRITES+1)+'px and height should be ' + yres+'px');
+				return ;
+			}
+			if (img.depth>palette.nBitplanes)
+			{
+				alert('Image color depth '+img.depth+' is too high, please change the png color depth or increase the bitplanes (if possible)');
+				return ;
+			}
+			//console.log(img);
+			var img2=UPNG.toRGBA8(img);
+			//console.log(img2);
+
+			var usePreviousPNGPaletteSchema=0;
+			if (PNG_MAPPING.length>0)
+			{
+				if (window.confirm("Use previous png palette schema?"))
+					usePreviousPNGPaletteSchema=1;
+				else
+					PNG_MAPPING=[];
+			}
+			var arrayPixel=[];
+			for (var i=0;i<img2.length;i+=4)
+			{
+				var idx = i/4;
+				idx = idx%(xres*(NUMATTACHEDSPRITES+1));
+				idx=Math.floor(idx/xres);
+				console.log("indice "+i + "x "+idx);
+				var squareIndex = arrayCounters[idx];
+
+				var squaresObjs = table.fontArray[idx].squaresObjs;
+				var pixel = {r:img2[i],g:img2[i+1],b:img2[i+2]};
+				var found=0;
+				for (var j=0;found==0&&j<arrayPixel.length;j++)
+				{
+					if (arrayPixel[j].r==pixel.r && arrayPixel[j].g==pixel.g && arrayPixel[j].b==pixel.b)
+					{
+						found=1;
+						if (squaresObjs[squareIndex]!=undefined)
+						{
+							squaresObjs[squareIndex].code=j;
+						}
+						squaresObjs[squareIndex].reset(palette.getBgFontColor());
+						if (j>0)
+							squaresObjs[squareIndex].storeClick(palette.getBgFontColor(),palette.getFontColorById(j));
+						arrayCounters[idx]++;
+					}
+				}
+				if (found==0) 
+				{
+					var mapping_found=0;
+					for (var cont_mapping=0;usePreviousPNGPaletteSchema==1&&cont_mapping<PNG_MAPPING.length&&mapping_found==0;cont_mapping++)
+					{
+						var pngMap=PNG_MAPPING[cont_mapping].pixel;
+						if (pngMap.r==pixel.r && pngMap.g==pixel.g && pngMap.b==pixel.b)
+						{
+							mapping_found=1;
+							var code=PNG_MAPPING[cont_mapping].code;
+							if (squaresObjs[squareIndex]!=undefined) squaresObjs[squareIndex].code=code;
+							squaresObjs[squareIndex].reset(palette.getBgFontColor());
+							if (code>0)
+								squaresObjs[squareIndex].storeClick(palette.getBgFontColor(),palette.getFontColorById(code));
+							arrayCounters[idx]++;
+						}
+					}
+					if (mapping_found==0)
+					{
+						if (squaresObjs[squareIndex]!=undefined) squaresObjs[squareIndex].code=arrayPixel.length;
+						squaresObjs[squareIndex].reset(palette.getBgFontColor());
+						if (arrayPixel.length>0)
+							squaresObjs[squareIndex].storeClick(palette.getBgFontColor(),palette.getFontColorById(arrayPixel.length));
+						PNG_MAPPING.push({'code':arrayPixel.length,'pixel':pixel});
+						arrayPixel.push(pixel);
+						arrayCounters[idx]++;
+					}
+				}
+			}
+			
+			//console.log(arrayPixel);
+			if (!window.confirm('Use new colors extracted from the png file?')) return ;
+			var arrayPixelRgb = [];
+			for (var i=0;i<arrayPixel.length;i++)
+			{
+				var rgbRes=table.fontArray[idx].rgbToHex(arrayPixel[i].r,arrayPixel[i].g,arrayPixel[i].b);
+				while (rgbRes.length < 6)  rgbRes="0"+rgbRes;
+				arrayPixelRgb.push('#'+rgbRes);
+			}
+			table.fontArray[idx].changePaletteCallback(arrayPixelRgb);
+		};
+		fileReader.readAsArrayBuffer(this.files[0]);
+		this.value=null;	
+	}
 
     </script>
   </body>

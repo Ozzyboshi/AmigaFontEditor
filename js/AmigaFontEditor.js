@@ -69,8 +69,10 @@ function createSpriteTable(characters,palette,resolution)
 		this.characters.forEach(function(element) {
 	  		var li = document.createElement("li");
 	  		li.setAttribute("id", "lifont"+element);
+			li.style.display = "inline-block";
+			li.style.margin = "0px";
 			var p = document.createElement("p");
-			var oTxt = document.createTextNode("Sprite: `"+String.fromCharCode(element)+"' Ascii code: "+element);
+			var oTxt = document.createTextNode("Sprite: "+String.fromCharCode(element));
 
 			p.appendChild(oTxt);
 	  		li.appendChild(p);
@@ -337,6 +339,54 @@ function createFontTable(characters,palette,resolution)
 			}
 			return ret;
 		},
+		getHexDataStringByFont: function (fontIndex,nBitplanes) {
+			var binaryCharacters="";
+			for (var j=0;j<nBitplanes;j++)
+				for (var i = 0; i < table.fontArray.length; i++)
+				{
+					if (i == fontIndex)
+					{
+						var canvas=this.fontArray[i].canvas;
+						binaryCharacters+=canvas.data.getBinaryDataStringForBitplane(j);
+					}
+				}
+			var s = binaryCharacters;
+			var i, k, part, accum, ret = '';
+			for (i = s.length-1; i >= 3; i -= 4) {
+				// extract out in substrings of 4 and convert to hex
+				part = s.substr(i+1-4, 4);
+				accum = 0;
+				for (k = 0; k < 4; k += 1) {
+					if (part[k] !== '0' && part[k] !== '1') {
+					    // invalid character
+					    return { valid: false };
+					}
+					// compute the length 4 substring
+					accum = accum * 2 + parseInt(part[k], 10);
+				}
+				if (accum >= 10) {
+					// 'A' to 'F'
+					ret = String.fromCharCode(accum - 10 + 'A'.charCodeAt(0)) + ret;
+				} else {
+					// '0' to '9'
+					ret = String(accum) + ret;
+				}
+			}
+			// remaining characters, i = 0, 1, or 2
+			if (i >= 0) {
+				accum = 0;
+				// convert from front
+				for (k = 0; k <= i; k += 1) {
+					if (s[k] !== '0' && s[k] !== '1') {
+					    return { valid: false };
+					}
+					accum = accum * 2 + parseInt(s[k], 10);
+				}
+				// 3 bits, value cannot exceed 2^3 - 1 = 7, just convert
+				ret = String(accum) + ret;
+			}
+			return ret;
+		},
 		getBinaryDataString: function (nBitplanes) {
 			var binaryCharacters="";
 			for (var j=0;j<nBitplanes;j++)
@@ -344,6 +394,19 @@ function createFontTable(characters,palette,resolution)
 				{
 					var canvas=this.fontArray[i].canvas;
 					binaryCharacters+=canvas.data.getBinaryDataStringForBitplane(j);
+				}
+			return binaryCharacters;
+		},
+		getBinaryDataStringByFont: function (fontIndex,nBitplanes) {
+			var binaryCharacters="";
+			for (var j=0;j<nBitplanes;j++)
+				for (var i = 0; i < table.fontArray.length; i++)
+				{
+					if (fontIndex == i)
+					{
+						var canvas=this.fontArray[i].canvas;
+						binaryCharacters+=canvas.data.getBinaryDataStringForBitplane(j);
+					}
 				}
 			return binaryCharacters;
 		},
@@ -372,6 +435,24 @@ function createFontTable(characters,palette,resolution)
 					var sampleBytes=canvas.data.getBinaryDataForBitplane(j);			
 					binaryData.set(sampleBytes,offset);
 					offset+=sampleBytes.length;
+				}
+			return binaryData;
+		},
+		getBinaryDataByFont: function (fontIndex,nBitplanes) {
+			var xres=this.resolution.x;
+			var yres=this.resolution.y;
+			var binaryData = new Uint8Array(xres*yres/8*nBitplanes);
+			var offset=0;
+			for (var j=0;j<nBitplanes;j++)
+				for (var i = 0; i < table.fontArray.length; i++)
+				{
+					if (fontIndex == i)
+					{
+						var canvas=this.fontArray[i].canvas;
+						var sampleBytes=canvas.data.getBinaryDataForBitplane(j);			
+						binaryData.set(sampleBytes,offset);
+						offset+=sampleBytes.length;
+					}
 				}
 			return binaryData;
 		},
@@ -421,6 +502,51 @@ function createFontTable(characters,palette,resolution)
 				//console.log(binaryArray);
 				this.fontArray[z].drawFontFromData(binaryArray);
 			}
+		},
+		drawRawDataByFont: function (fontIndex,rawData,nBitplanes,module=0) {
+
+			// Set resolution variables
+			var xres=this.resolution.x;
+			var yres=this.resolution.y;
+
+			// init contmodule and xContBytes for interleaved processing
+			var contModule=0;
+			var xContBytes=xres/8;
+
+			// Init resultarray
+			//for (var z = 0; z < table.fontArray.length; z++,contModule=0)
+			//{
+				var binaryArray = [nBitplanes];
+				for (var i=0;i<nBitplanes;i++)
+					binaryArray[i]=new Uint8Array(xres*yres/8);
+				//Cycle an entire font
+				for (var i=0;i<xres*yres/8;i++)
+				{
+					//console.log("Byte"+i);
+					// Cycle all the bitplanes
+					for (var j=0;j<nBitplanes;j++)
+					{
+						//console.log("Bitplane"+j);
+
+						// Enter here for interleaved fonts with 1 bitplane
+						if (nBitplanes==1 && module>0)
+						{
+							
+							var skipBytes=z*xContBytes;
+							var byte=rawData[skipBytes+contModule+(i%xContBytes)];
+							if ((i+1)%xContBytes==0)
+								contModule+=module;
+						}
+						else var byte=rawData[(xres*yres/8)+i+j*xres*yres/8];
+						//console.log(byte);
+						binaryArray[j][i]=byte;
+					}
+					//console.log(rawData[i]);
+				}
+				// Binaryarray is an array of Uint8Array, each element of the array is a bitplane representation of a font, bitplane0 is at index 0, bitplane1 is at index 1 and so on
+				//console.log(binaryArray);
+				this.fontArray[fontIndex].drawFontFromData(binaryArray);
+			//}
 		},
 		clearRawImg: function () {
 			this.fontArray[0].clearAllSquares();
