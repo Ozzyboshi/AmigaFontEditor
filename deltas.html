@@ -127,9 +127,9 @@
     function translateToDelta(input)
     {
         // If decimal
-        if (input[0]>='0' && input[0]<='9')
+        if (input[0]=='-' || (input[0]>='0' && input[0]<='9'))
         {
-            if (input.match(/^[0-9]+$/) == null) return null;
+            if (input.match(/^[0-9\-]+$/) == null) return null;
             return input;
         }
 
