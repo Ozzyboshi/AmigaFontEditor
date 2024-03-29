@@ -1,0 +1,232 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/AmigaFontEditor.css">
+	<script src="js/AmigaFontEditor.js"></script>
+
+	<style>
+        .grigio-background {
+            background-color: #f0f0f0; /* gray */
+        }
+    </style>
+
+  </head>
+  <body>
+	<a href="https://github.com/Ozzyboshi/AmigaFontEditor"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"></a>
+	<div class="topnav">
+	  <a href="index.html">Fonts</a>
+	  <a href="index_sprite.html">Sprite</a>
+	  <a href="index_sprite_position.html">Sprite position</a>
+	  <a  href="register_conversion.html">Register conversion</a>
+	  <a  href="copperlist_translator.html">Copperlist translator</a>
+	  <a  href="diwstartstop.html">Diwstart/stop</a>
+	  <a  href="projection.html">Point Projection</a>
+	  <a  href="trigonometry.html">Trigonometric tables</a>
+	  <a href="raw2planar.html">Raw 2 planar viewer</a>
+	  <a href="rgbcolors.html">RGB Colors</a>
+	  <a href="sqrt.html">Square root tables</a>
+	  <a href="deltas.html">Deltas table calculator</a>
+	  <a href="number_interpreter.html">Number interpreter</a>
+      <a class="active" href="#">Raw diff</a>
+	</div>
+
+	<div id="content" style="padding:25px;flex: 1;border: 0px ;">
+		<h2>Raw diff</h2>
+		<h4>Display difference between 2 raw files - each byte on both tables will get color from the list on the right according to how much difference between the 2 files</h4>
+		
+		
+		<div id=file1 style="width:40%;float:left">
+			<div>
+				<input type="file" id="fileChooser" style="display:none;">
+				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
+			</div>
+			<table id="table1">
+				<tr><td class="grigio-background">0</td></tr>
+			</table>
+		</div>
+        <div id=file2 style="width:40%;float:left">
+			<div>
+				<input type="file" id="fileChooser2" style="display:none;">
+				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser2').click();" />
+			</div>
+            <table id="table2">
+				<tr><td class="grigio-background">0</td></tr>
+			</table>
+		</div>
+		<div id=file3 style="width:20%;float:left">
+			<div>
+				<input type="button" value="Compare" onclick="startComparison();" />
+				<ul id="colorlist">
+					<li><input type=number min=0 max="255" value=0 size="3"><input type="color" value="#00FF00"></li>
+					<li><input type=number min=0 max="255" value=255 size="3"><input type="color" value="#FF0000"></li>
+				</ul>
+				<input type=button value="Add" onclick="AddColor();">
+			</div>
+		</div>
+	</div>
+    <script>
+	document.querySelector("#fileChooser").addEventListener('change',filesChosen1, false);
+	document.querySelector("#fileChooser2").addEventListener('change',filesChosen2, false);
+
+	function filesChosen1(evt)
+	{
+		const table = document.getElementById("table1");
+		while (table.rows.length > 0) table.deleteRow(0);
+		table.insertRow();
+		appendTableEntry("0","table1","grigio-background");
+		return filesChosen(evt,"table1","#fileChooser");
+	}
+	function filesChosen2(evt)
+	{
+		const table = document.getElementById("table2");
+		while (table.rows.length > 0) table.deleteRow(0);
+		table.insertRow();
+		appendTableEntry("0","table2","grigio-background");
+		return filesChosen(evt,"table2","#fileChooser2");
+	}
+
+	function filesChosen(evt,tableName,fileChooser){
+		var chosenFile = evt.target.files[0]; //get the first file in the FileList
+		var fileName = chosenFile.name; //the name of the file as a string
+		var fileSize = chosenFile.size; //the size of the file in bytes, as an integer
+		var fileModifiedDate = chosenFile.lastModifiedDate; //a Date object
+		//console.log(chosenFile);
+		reader = new FileReader();
+		//reader.addEventListener("load", readFile, false);
+		reader.readAsArrayBuffer(document.querySelector(fileChooser).files[0]);
+		reader.onloadend = function () {
+			var module=0;
+			var contEntry = 0;
+			//table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes,module);
+			let rawdata = new Uint8Array(reader.result);
+			console.log("Loading file with size "+rawdata.length);
+			for (let i = 0; i < rawdata.length; i++) {
+				appendTableEntry(byteToHex(rawdata[i]),tableName,"");
+				contEntry = contEntry +1;
+				if ((contEntry % 16) == 0)
+				{
+					const table = document.getElementById(tableName);
+					table.insertRow();
+					appendTableEntry(String(contEntry),tableName,"grigio-background");
+				}
+			}
+			//alert('File loaded succesfully');
+			document.getElementById('fileChooser').value = null;
+			return ;
+		}
+	}
+
+	function byteToHex(byte) {
+    	return ('0' + byte.toString(16)).slice(-2); // Aggiunge uno zero iniziale se necessario
+	}
+	function appendTableEntry(value,tableName,className)
+	{
+		const table = document.getElementById(tableName);
+		const td = document.createElement("td");
+		if (className != "") td.classList.add(className);
+		td.textContent = value;
+		const lastRow = table.rows[table.rows.length - 1];
+		lastRow.appendChild(td);
+	}
+	function startComparison()
+	{
+		const table1 = document.getElementById("table1");
+		const table2 = document.getElementById("table2");
+		const maxIterations = table1.rows.length>table2.rows.length?table1.rows.length:table2.rows.length;
+		for (let i = 0; i < maxIterations; i++) 
+
+		{
+			const row1 = table1.rows[i];
+			const row2 = table2.rows[i];
+			for (let j = 0; row1 != undefined && row2 != undefined && j < row1.cells.length; j++) 
+			{
+
+				const cell1 = row1.cells[j];
+				const cell2 = row2.cells[j];
+
+				if (cell1.classList.contains("grigio-background")) continue;
+
+				const num1 = parseInt(cell1.textContent, 16);
+				const num2 = parseInt(cell2.textContent, 16);
+
+				let diff = Math.abs(num1 - num2);
+
+				// Select the <ul> element with ID "colorlist"
+				var ulElement = document.getElementById("colorlist");
+
+    			// Get a NodeList of <li> elements inside the <ul> element
+    			var liElements = ulElement.getElementsByTagName("li");
+
+    			// Iterate over each <li> element
+    			for (var ii = 0; ii < liElements.length; ii++) 
+				{
+        			var li = liElements[ii];
+        
+        			// Get the input elements inside the <li> element
+        			var inputElements = li.getElementsByTagName("input");
+
+        			// Ensure there are at least two input elements
+        			if (inputElements.length >= 2) 
+					{
+            			var inputNumberValue = inputElements[0].value; // Value of the input type=number
+            			var inputColorValue = inputElements[1].value;  // Value of the input type=color
+            
+            			if (diff<=parseInt(inputNumberValue))
+						{
+							cell1.style.backgroundColor = String(inputColorValue);
+							cell2.style.backgroundColor = String(inputColorValue);
+							break;
+						}
+        			}
+    			}
+				
+
+				//console.log(cell1.textContent);
+				//console.log(cell2.textContent);
+			}
+		}
+		return ;
+	}
+	function AddColor()
+	{
+		var newLi = document.createElement("li");
+
+		// Create a new <input> element of type number
+		var inputNumber = document.createElement("input");
+		inputNumber.type = "number";
+		inputNumber.min = 0;
+		inputNumber.max = 255;
+		inputNumber.size = 3;
+
+		// Create a new <input> element of type color
+		var inputColor = document.createElement("input");
+		inputColor.type = "color";
+
+		var deleteButton = document.createElement("input");
+		deleteButton.type = "button";
+		deleteButton.value = "Cancella";
+
+		// Aggiungi un gestore eventi al pulsante
+		deleteButton.addEventListener("click", deleteLi);
+		
+
+		// Append inputs to the new <li>
+		newLi.appendChild(inputNumber);
+		newLi.appendChild(inputColor);
+		newLi.appendChild(deleteButton);
+
+    	// Append the new <li> to the end of the <ul>
+		var ulElement = document.getElementById("colorlist");
+    	ulElement.appendChild(newLi);
+	}
+
+	function deleteLi() 
+	{
+	    var ulParent = this.parentNode.parentNode;
+    	var liParent = this.parentNode;
+    	ulParent.removeChild(liParent);
+	}
+
+    </script>
+  </body>
+</html>
