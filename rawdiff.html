@@ -39,6 +39,8 @@
 			<div>
 				<input type="file" id="fileChooser" style="display:none;">
 				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
+				<label for="start1">Start at byte:</label>
+				<input type="number" value="0" id="start1" placeholder="Start at byte">
 			</div>
 			<table id="table1">
 				<tr><td class="grigio-background">0</td></tr>
@@ -48,6 +50,8 @@
 			<div>
 				<input type="file" id="fileChooser2" style="display:none;">
 				<input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser2').click();" />
+				<label for="start2">Start at byte:</label>
+				<input type="number" value="0" id="start2" placeholder="Start at byte">
 			</div>
             <table id="table2">
 				<tr><td class="grigio-background">0</td></tr>
@@ -74,7 +78,7 @@
 		while (table.rows.length > 0) table.deleteRow(0);
 		table.insertRow();
 		appendTableEntry("0","table1","grigio-background");
-		return filesChosen(evt,"table1","#fileChooser");
+		return filesChosen(evt,"table1","#fileChooser",parseInt(document.getElementById("start1").value));
 	}
 	function filesChosen2(evt)
 	{
@@ -82,10 +86,10 @@
 		while (table.rows.length > 0) table.deleteRow(0);
 		table.insertRow();
 		appendTableEntry("0","table2","grigio-background");
-		return filesChosen(evt,"table2","#fileChooser2");
+		return filesChosen(evt,"table2","#fileChooser2",parseInt(document.getElementById("start2").value));
 	}
 
-	function filesChosen(evt,tableName,fileChooser){
+	function filesChosen(evt,tableName,fileChooser,startByte){
 		var chosenFile = evt.target.files[0]; //get the first file in the FileList
 		var fileName = chosenFile.name; //the name of the file as a string
 		var fileSize = chosenFile.size; //the size of the file in bytes, as an integer
@@ -99,8 +103,8 @@
 			var contEntry = 0;
 			//table.drawRawData(new Uint8Array(reader.result),palette.nBitplanes,module);
 			let rawdata = new Uint8Array(reader.result);
-			console.log("Loading file with size "+rawdata.length);
-			for (let i = 0; i < rawdata.length; i++) {
+			//console.log("Loading file with size "+rawdata.length);
+			for (let i = startByte; i < rawdata.length; i++) {
 				appendTableEntry(byteToHex(rawdata[i]),tableName,"");
 				contEntry = contEntry +1;
 				if ((contEntry % 16) == 0)
