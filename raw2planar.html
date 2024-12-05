@@ -105,8 +105,8 @@
 				</select>
 				<br><input type=button id=swapcolors value="Swap colors" />
 				<br>Swap palette colors also<input type="checkbox" id="swappalette" />
-				<input id="xres" type="range" min="0" max="320" step="8" value="320" /><a id="xreslabel">X resolution :320</a>
-				<input id="yres" type="range" min="0" max="256" step="1"value="256" /><a id="yreslabel">Y resolution :255</a>
+				<input id="xres" type="range" min="0" max="320" step="8" value="320" /><a id="xreslabel">X RES :<input type=number id=xresvalue min=0 max=320 step="8" value="320" size="3"></a>
+				<input id="yres" type="range" min="0" max="256" step="1" value="256" /><a id="yreslabel">Y RES :<input type=number id=yresvalue min=0 max=256 step="1" value="256" size="3"></a>
 				<input type=button id=showhex value="Show Hex" />
 				<br><input id="squaresize" type="range" min="10" max="25" step="1" value="5"/><a id="squaresizelabel"></a>
 				<br><input type=button id=importcolors value="Import colors from raw file" onclick="document.getElementById('fileChooserColors').click();" />
@@ -403,19 +403,25 @@
 	};
 
 	// Handle xres change
+	document.getElementById('xresvalue').addEventListener('change',handleChangeXres,false);
 	document.getElementById('xres').addEventListener('change',handleChangeXres,false);
 	function handleChangeXres(event)
 	{
-		document.getElementById('xreslabel').innerHTML='X Resolution :'+this.value;
-	  	table.changeFontXRes(parseInt(this.value));
+		document.getElementById('xreslabel').innerHTML='X RES :<input type=number id=xresvalue min=0 max=320 step="8" value="' + this.value+ '" size="3">';
+		document.getElementById('xresvalue').addEventListener('change',handleChangeXres,false);
+		document.getElementById('xres').value = this.value;
+		table.changeFontXRes(parseInt(this.value));
 	}
 
 	// Handle yres change
+	document.getElementById('yresvalue').addEventListener('change',handleChangeYres,false);
 	document.getElementById('yres').addEventListener('change',handleChangeYres,false);
 	function handleChangeYres(event)
 	{
-		document.getElementById('yreslabel').innerHTML='Y Resolution :'+this.value;
-	  	table.changeFontYRes(parseInt(this.value));
+		document.getElementById('yreslabel').innerHTML='Y RES :<input type=number id=yresvalue min=0 max=255 step="1" value="' + this.value+ '" size="3">';
+		document.getElementById('yresvalue').addEventListener('change',handleChangeYres,false);
+		document.getElementById('yres').value = this.value;
+		table.changeFontYRes(parseInt(this.value));
 	}
 
 	// Handle click on SHOWEXSTRING button
