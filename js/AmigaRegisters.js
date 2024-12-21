@@ -2118,6 +2118,64 @@ AMIGAREGISTERS.push(
 
 AMIGAREGISTERS.push(
 	{
+		address: "DFF1FC",
+		name:	 "FMODE",
+		description:	"This register controls the fetch mechanism for different types of Chip RAM accesses",
+		bits:[
+			{
+				name:"BLP32",
+				description:"Bitplane 32 bit wide mode"
+			},{
+				name:"BPAGEM",
+				description:"Bitplane Page Mode (double CAS)"
+			},{
+				name:"SPR32",
+				description:"Sprite 32 bit wide mode"
+			},{
+				name:"SPAGEM",
+				description:"Sprite page mode (double CAS)"
+			},{
+				name:"SAGA Enable",
+				description:"32 bit copper, enhanced sprites (VAMPIREs V4 ONLY)"
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"Unused",
+				description:""
+			},{
+				name:"BSCAN2",
+				description:"Enables the use of 2nd P/F modulus on an alternate line basis to support bitplane scan-doubling."
+			},{
+				name:"SSCAN2",
+				description:"Global enable for sprite scan-doubling."
+			},
+		]
+	});
+
+AMIGAREGISTERS.push(
+	{
 		address: "AMMX1",
 		name:	 "ammx word 1",
 		description:	"Ammx instruction word 1",
