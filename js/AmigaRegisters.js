@@ -1696,7 +1696,7 @@ AMIGAREGISTERS.push(
 	address: "DFF104",
 	name:	 "BPLCON2",
 	description:	"Bit Plane Control Register (new control bits)",
-	note:"NOTE:  If you are in single playfieldmode and want to set sprite priority over it, use FP2 bits and not FP1, in other words use bits 3,4 and 5.",
+	note:"If you are in single playfield mode and want to set sprite priority over it, use FP2 bits and not FP1, in other words use bits 3,4 and 5.",
 	bits:[
 		{
 			name:"PF1P0",
