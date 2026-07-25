@@ -37,6 +37,7 @@
         <input type="button" value="Import From Raw File" onclick="document.getElementById('fileChooser').click();" />
 		<input type=button id=calculate value="Export to Raw" />
 		<input type=button id=calculate2 value="Export to 68k ASM" />
+		<input type=button id=calculate3 value="Export to PNG" />
 		<input type="button" value="Clear all squares" onclick="clearAllSquares();" />
 
 		<div id="colorpalette" draggable="true" >
@@ -239,6 +240,39 @@
 				a.click();
 
 				URL.revokeObjectURL(a.href);
+		}
+	};
+
+	// Handle export to PNG click - reuses UPNG.js (already loaded for the "Load png" feature)
+	// and the same table/palette data structures used by the other export buttons
+	var calculate3 = document.getElementById('calculate3');
+	calculate3.onclick = function() {
+		var fontObj = table.fontArray[0];
+		var width = fontObj.xres;
+		var height = fontObj.yres;
+		var squares = fontObj.getAllSquares();
+
+		var rgba = new Uint8Array(width * height * 4);
+		for (var i = 0; i < squares.length; i++) {
+			var sq = squares[i];
+			var color = fontObj.palette.getFontColorById(sq.code);
+			var rgb = hexToRgb(color.hex);
+			var idx = (sq.y * width + sq.x) * 4;
+			rgba[idx]   = rgb.r;
+			rgba[idx+1] = rgb.g;
+			rgba[idx+2] = rgb.b;
+			rgba[idx+3] = 255;
+		}
+
+		var pngBuffer = UPNG.encode(rgba.buffer, width, height, 0); // 0 = lossless
+		var fileName = prompt("Please enter the name of your export file", "MyImage.png");
+		if (fileName) {
+			var blob = new Blob([pngBuffer], { type: "image/png" });
+			const a = document.createElement('a');
+			a.href = URL.createObjectURL(blob);
+			a.download = fileName;
+			a.click();
+			URL.revokeObjectURL(a.href);
 		}
 	};
 
