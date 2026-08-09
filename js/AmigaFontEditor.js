@@ -168,36 +168,41 @@ function createTableObj(square_pixels,xres,yres,parentObject,palette,clickCallba
 		context = canvas.getContext('2d');
 		canvas.data = this;
 
-	  	for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
-				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
+	  	for (var ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
+				for (var xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
 				{
+					// PATCH: don't stroke a path per square here either; collect them
+					// and let redrawAll() paint the whole canvas in one batched pass.
 					var square = createSquareObj(context,xsquarecont,ysquarecont);
-					square.draw(this.palette.getBgFontColor());
 					this.squaresObjs.push(square);
 	  			}
+			this.redrawAll();
+			// PATCH: the original handler did, on EVERY mouse move:
+			//   - getImageData(x,y,1,1) -> a synchronous GPU readback on a canvas that
+			//     can be 51 Mpixel, and the result was never used;
+			//   - getOtherSquares() -> allocated an 81919-element array (~700 KB of
+			//     garbage per event, at ~100 events/s) and then walked it.
+			// Only one square can be hovered at a time, so we just remember the
+			// previous one and unfill that. O(1) per event instead of O(N).
 			canvas.addEventListener("mousemove",function(e){
 			   	var pos = this.data.findPos(this);
 				var x = e.pageX - pos.x;
 				var y = e.pageY - pos.y;
-				var coord = "x=" + x + ", y=" + y;
-				var c = this.getContext('2d');
-				var p = c.getImageData(x, y, 1, 1).data; 
-				square_selected=this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
-				if (square_selected==undefined) return; 
+				var square_selected = this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
+				if (square_selected==undefined) return;
+				if (square_selected===this.data._lastHover) return;   // same square, nothing to redraw
+				var prev = this.data._lastHover;
+				if (prev!=undefined && prev.pixel_clicked==false) prev.unfill(this.data.palette.getBgFontColor());
+				this.data._lastHover = square_selected;
 				if (mouseMoveCallback!=null) mouseMoveCallback(square_selected);
-				other_squares=this.data.getOtherSquares(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
-				// On hover i fill the square	
+				// On hover i fill the square
 				square_selected.fill(this.data.palette.getFgFontColor());
-				for (var i = 0; i < other_squares.length; i++) {
-					if (other_squares[i].pixel_clicked==false) other_squares[i].unfill(this.data.palette.getBgFontColor());
-				}
 			});
-			// On mouse exit canvas unfill all non clicked squares
+			// On mouse exit canvas unfill the hovered square (only one can be filled)
 			canvas.addEventListener("mouseout",function(e){
-				all_squares=this.data.getAllSquares();
-				for (var i = 0; i < all_squares.length; i++) {
-					if (all_squares[i].pixel_clicked==false) all_squares[i].unfill(this.data.palette.getBgFontColor());
-				}
+				var prev = this.data._lastHover;
+				if (prev!=undefined && prev.pixel_clicked==false) prev.unfill(this.data.palette.getBgFontColor());
+				this.data._lastHover = undefined;
 			});
 			canvas.addEventListener("click",function(e){
 				var pos = this.data.findPos(this);
@@ -587,70 +592,80 @@ function createFontTable(characters,palette,resolution)
 		},
 
 		// Update each square with color currently selected (second parameter is unused)
+		// PATCH: identical semantics, but the squares are only mutated here and the
+		// canvas is repainted once at the end instead of up to 2 stroked paths per square.
 		updateColor: function (index,color) {
 			for (var i = 0; i < table.fontArray.length; i++)
 			{
-				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
+				var f  = table.fontArray[i];
+				var fg = f.palette.getFgFontColor();
+				for (var j=0;j<f.squaresObjs.length;j++)
 				{
-					if (table.fontArray[i].squaresObjs[j].code==index)
+					var sq = f.squaresObjs[j];
+					if (sq.code==index)
 					{
-						//console.log(table.fontArray[i].squaresObjs[j].code);
-						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
-						if (index>0)
-							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFgFontColor());
+						if (index>0) { sq.code = fg.code; sq.pixel_clicked = true;  sq.pixel_filled = true;  }
+						else         { sq.code = 0;       sq.pixel_clicked = false; sq.pixel_filled = false; }
 					}
 				}
+				f.redrawAll();
 			}
 		},
 		// Update each square with color currently selected (second parameter is unused)
+		// PATCH: state-only mutation + a single batched repaint (see updateColor).
 		refreshColor: function (index,colorindex) {
 			for (var i = 0; i < table.fontArray.length; i++)
 			{
-				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
+				var f = table.fontArray[i];
+				for (var j=0;j<f.squaresObjs.length;j++)
 				{
-					if (table.fontArray[i].squaresObjs[j].code==index)
+					var sq = f.squaresObjs[j];
+					if (sq.code==index)
 					{
-						//console.log(table.fontArray[i].squaresObjs[j].code);
-						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
-						if (index>0)
-							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFontColorById(index));
+						if (index>0) { sq.code = f.palette.getFontColorById(index).code; sq.pixel_clicked = true;  sq.pixel_filled = true;  }
+						else         { sq.code = 0;                                      sq.pixel_clicked = false; sq.pixel_filled = false; }
 					}
 				}
+				f.redrawAll();
 			}
 		},
 		// Update each square color with color index
+		// PATCH: state-only mutation + a single batched repaint (see updateColor).
+		// Note index1/index2 arrive as strings from the <select>, so == is kept on purpose.
 		swapColors: function (index1,index2) {
 			for (var i = 0; i < table.fontArray.length; i++)
 			{
-				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
+				var f = table.fontArray[i];
+				for (var j=0;j<f.squaresObjs.length;j++)
 				{
-					if (table.fontArray[i].squaresObjs[j].code==index1)
+					var sq = f.squaresObjs[j];
+					if (sq.code==index1)
 					{
-						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
-						if (index2>0)
-							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFontColorById(index2));
+						if (index2>0) { sq.code = f.palette.getFontColorById(index2).code; sq.pixel_clicked = true;  sq.pixel_filled = true;  }
+						else          { sq.code = 0;                                       sq.pixel_clicked = false; sq.pixel_filled = false; }
 					}
-					else if (table.fontArray[i].squaresObjs[j].code==index2)
+					else if (sq.code==index2)
 					{
-						table.fontArray[i].squaresObjs[j].reset(table.fontArray[i].palette.getBgFontColor());
-						if (index1>0)
-							table.fontArray[i].squaresObjs[j].storeClick(table.fontArray[i].palette.getBgFontColor(),table.fontArray[i].palette.getFontColorById(index1));
+						if (index1>0) { sq.code = f.palette.getFontColorById(index1).code; sq.pixel_clicked = true;  sq.pixel_filled = true;  }
+						else          { sq.code = 0;                                       sq.pixel_clicked = false; sq.pixel_filled = false; }
 					}
 				}
+				f.redrawAll();
 			}
 		},
 		updateSquareSize: function (newSize)
 		{
+			// PATCH: the original code had an inner loop over squaresObjs whose body
+			// never used the loop variable, so it repeated identical work 81920 times
+			// at 320x256. Combined with the O(N^2) getSquare that was ~5e14 operations
+			// plus 163840 canvas backing-store reallocations (~205 MB each at size 25).
+			// Changing the zoom does not change the data: we only need to repaint once.
 			SQUARE_PIXELS = newSize;
 			table.square_pixels = SQUARE_PIXELS;
 			for (var i = 0; i < table.fontArray.length; i++)
 			{
-				for (var j=0;j<table.fontArray[i].squaresObjs.length;j++)
-				{
-					table.fontArray[i].square_pixels=newSize;
-					table.fontArray[i].changeCanvasXResolution(table.fontArray[i].xres);
-					table.fontArray[i].changeCanvasYResolution(table.fontArray[i].yres);
-				}
+				table.fontArray[i].square_pixels = newSize;
+				table.fontArray[i].redrawAll();
 			}
 		},
 		updatePalette: function (newPalette) {
@@ -686,6 +701,7 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 		canvas:undefined,
 		context:undefined,
 		squaresObjs:[],
+		_lastHover:undefined,   // PATCH: currently hovered square, for O(1) hover handling
 		changePaletteCallback:undefined,
 		createCanvas: function () {
 			canvas = document.createElement('canvas');
@@ -736,38 +752,35 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			pasteBtn.data = this;
 			loadPngBtnReal.data = this;
 
-			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
-				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
+			for (var ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
+				for (var xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
 				{
+					// PATCH: don't stroke a path per square here either; collect them
+					// and let redrawAll() paint the whole canvas in one batched pass.
 					var square = createSquareObj(context,xsquarecont,ysquarecont);
-					square.draw(this.palette.getBgFontColor());
 					this.squaresObjs.push(square);
 	  			}
+			this.redrawAll();
+			// PATCH: see the note in createTableObj - same fix, O(1) hover instead of
+			// a per-event GPU readback plus a full-array allocation and scan.
 			canvas.addEventListener("mousemove",function(e){
 			   	var pos = this.data.findPos(this);
 				var x = e.pageX - pos.x;
 				var y = e.pageY - pos.y;
-				var coord = "x=" + x + ", y=" + y;
-				var c = this.getContext('2d');
-				var p = c.getImageData(x, y, 1, 1).data; 
-					//var hex = "#" + ("000000" + this.data.rgbToHex(p[0], p[1], p[2])).slice(-6);
-					//console.log(coord);
-					//console.log(hex);
-				square_selected=this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
-				if (square_selected==undefined) return; 
-				other_squares=this.data.getOtherSquares(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
-				// On hover i fill the square	
+				var square_selected = this.data.getSquare(Math.floor(x/this.data.square_pixels),Math.floor(y/this.data.square_pixels));
+				if (square_selected==undefined) return;
+				if (square_selected===this.data._lastHover) return;
+				var prev = this.data._lastHover;
+				if (prev!=undefined && prev.pixel_clicked==false) prev.unfill(this.data.palette.getBgFontColor());
+				this.data._lastHover = square_selected;
+				// On hover i fill the square
 				square_selected.fill(this.data.palette.getFgFontColor());
-				for (var i = 0; i < other_squares.length; i++) {
-					if (other_squares[i].pixel_clicked==false) other_squares[i].unfill(this.data.palette.getBgFontColor());
-				}
 			});
-			// On mouse exit canvas unfill all non clicked squares
+			// On mouse exit canvas unfill the hovered square
 			canvas.addEventListener("mouseout",function(e){
-				all_squares=this.data.getAllSquares();
-				for (var i = 0; i < all_squares.length; i++) {
-					if (all_squares[i].pixel_clicked==false) all_squares[i].unfill(this.data.palette.getBgFontColor());
-				}
+				var prev = this.data._lastHover;
+				if (prev!=undefined && prev.pixel_clicked==false) prev.unfill(this.data.palette.getBgFontColor());
+				this.data._lastHover = undefined;
 			});
 			canvas.addEventListener("click",function(e){
 				var pos = this.data.findPos(this);
@@ -901,60 +914,130 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 			});
 		},
 		setChangePaletteCallback: function (callback) { this.changePaletteCallback = callback },
+		// PATCH: repaint the whole canvas in a single O(N) pass.
+		// The original code drew every square with its own beginPath/rect/fill/stroke,
+		// i.e. 81920 separate stroked paths at 320x256. Here we do:
+		//   1 fillRect for the background
+		// + 1 path per palette colour actually used (max 32)
+		// + 1 path for the entire grid (xres+yres lines)
+		// Used when only the zoom level changed, so the square objects (and their
+		// colour codes) stay exactly as they are and do not need to be recreated.
+		redrawAll : function ()
+		{
+			var sp = this.square_pixels;
+			var w  = sp*this.xres, h = sp*this.yres;
+
+			// Assigning width/height reallocates and clears the backing store,
+			// so only touch them when the size actually changed.
+			if (this.canvas.width  != w) this.canvas.width  = w;
+			if (this.canvas.height != h) this.canvas.height = h;
+
+			var ctx = this.canvas.getContext('2d');
+
+			// 1) background in one shot
+			ctx.fillStyle = this.palette.getBgFontColor().hex;
+			ctx.fillRect(0,0,w,h);
+
+			// 2) lit pixels, grouped by colour code
+			var byColor = {};
+			for (var i=0;i<this.squaresObjs.length;i++)
+			{
+				var s = this.squaresObjs[i];
+				s.pixel_filled = (s.code>0);   // keep the flag in sync with what is on screen
+				if (s.code>0)
+				{
+					if (byColor[s.code]==undefined) byColor[s.code]=[];
+					byColor[s.code].push(s);
+				}
+			}
+			for (var code in byColor)
+			{
+				var col = this.palette.getFontColorById(parseInt(code,10));
+				if (col==undefined) continue;   // palette shrank below this code
+				var list = byColor[code];
+				ctx.fillStyle = col.hex;
+				ctx.beginPath();
+				for (var k=0;k<list.length;k++)
+					ctx.rect(list[k].x*sp, list[k].y*sp, sp, sp);
+				ctx.fill();
+			}
+
+			// 3) grid as a single path; pointless (and unreadable) below ~4 px
+			if (sp >= 4)
+			{
+				ctx.beginPath();
+				for (var x=0;x<=this.xres;x++) { ctx.moveTo(x*sp+0.5,0); ctx.lineTo(x*sp+0.5,h); }
+				for (var y=0;y<=this.yres;y++) { ctx.moveTo(0,y*sp+0.5); ctx.lineTo(w,y*sp+0.5); }
+				ctx.lineWidth   = 1;
+				ctx.strokeStyle = 'black';
+				ctx.stroke();
+			}
+
+			this._lastHover = undefined;   // the hover highlight was just painted over
+			return ;
+		},
 		changeCanvasXResolution : function (newXres)
 		{
-
-			this.canvas.width  = this.square_pixels*newXres;
+			// PATCH: build the new square array without drawing anything (the old code
+			// issued one stroked path per square, 81920 of them), then repaint once
+			// with redrawAll(). getSquare() is now O(1), so this whole function is O(N).
 			var newSquaresObj=[];
-			for (ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
-				for (xsquarecont=0;xsquarecont<newXres;xsquarecont++)
+			var ctx = this.canvas.getContext('2d');
+			for (var ysquarecont=0;ysquarecont<this.yres;ysquarecont++)
+				for (var xsquarecont=0;xsquarecont<newXres;xsquarecont++)
 				{
-					var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
+					var square = createSquareObj(ctx,xsquarecont,ysquarecont);
 					var oldSquare = this.getSquare(xsquarecont,ysquarecont);
-					if (oldSquare==undefined)
-						square.draw(this.palette.getBgFontColor());
-					else
+					if (oldSquare!=undefined && oldSquare.code>0)
 					{
-						if (oldSquare.code>0) square.storeClick(this.palette.getBgFontColor(),this.palette.getFontColorById(oldSquare.code));
-						else square.draw(this.palette.getBgFontColor());
+						square.code          = oldSquare.code;
+						square.pixel_clicked = true;
+						square.pixel_filled  = true;
 					}
 					newSquaresObj.push(square);
 	  			}
-	  		
+
 	  		this.squaresObjs=newSquaresObj;
-	  		this.xres=newXres;
+	  		this.xres=newXres;          // must come AFTER the getSquare() calls above
+	  		this.redrawAll();
 	  		return ;
 		},
 		changeCanvasYResolution : function (newYres)
 		{
-			this.canvas.height  = this.square_pixels*newYres;
+			// PATCH: same treatment as changeCanvasXResolution above.
 			var newSquaresObj=[];
-			for (ysquarecont=0;ysquarecont<newYres;ysquarecont++)
-				for (xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
+			var ctx = this.canvas.getContext('2d');
+			for (var ysquarecont=0;ysquarecont<newYres;ysquarecont++)
+				for (var xsquarecont=0;xsquarecont<this.xres;xsquarecont++)
 				{
-					var square = createSquareObj(this.canvas.getContext('2d'),xsquarecont,ysquarecont);
+					var square = createSquareObj(ctx,xsquarecont,ysquarecont);
 					var oldSquare = this.getSquare(xsquarecont,ysquarecont);
-					if (oldSquare==undefined)
-						square.draw(this.palette.getBgFontColor());
-					else
+					if (oldSquare!=undefined && oldSquare.code>0)
 					{
-						if (oldSquare.code>0) square.storeClick(this.palette.getBgFontColor(),this.palette.getFontColorById(oldSquare.code));
-						else square.draw(this.palette.getBgFontColor());
+						square.code          = oldSquare.code;
+						square.pixel_clicked = true;
+						square.pixel_filled  = true;
 					}
 					newSquaresObj.push(square);
 	  			}
-	  		
+
 	  		this.squaresObjs=newSquaresObj;
-	  		this.yres=newYres;
+	  		this.yres=newYres;          // must come AFTER the getSquare() calls above
+	  		this.redrawAll();
 	  		return ;
 		},
 		// Get a square object from a coordinate pair
+		// PATCH: squaresObjs is always built in row-major order, so the index can be
+		// computed directly. This turns an O(N) scan into O(1) and, since getSquare is
+		// called once per square inside changeCanvas*Resolution, it turns those from
+		// O(N^2) (~3.3 billion ops at 320x256) into O(N).
+		// NOTE: this.xres / this.yres are only updated at the END of
+		// changeCanvasXResolution / changeCanvasYResolution, so while those functions
+		// run we are still indexing the OLD array with the OLD geometry: correct.
 		getSquare: function (x,y)
 		{
-			for (var i = 0; i < this.squaresObjs.length; i++) {
-				if (this.squaresObjs[i].x==x && this.squaresObjs[i].y==y )
-					return this.squaresObjs[i];
-			}
+			if (x<0 || y<0 || x>=this.xres || y>=this.yres) return undefined;
+			return this.squaresObjs[y*this.xres + x];
 		},
 		// Removes a square object from a coordinate pair
 		removeSquare: function (x,y)
@@ -983,10 +1066,13 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 		},
 		clearAllSquares: function ()
 		{
+			// PATCH: clear the state, then one batched repaint instead of N stroked paths.
 			for (var i = 0; i < this.squaresObjs.length; i++) {
-				//this.squaresObjs[i].unfill(this.palette.getBgFontColor());
-				this.squaresObjs[i].reset(this.palette.getBgFontColor());
+				this.squaresObjs[i].code          = 0;
+				this.squaresObjs[i].pixel_clicked = false;
+				this.squaresObjs[i].pixel_filled  = false;
 			}
+			this.redrawAll();
 		},
 		getBinaryBitplanes: function () {
 			var resultArray = [];
@@ -1201,25 +1287,38 @@ function createFontObj(square_pixels,xres,yres,parentObject,palette)
 				}
 				bitArray=bitArray.reverse();
 				//console.log("Bittarray per carattere "+n+"-"+bitArray);
+				// PATCH: only mutate the square state here. The original called
+				// reset() (and sometimes storeClick()) per pixel, i.e. up to 163840
+				// separate stroked canvas paths on every file load. One redrawAll()
+				// at the end paints the same result in a single batched pass.
 				for (var i=0;i<8;i++)
 				{
-					this.squaresObjs[squaresObjsCont].reset(this.palette.getBgFontColor());
-					if (bitArray[i]>0)
+					var sq = this.squaresObjs[squaresObjsCont];
+					if (sq!=undefined)
 					{
-						this.squaresObjs[squaresObjsCont].storeClick(this.palette.getBgFontColor(),this.palette.getFontColorById(bitArray[i]));
+						sq.code          = (bitArray[i]>0) ? bitArray[i] : 0;
+						sq.pixel_clicked = (bitArray[i]>0);
+						sq.pixel_filled  = (bitArray[i]>0);
 					}
 					squaresObjsCont++;
 				}
-				
+
 			}
+			this.redrawAll();
 			return ;
 		},
 		updatePalette: function (newPalette){
+			// PATCH: state first, single repaint after.
 			this.palette=newPalette;
+			var limit = Math.pow(2,newPalette.nBitplanes);
 			for (var i = 0; i < this.squaresObjs.length; i++) {
-				if (this.squaresObjs[i].code>=Math.pow(2,newPalette.nBitplanes))
-					this.squaresObjs[i].reset(this.palette.getBgFontColor());
+				if (this.squaresObjs[i].code>=limit) {
+					this.squaresObjs[i].code          = 0;
+					this.squaresObjs[i].pixel_clicked = false;
+					this.squaresObjs[i].pixel_filled  = false;
+				}
 			}
+			this.redrawAll();
 		}
 
 	};
