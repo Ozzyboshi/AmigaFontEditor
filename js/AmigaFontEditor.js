@@ -59,6 +59,33 @@ function FontColorsTable(nBitplanes)
 	this.changeColor = function (index,hex) {
 		this.FontColorsArray[index]=new FontColor(hex,index);
 	}
+	// Dump the palette in Amiga COLORxx register format: one big endian 16 bit
+	// word per color (0x0RGB), so 2 bytes per color, which is exactly the layout
+	// read back by the "import colors from raw file" feature.
+	// The 4 bit values are taken from the FontColor objects themselves
+	// (amigaR/amigaG/amigaB) instead of being recomputed here, so this export can
+	// never disagree with the quantization used everywhere else in the editor.
+	// By default only the colors addressable with the current number of bitplanes
+	// are written, i.e. 2^nBitplanes, which is also what the color list shows.
+	this.getAmigaColorsBinaryData = function (numColors) {
+		if (typeof numColors === 'undefined')
+			numColors = Math.pow(2,this.nBitplanes);
+		if (numColors > this.FontColorsArray.length)
+			numColors = this.FontColorsArray.length;
+
+		var binaryData = new Uint8Array(numColors*2);
+		for (var i=0;i<numColors;i++)
+		{
+			var color = this.FontColorsArray[i];
+			if (!color) continue; // never written slot, leave it as 0x0000 (black)
+			var r = parseInt(color.amigaR,16) & 0x0f;
+			var g = parseInt(color.amigaG,16) & 0x0f;
+			var b = parseInt(color.amigaB,16) & 0x0f;
+			binaryData[i*2]   = r;            // high byte : 0x0R
+			binaryData[i*2+1] = (g<<4) | b;   // low  byte : 0xGB
+		}
+		return binaryData;
+	}
 }
 
 function createSpriteTable(characters,palette,resolution)

@@ -111,6 +111,7 @@
 				<input type=button id=showhex value="Show Hex" />
 				<br><input id="squaresize" type="range" min="10" max="25" step="1" value="5"/><a id="squaresizelabel"></a>
 				<br><input type=button id=importcolors value="Import colors from raw file" onclick="document.getElementById('fileChooserColors').click();" />
+				<br><input type=button id=exportcolors value="Export colors to raw file" />
 			</div>
 		</div>
 		<div id=result style="display:none;">
@@ -274,6 +275,18 @@
 			a.click();
 			URL.revokeObjectURL(a.href);
 		}
+	};
+
+	// Handle palette export click - the mirror image of the "Import colors from
+	// raw file" button. The 0x0RGB word conversion lives in AmigaFontEditor.js
+	// (FontColorsTable.getAmigaColorsBinaryData) so that it stays in sync with
+	// the FontColor objects the rest of the editor works with.
+	var exportcolors = document.getElementById('exportcolors');
+	exportcolors.onclick = function() {
+		var binaryData = palette.getAmigaColorsBinaryData();
+		var fileName = prompt("Please enter the name of your export file", "Mycolors.raw");
+		if (fileName)
+			saveByteArray([binaryData], fileName);
 	};
 
 	var saveByteArray = (function () {
