@@ -40,7 +40,7 @@
 		<input type=button id=calculate3 value="Export to PNG" />
 		<input type="button" value="Clear all squares" onclick="clearAllSquares();" />
 
-		<div id="colorpalette" draggable="true" >
+		<div id="colorpalette" style="touch-action:none;">
 			<input type="file" id="fileChooser" style="display:none;">
 			<input type="file" id="fileChooserColors" style="display:none;">
 			<input id="nbitplanes" value=2 type="range" min="1" max="5" step="1"/><a id="bitplaneslabel">Bitplanes :2</a>
@@ -359,12 +359,122 @@
 
 		document.getElementById("resultpre").innerHTML += '\nFINETABY';
 	}
-	document.getElementById("colorpalette").addEventListener('dragend',dragfunction,false);
-	function dragfunction (data)
+	// --- Draggable color palette window -------------------------------------
+	// NOTE: the old implementation used the HTML5 'dragend' event and screenX /
+	// screenY, which are coordinates relative to the physical monitor (and, on
+	// Windows/Linux with display scaling, in device pixels). Adding a hardcoded
+	// -173 px to compensate for the browser chrome only worked on one specific
+	// setup: on other resolutions / zoom levels / multi-monitor layouts the
+	// window ended up outside the viewport and looked like it had vanished.
+	// It is now done with pointer events and clientX / clientY (viewport
+	// coordinates), and the final position is clamped so the window can never
+	// leave the visible area.
+	(function ()
 	{
-		document.getElementById("colorpalette").style.left = data.screenX + 'px';
-    	document.getElementById("colorpalette").style.top = data.screenY-173 + 'px';
-	}
+		var palette = document.getElementById("colorpalette");
+		if (!palette) return;
+
+		// Disable the native HTML5 drag&drop, we handle it ourselves.
+		palette.draggable = false;
+		palette.removeAttribute("draggable");
+
+		var dragging  = false;
+		var pointerId = null;
+		var grabX = 0, grabY = 0;   // cursor offset inside the window
+
+		// Do not start a drag when the user is interacting with a control.
+		function isInteractive (node)
+		{
+			while (node && node !== palette)
+			{
+				var tag = node.tagName;
+				if (tag === 'INPUT'  || tag === 'SELECT' || tag === 'OPTION' ||
+				    tag === 'BUTTON' || tag === 'TEXTAREA' || tag === 'LABEL' ||
+				    tag === 'A'      || tag === 'CANVAS')
+					return true;
+				node = node.parentNode;
+			}
+			return false;
+		}
+
+		function clampAndPlace (left, top)
+		{
+			var w = palette.offsetWidth;
+			var h = palette.offsetHeight;
+			var maxLeft = Math.max(0, window.innerWidth  - w);
+			var maxTop  = Math.max(0, window.innerHeight - h);
+
+			if (left < 0) left = 0; else if (left > maxLeft) left = maxLeft;
+			if (top  < 0) top  = 0; else if (top  > maxTop)  top  = maxTop;
+
+			palette.style.left = left + 'px';
+			palette.style.top  = top  + 'px';
+		}
+
+		palette.addEventListener('pointerdown', function (e)
+		{
+			if (dragging) return;
+			if (e.button !== 0 && e.pointerType === 'mouse') return;
+			if (isInteractive(e.target)) return;
+
+			var rect = palette.getBoundingClientRect();
+
+			// Switch to viewport-fixed positioning without moving the window.
+			palette.style.position = 'fixed';
+			palette.style.margin   = '0';
+			palette.style.right    = 'auto';
+			palette.style.bottom   = 'auto';
+			palette.style.left     = rect.left + 'px';
+			palette.style.top      = rect.top  + 'px';
+
+			grabX = e.clientX - rect.left;
+			grabY = e.clientY - rect.top;
+
+			dragging  = true;
+			pointerId = e.pointerId;
+			palette.style.userSelect = 'none';
+			if (palette.setPointerCapture) palette.setPointerCapture(e.pointerId);
+			e.preventDefault();
+		}, false);
+
+		palette.addEventListener('pointermove', function (e)
+		{
+			if (!dragging || e.pointerId !== pointerId) return;
+			clampAndPlace(e.clientX - grabX, e.clientY - grabY);
+			e.preventDefault();
+		}, false);
+
+		function endDrag (e)
+		{
+			if (!dragging || (e && e.pointerId !== pointerId)) return;
+			dragging = false;
+			palette.style.userSelect = '';
+			if (palette.releasePointerCapture && pointerId !== null)
+			{
+				try { palette.releasePointerCapture(pointerId); } catch (ex) {}
+			}
+			pointerId = null;
+		}
+
+		palette.addEventListener('pointerup',     endDrag, false);
+		palette.addEventListener('pointercancel', endDrag, false);
+
+		// If the browser window is resized (or the device is rotated) make sure
+		// the palette is still reachable.
+		window.addEventListener('resize', function ()
+		{
+			if (palette.style.position !== 'fixed') return;
+			clampAndPlace(parseInt(palette.style.left, 10) || 0,
+			              parseInt(palette.style.top,  10) || 0);
+		}, false);
+
+		// Emergency escape hatch: double click on the window border resets it.
+		palette.addEventListener('dblclick', function (e)
+		{
+			if (isInteractive(e.target)) return;
+			clampAndPlace(20, 20);
+		}, false);
+	})();
 	// Manage slider for changing bitplane numbers
 	document.getElementById('nbitplanes').addEventListener('change',handleChangeBitplaneNumber,false);
 	function handleChangeBitplaneNumber(event)
