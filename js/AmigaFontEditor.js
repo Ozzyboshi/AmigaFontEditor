@@ -1361,37 +1361,43 @@ function createSquareObj(context,x,y)
    		code: 0,
 		pixel_clicked: false,  // If true the pixel has been clicked
 		pixel_filled: false,   // If true the pixel has been filled (this occurs whether the pixel has been click or the mouse pointer is hovering on it
-		draw: function (color) {
-			context.beginPath();
-			context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
+		// PATCH: single painting primitive shared by draw/fill/unfill/reset.
+		// The old code did rect(x*S,y*S,S,S) + lineWidth 1 + stroke(). A 1 pixel
+		// stroke is centred ON the path, so on integer coordinates it covered half
+		// of the neighbouring cell's last pixel row/column at 50% alpha. That half
+		// was never repainted by this square (its own fill only covers its own
+		// cell), so every hover left 9 permanently darkened pixels behind, getting
+		// darker on each pass: that was the trail under the mouse pointer. The
+		// stroke was also half a pixel off the grid drawn by redrawAll(), which is
+		// why the smear looked like a blurred duplicate of the grid line.
+		// fillRect on integer coordinates is not antialiased, cannot bleed outside
+		// the cell and reproduces redrawAll()'s grid exactly (left and top edge of
+		// each cell, the right/bottom edge belongs to the next cell).
+		paintCell: function (color) {
+			var s  = SQUARE_PIXELS;
+			var px = x*s, py = y*s;
 			context.fillStyle = color.hex;
-			context.fill();
-			context.lineWidth = 1;
-			context.strokeStyle = 'black';
-			context.stroke();
+			context.fillRect(px,py,s,s);
+			if (s>=4)   // same threshold used by redrawAll(), below that there is no grid
+			{
+				context.fillStyle = 'black';
+				context.fillRect(px,py,s,1);   // top edge
+				context.fillRect(px,py,1,s);   // left edge
+			}
+		},
+		draw: function (color) {
+			this.paintCell(color);
 		},
 		//Fill the square with black
 		fill: function (color) {
 			if (this.pixel_filled==true) return ;
-			context.beginPath();
-			context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
-			context.fillStyle = color.hex;
-			context.fill();
-			context.lineWidth = 1;
-			context.strokeStyle = 'black';
-			context.stroke();
+			this.paintCell(color);
 			this.pixel_filled=true;
 		},
 		// Fill the square with white
 		unfill: function (color) {
 			if (this.pixel_filled==false) return ;
-			context.beginPath();
-			context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
-			context.fillStyle = color.hex;
-			context.fill();
-			context.lineWidth = 1;
-			context.strokeStyle = 'black';
-			context.stroke();
+			this.paintCell(color);
 			this.pixel_filled=false;
 		},
 		// Change the state of the square
@@ -1404,13 +1410,7 @@ function createSquareObj(context,x,y)
 			this.pixel_clicked=false;
 			this.pixel_filled=false;
 			this.code=0;
-			context.beginPath();
-			context.rect(x*SQUARE_PIXELS, y*SQUARE_PIXELS, SQUARE_PIXELS, SQUARE_PIXELS);
-			context.fillStyle = color.hex;
-			context.fill();
-			context.lineWidth = 1;
-			context.strokeStyle = 'black';
-			context.stroke();
+			this.paintCell(color);
 		}
 	};
 }
